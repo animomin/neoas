@@ -89,6 +89,15 @@
             where = ' AND 서비스상태 IN (' + params.status + ') ';
             where += ' AND ISNULL(처리자ID,0) = ' + params.user;
             orderby = ' 응급여부 DESC, CONVERT(char(10),접수일자,120) DESC ';
+          }else if(params.type === 'HISTORY'){
+
+            where = " And ( ";
+            where += "        접수자 like '%"+params.search+"%' Or ";
+            where += "        확인자 like '%"+params.search+"%' Or ";
+            where += "        처리자 like '%"+params.search+"%' Or ";
+            where += "        문의내용 like '%"+params.search+"%' )  ";
+            // where += "        인덱스 In ( Select AS인덱스 From N_ServiceReply Where 처리내용 like '%"+params.search+"%'))";
+
           }else{
             switch (params.status) {
               case ASSTATUS.ACCEPT:
@@ -106,23 +115,24 @@
             }
           }
 
-          if(params.search !== ""){
-            where += " And ( ";
-            where += "        기관코드 like '%"+params.search+"%' Or ";
-            where += "        기관명칭 like '%"+params.search+"%' Or ";
-            where += "        접수자 like '%"+params.search+"%' ) ";
-          }
+          if(params.type !== "HISTORY"){
+            if(params.search !== ""){
+              where += " And ( ";
+              where += "        기관코드 like '%"+params.search+"%' Or ";
+              where += "        기관명칭 like '%"+params.search+"%' Or ";
+              where += "        접수자 like '%"+params.search+"%' ) ";
+            }
 
-          var area = "";
-          if(!params.user_area) area = req.session.user.user_area;
-          else area = params.user_area;
-          if(area.trim() === '0000' || area.trim() === '0030') area = "'0000','0030'";
-          if(!params.area){
-            where += " And 지사코드 IN (" + area + ")";
+            var area = "";
+            if(!params.user_area) area = req.session.user.user_area;
+            else area = params.user_area;
+            if(area.trim() === '0000' || area.trim() === '0030') area = "'0000','0030'";
+            if(!params.area){
+              where += " And 지사코드 IN (" + area + ")";
+            }
           }
-
           query = util.format(query, where, orderby);
-          // logger.info(query);
+          logger.info(query);
           return callback2();
         },
         function(callback2){

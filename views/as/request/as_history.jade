@@ -1,2 +1,17 @@
 div.panel-body.as-body
-  h4 AS 기록 검색
+  div.ibox
+    div.ibox-title
+      h4 AS 기록 검색  
+      //- div.input-group.has-success
+        //- span.input-group-btn
+        //-   button.btn.btn-sm.btn-primary.btn-outline NeoAS
+        //-   button.btn.btn-sm.btn-primary.btn-outline 센스입원
+        //-   button.btn.btn-sm.btn-primary.btn-outline 네오소프트뱅크
+        //-   button.btn.btn-sm.btn-primary.btn-outline E-PLUS    
+      input.input-sm.form-control#search_library(
+        type='text',
+        placeholder='문의내용, 처리내용, 글쓴이 등으로 검색')      
+    div.ibox-content
+      div#library
+  
+    

@@ -42,6 +42,7 @@
             connectTime : datetime.create().format('Y-m-d H:M:S'),
             liveas : {
               member : null,
+              member_socket : null,
               command : null,
               params : null,
               oCommand : null,
@@ -63,12 +64,10 @@
       },
       remove : function(id, callback){
         var _this = this;
-        _this.slot.find(function(item, index){
-          console.log('remove!');
-          console.log(item);
-          console.log(id);
-          if(item.id === id){
-            return _this.slot.splice(index, 1);
+
+        _this.slot = _this.slot.filter(function(item, index){
+          if(item.id !== id){
+            return item;
           }
         });
 
@@ -83,11 +82,16 @@
       find : function(id, callback){
         var _this = this;
 
-        var selItem = this.slot.find(function(item, index){
-                        if(parseInt(item.id) === parseInt(id)){
-                          return {selItem : item , index : index};
-                        }
-                      });
+        // var selItem = this.slot.find(function(item, index){
+        //                 if(parseInt(item.id) === parseInt(id)){
+        //                   return {selItem : item , index : index};
+        //                 }
+        //               });
+        var selItem = this.slot.filter(function(item){
+          if(item.id === id){
+            return item;
+          }
+        });
         if(typeof callback === 'function'){
           return callback(selItem);
         }else{
@@ -107,11 +111,13 @@
           return selItem;
         }
       },
-      setLiveas : function(id, data, callback){
+      setLiveas : function(id, data, socket, callback){
         var _this = this;
         var selItem = _this.find(id);
-        if(selItem){
+        if(selItem.length > 0){
+          selItem = selItem[0];
           selItem.liveas.member = data.member;
+          selItem.liveas.member_socket = socket;
           selItem.liveas.command = data.command;
           selItem.liveas.params = data.params || null;
           selItem.liveas.oCommand = data.oCommand;
@@ -129,9 +135,11 @@
       unsetLiveas : function(id, callback){
         var _this = this;
         var selItem = _this.find(id);
-        if(selItem){
+        if(selItem.length > 0){
+          selItem = selItem[0];
           selItem.liveas = {
             member : null,
+            member_socket : null,
             command : null,
             params : null,
             oCommand : null,
@@ -228,11 +236,11 @@
         console.log(SOCKETEVENT.MEMBER.CHECKLIVEAS);
         var item = sckClients.find(data.id);
         console.log(item);
-        socket.emit(SOCKETEVENT.MEMBER.CHECKLIVEAS, {liveas : item.liveas});
+        socket.emit(SOCKETEVENT.MEMBER.CHECKLIVEAS, {liveas : item[0].liveas});
       });
       socket.on(SOCKETEVENT.MEMBER.LIVEAS, function(data){
         console.log(SOCKETEVENT.MEMBER.LIVEAS ,data);
-        sckClients.setLiveas(data.id, data.LIVEAS , function(item){
+        sckClients.setLiveas(data.id, data.LIVEAS , socket.id, function(item){
           console.log('setliveas ', item);
           if(item){
 
@@ -240,6 +248,7 @@
               socket.emit(SOCKETEVENT.MEMBER.LIVEAS, {TYPE : 'LIVEAS', STEP : 'TIMEOUT', CLIENT : item});
               item.liveas = {
                 member : null,
+                member_socket : null,
                 command : null,
                 params : null,
                 oCommand : null,
@@ -264,7 +273,7 @@
         });
       });
       socket.on(SOCKETEVENT.MEMBER.UNLIVEAS, function(data){
-          var member = sckMember.find(data.member);
+          // var member = sckMember.find(data.member);
           sckClients.unsetLiveas(data.CLIENT, function(item){
             console.log('unliveas ', item);
             //if(member) io.to(member.socket).emit(SOCKETEVENT.MEMBER.LIVEAS, {TYPE : 'LIVEAS', STEP : 'RECEIVE', RESULT : data});
@@ -274,11 +283,12 @@
       socket.on(SOCKETEVENT.CLIENT.LIVEAS, function(data){
         console.log('CLIENT LIVEAS RESULT SEND :::::::::::::::::::::::::::');
         console.log(data);
-        var member = sckMember.find(data.MEMBER);
+        // var member = sckMember.find(data.MEMBER);
         console.log('CLIENT LIVEAS RESULT SEND :::::::::::::::::::::::::::');
-        console.log(member);
-        sckClients.find(data.id, function(item){
-          if(member) io.to(member.socket).emit(SOCKETEVENT.MEMBER.LIVEAS, {TYPE : 'LIVEAS', STEP : 'RECEIVE', RESULT : data.RESULT, CLIENT : item});
+        // console.log(member);
+        sckClients.find(data.id, function(c){
+          var member = sckMember.findBySocket(c[0].liveas.member_socket);
+          io.to(member.socket).emit(SOCKETEVENT.MEMBER.LIVEAS, {TYPE : 'LIVEAS', STEP : 'RECEIVE', RESULT : data.RESULT, CLIENT : c[0]});
           sckClients.unsetLiveas(data.id);
         });
       });
@@ -298,7 +308,7 @@
         console.log('CLIENT ALIVE CHECK EVENT');
         var item = sckClients.find(data.id);
         console.log(item);
-        socket.emit(SOCKETEVENT.MEMBER.ALIVE, {TYPE : 'ALIVE', STATUS : (item ? 'LIVE' : 'DEAD'), CLIENT : item });
+        socket.emit(SOCKETEVENT.MEMBER.ALIVE, {TYPE : 'ALIVE', STATUS : (item[0] ? 'LIVE' : 'DEAD'), CLIENT : item[0] });
       });
 
       /**
@@ -307,7 +317,7 @@
       socket.on(SOCKETEVENT.STATUS, function(data){
         console.log(SOCKETEVENT.STATUS);
         sckClients.find(data.id, function(item){
-          if(item) io.to(item.socket).emit(SOCKETEVENT.STATUS, {TYPE : 'STATUS', STATUS : data.status, item : data.item});
+          if(item) io.to(item[0].socket).emit(SOCKETEVENT.STATUS, {TYPE : 'STATUS', STATUS : data.status, item : data.item});
         });
         console.log('MEMBER SEARCH');
         sckMember.slot.forEach(function(item){

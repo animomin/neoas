@@ -382,7 +382,7 @@
           cancelButtonColor: '#d33',
           confirmButtonText: '네, 변경합니다.'
         }).then(function() {
-          _me.selItem.UpdateAS(type);
+          _me.selItem.UpdateAS(_this);
           swal({
             title : '인계완료!',
             text : '나의AS 페이지에서 확인할 수 있습니다.',

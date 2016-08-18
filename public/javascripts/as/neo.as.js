@@ -3,7 +3,9 @@
   var NeoAS = function(){
 
     var _me = this;
-
+    /**
+     * 공용 옵션 변수
+     */
     _me.options = {
       workDate : null,    // 작업일자
       workState : null,   // 서비스상태,
@@ -19,6 +21,9 @@
         return;
       }
     };
+    /**
+     * 에디터 설정
+     */
     _me.editor = {
       toolbar : [
           ['mybutton', ['capture']],
@@ -117,7 +122,9 @@
         }
       }
     };
-
+    /**
+     * AS 접수리스트
+     */
     _me.listData = {
       data : {},          // as요청, 마이페이지용 데이터
       search : null,    // 검색어
@@ -362,21 +369,26 @@
         var selItem = null;
         $.each(_this.data, function(index, arr){
           console.log(index, arr);
-          selItem = arr.find(function(item){
-            return parseInt(item.인덱스) === parseInt(id);
-          });
+          if(arr && arr.length){
+            selItem = arr.find(function(item){
+              return parseInt(item.인덱스) === parseInt(id);
+            });
+          }
 
           if(selItem) return false;
         });
         return selItem;
       }
     };
-
+    /**
+     * 선택한 AS 정보
+     */
     _me.selItem = {
       $elem : null,
       data : null,
       id : null,    // 배열의 인덱스 번호
       socket : false,
+      imgStack : {},
       init : function(){
         this.$elem = null;
         this.data = null;
@@ -507,7 +519,7 @@
             cData.인계자지사 = neo.user.user_area;
             cData.인계자연락처 = neo.user.info_hp || neo.user.info_tel;
             cData.인계일자 = (new Date()).GetToday('YYYY-MM-DD HH:MM:SS');
-            cData.문의내용 = _me.elem.$edit_q.summernote('code');
+            cData.문의내용 = _me.elem.GetComment();//_me.elem.$edit_q.summernote('code');
             break;
           case ASSTATUS.DONE:
             if(cData.확인자ID === 0){
@@ -577,6 +589,132 @@
       }
     };
 
+    _me.library = {
+      $list : null,
+      $item : null,
+      search : null,
+      init : function(){
+        var _this = this;
+        _this.search = "";
+        _this.$list = _me.elem.$library || $('div#library');
+        neoAJAX.GetTemplate('as-takeover-takeover_item' , function(view){
+          _this.$item = $(view);
+        });
+        return;
+      },
+      Load : function(){
+        var _this = _me.library;
+
+        if(_this.search + "" === ""){
+          var $input = _me.elem.$search_library || $('input#search_library');
+          $input.addClass('animated tada').popover({
+            content: "<span class='font-bold text-danger'>검색어를 입력해주세요.</span>",
+            placement: "bottom",
+            html : true,
+          }).popover('show').on('shown.bs.popover',function(){
+            setTimeout(function(){
+              $input.removeClass('animated tada').popover('hide');
+            }, 2000);
+          });
+
+          return false;
+        }
+
+        var options = {
+          target_list : _this.$list,
+          beforeSend : _beforeSend,
+          url : 'clients/list',
+          data : {
+            type : 'HISTORY',
+            search : _this.search
+          },
+          dataType : 'json',
+          async : true,
+          method : 'GET',
+          success : _beforeLoaded,
+          callback : _afterLoaded
+        };
+        neoAJAX.as.list(options);
+
+        function _beforeSend(opts){
+          opts.target_list.empty();
+          opts.target_list.append(neoAJAX.GetSpinners('fadingCircles'));
+        }
+
+        function _beforeLoaded(opts, data){
+          // console.log(data);
+          if(data.err && data.err !== 'NODATA'){
+            neoNotify.Show({
+              title : 'AS 기록 검색',
+              text : data.err
+            });
+            return false;
+          }
+
+          if(data.err === 'NODATA'){
+            neoNotify.Show({
+              title : 'AS 기록 검색',
+              text : '검색결과가 없습니다.'
+            });
+            return false;
+          }
+
+          data.data.forEach(function(item, index){
+
+            var newItem = _this._SetNewItem(opts.target_list, item, index);
+          });
+          return opts.target_list.find('div.spiner-example').removeClass('fadeInDown').addClass('fadeOutUp');
+        }
+
+        function _afterLoaded(opts){
+          opts.target_list.find('div.spiner-example').remove();
+        }
+      },
+      _SetNewItem : function(obj, item, index){
+        var _this = _me.library;
+        var $item = _this.$item.clone();
+
+        $item.addClass('animated fadeInUp');
+        $item.attr({'data-id' : index, 'data-index' : item.인덱스, 'data-animated' : 'fadeInUp', 'data-emergency' : item.응급여부});
+        $item.find('button[data-name="인계접수"]').remove();
+        $item.find('a[data-name="인계자"]').text(item.인계자);
+        $item.find('small[data-name="인계일자"]').text(item.인계일자);
+        $item.find('h5[data-name="기관명칭"]').text(item.기관명칭 + ' (' + item.기관코드 + ')');
+        $item.find('div[data-name="문의내용"]').html(item.문의내용);
+
+        var $updateBadge = $item.find('span[data-name="업데이트"]');
+            $updateBadge.empty();
+        if(item.응급여부 === 1){
+          $updateBadge.append('<span class="badge badge-danger update-badge update-danger ">응급</span>');
+          $item.addClass('takeover-items-danger');
+        }
+
+        var badgename, typename;
+        switch (parseInt(item.서비스타입)) {
+          case 0:
+            badgename = 'badge-done'; typename='선택없음';
+            break;
+          case 1:
+            badgename = 'badge-warning'; typename='장애';
+            break;
+          case 2:
+            badgename = 'badge-primary'; typename='사용법';
+            break;
+          case 3:
+            badgename = 'badge-info'; typename='개선';
+            break;
+          case 4:
+            badgename = 'badge-echart'; typename='기타';
+            break;
+        }
+        $item.find('span.badge[data-name="서비스타입"]')
+            .text(typename)
+            .addClass(badgename);
+
+        obj.append($item);
+        return $item;
+      }
+    };
     /**
      * SET TEMPLATE OR GET ELEMENT
      */
@@ -658,6 +796,7 @@
       $tblhosp : null,          // 병원정보테이블
       $custom : null,           // 사용자정의
       $library : null,          // 문의내용 검색
+      $search_library : null,   // 기록검색입력박스
       $liveas : null,           // 실시간 AS 명령 버튼 + 캡쳐버튼
       $asStatus : null,         // AS 상태변경 버튼
       $edit_q : null,           // 문의내용 에디터
@@ -670,7 +809,7 @@
         _this.list.$acceptTab = $('a.aceept-tab[data-type="0"]');
         _this.list.$workingTab = $('a.aceept-tab[data-type="1,2,3"]');
         _this.list.$cancelTab = $('a.aceept-tab[data-type="5"]');
-        $('a.aceept-tab').bind('click', _me.events.onAcceptTabClick);
+
 
         _this.list.$accept = $('.accept-list[data-type="0"]');
         _this.list.$working = $('.accept-list[data-type="1,2,3"]');
@@ -683,7 +822,8 @@
         _this.$search_area = $('button#as_search_area');
         _this.$tblhosp = $('table tr td.tb-value');
         // _this.$custom = $('di')    // 사용자정의
-        // _this.library = $();       // 문의내용 검색
+        _this.$library = $('div#library');       // 문의내용 검색
+        _this.$search_library = $('input#search_library');
         _this.$status = $('div.as_status');
 
         _this.$edit_q = $('#as_question');
@@ -697,10 +837,9 @@
         this.SetTemplate(this.$edit_q);
 
         _this.$liveas = $('.as-lives-item');
-        _this.$liveas.bind('click', _me.events.onExecuteLiveAS);
 
         _this.$asStatus = $('.as-status-btn');
-        _this.$asStatus.bind('click', _me.events.onUpdateAS);
+
 
         /**
          * Set Layout
@@ -731,8 +870,12 @@
       },
       initEvents : function(){
 
+        $('a.aceept-tab').bind('click', _me.events.onAcceptTabClick);
         this.$search_i.bind('keyup', _me.events.onSearch);
         this.$search_area.bind('click', _me.events.onAreaAllClick);
+        this.$liveas.bind('click', _me.events.onExecuteLiveAS);
+        this.$asStatus.bind('click', _me.events.onUpdateAS);
+        this.$search_library.bind('keyup', _me.events.onLibrarySearch);
 
         return;
       },
@@ -800,7 +943,7 @@
           elem.one('webkitAnimationEnd oanimationend msAnimationEnd animationend',
           function(e) {
             elem.remove();
-            _me.clear();
+            _this.clear();
           });
 
         }else{
@@ -842,76 +985,102 @@
         return $('.as-item[data-index="'+id+'"]');
       },//FindElemByIdD
       SetTemplate : function(force, callback){
-        var Tmplt = "";
+        var Tmplt = "", TmpltTable = "";
         var target = this.$edit_q;
-        Tmplt = '<span class="template"><h4><b><u>1. 이미지</u></b></h4><h4>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: rgb(107, 113, 122); font-size: 13px; line-height: 1.42857;">{첨부이미지}</span></h4><h4 style="font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; color: rgb(0, 0, 0);"><b><u>2. 문의내용 ( 병원용 )</u></b></h4><h4>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: rgb(107, 113, 122); font-size: 13px; line-height: 18.5714px; font-family: inherit;">{문의내용}</span></h4><h4 style="font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; color: rgb(0, 0, 0);"><b><u>3. 확인내용 ( 담당자용 )</u></b></h4><h4 style="font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; color: rgb(0, 0, 0);">&nbsp; &nbsp;&nbsp;<span style="color: rgb(107, 113, 122); font-size: 13px; line-height: 18.5714px; font-family: inherit;">{오류내용}</span></h4><h4><b><u>4. 처리내용</u></b></h4><h4 style="font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; color: rgb(0, 0, 0);">&nbsp; &nbsp;&nbsp;<span style="color: rgb(107, 113, 122); font-size: 13px; line-height: 18.5714px; font-family: inherit;">{처리내용}</span></h4><h4>&nbsp; &nbsp;&nbsp;<b><u><br></u></b></h4><table class="table table-bordered"><tbody><tr><td>접수자 정보</td><td>확인자 정보</td><td>인계자 정보</td><td>처리자 정보</td></tr><tr><td><p>접수자 : {접수자}</p><p>연락처 : {접수자연락처}</p></td><td><p>확인자 : {확인자}</p><p>연락처 : {확인자연락처}</p></td><td><p>인계자 : {인계자}</p><p>연락처 : {인계자연락처}</p></td><td><p>처리자 : {처리자}</p><p>연락처 : {처리자연락처}</p></td></tr></tbody></table><h4><b><u><br></u></b></h4><h4><b><u><br></u></b></h4></span>';
-
-        Tmplt = Tmplt.replace('{첨부이미지}', '<span id="uploadImage"></span>');
-        Tmplt = Tmplt.replace('{문의내용}', '<span id="question"></span>');
-        Tmplt = Tmplt.replace('{오류내용}', '<span id="error"></span>');
-        Tmplt = Tmplt.replace('{처리내용}', '<span id="done"></span>');
-        Tmplt = Tmplt.replace('{접수자}', '<span id="accept"></span>');
-        Tmplt = Tmplt.replace('{접수자연락처}','<span id="acceptcontact"></span>');
-        Tmplt = Tmplt.replace('{확인자}','<span id="confirm"></span>');
-        Tmplt = Tmplt.replace('{확인자연락처}','<span id="confirmcontact"></span>');
-        Tmplt = Tmplt.replace('{인계자}','<span id="takeover"></span>');
-        Tmplt = Tmplt.replace('{인계자연락처}','<span id="takeovercontact"></span>');
-        Tmplt = Tmplt.replace('{처리자}','<span id="confirm"></span>');
-        Tmplt = Tmplt.replace('{처리자연락처}','<span id="confirmcontact"></span>');
-
-
         var item = _me.selItem.data;
-        Tmplt = $(Tmplt);
+
+        Tmplt = '<span class="template"><h3><span style="font-family: inherit; line-height: 1.1;">1. 문의내용 ( 병원용 )</span><br></h3><p>&nbsp; &nbsp; <span id="question"></span>&nbsp; &nbsp;&nbsp;<br></p><h3>3. 확인내용 ( 담당자용 )</h3><p>&nbsp; &nbsp;&nbsp;<br></p><h3>4. 처리내용</h3><p>&nbsp; &nbsp;&nbsp;</p></span>';
+        TmpltTable ='<table id="personInfo" class="table table-bordered small"><tbody><tr><td>접수자 정보<br></td><td>확인자 정보<br></td><td>인계자 정보<br></td><td>처리자 정보<br></td></tr><tr><td><span id="iaccept"></span><br></td><td><span id="iconfirm"></span><br></td><td><span id="itakeover"></span><br></td><td><span id="idone"></span><br></td></tr></tbody></table>';
+
         if(item){
-
-          var question = $(item.문의내용.trim());
-
-          if(!force){ //강제적용
-            if(question.hasClass('template')){
-              target.summernote('code', item.문의내용);
-              return false;
-              // return neoNotify.Show({
-              //   text : '이미 양식지를 적용하여 작성된 문서입니다.',
-              //   type : 'error',
-              //   desktop : false
-              // });
+          var question;
+          try{
+            question = $(item.문의내용.trim());
+            if(question.length <= 0) question = $('<p />').html(item.문의내용.trim());
+          }catch(e){
+            console.log(e);
+            if(e.message.indexOf('Syntax error') >= 0){
+              question = $('<span />').html('<p>'+item.문의내용.trim()+'</p>');
+            }else{
+              question = $('<span />').text('문의내용 저장중 실패하였습니다.');
             }
           }
 
-          var imgs = question.find('img');
-          if(imgs && imgs.length){
-            imgs.each(function(index, item){
-              var subItem = $(item).clone();
-              Tmplt.find('span#uploadImage').append(subItem);
-              $(item).remove();
-            });
+          if(question.hasClass('template') || question.find('.template').lrngth > 0) {
+            target.summernote('code', item.문의내용.trim() + TmpltTable);
+            if($('.note-editable').find('table').length > 0){
+              $($('.note-editable').find('table')).each(function(i,v){
+                if($(v).attr('id') !== 'personInfo') $(v).remove();
+              });
+            }
+          }else{
+            target.summernote('code', Tmplt + TmpltTable);
+
+            var imgs = question.find('img');
+            if(imgs && imgs.length){
+              imgs.each(function(index, item){
+                $('.note-editable').prepend($(item).clone());
+                $(item).remove();
+              });
+            }
+            $('.note-editable').find('span#question').html(item.문의내용.trim());
           }
-          Tmplt.find('span#question').html(question);
 
-          Tmplt.find('span#accept').text(item.접수자.trim());
-          Tmplt.find('span#acceptcontact').text(item.접수연락처.trim());
-          Tmplt.find('span#confirm').text(item.확인자.trim() || neo.user.USER_NAME);
-          Tmplt.find('span#confirmcontact').text(item.확인자연락처.trim() || (neo.user.info_hp || neo.user.info_tel));
+          if( _me.selItem.imgStack[item.인덱스]){
+            $('.note-editable').prepend( _me.selItem.imgStack[item.인덱스].img);
+            delete  _me.selItem.imgStack[item.인덱스];
+          }
 
-          Tmplt.find('span#takeover').text(item.인계자.trim() || neo.user.USER_NAME);
-          Tmplt.find('span#takeovercontact').text(item.인계자연락처.trim() || (neo.user.info_hp || neo.user.info_tel));
+          $('.note-editable').find('span#iaccept').html(
+            '접수자 : ' + item.접수자.trim() + '<br>' +
+            '접수자 연락처 : ' + item.접수연락처.trim()
+          );
+
+          $('.note-editable').find('span#iconfirm').html(
+            '확인자 : ' + item.확인자.trim() + '<br>' +
+            '확인자 연락처 : ' + item.확인자연락처.trim() + '<br>' +
+            '확인일자 : ' + (item.확인자ID === 0 ?  "" : item.확인일자.trim())
+          );
+
+
+          $('.note-editable').find('span#itakeover').html(
+            '인계자 : ' + item.인계자.trim() + '<br>' +
+            '인계자 연락처 : ' + item.인계자연락처.trim() + '<br>' +
+            '인계일자 : ' + (item.인계자ID === 0 ?  "" : item.인계일자.trim())
+          );
+
+
+          $('.note-editable').find('span#idone').html(
+            '처리자 : ' + item.처리자.trim() + '<br>' +
+            '처리자 연락처 : ' + item.처리자연락처.trim() + '<br>' +
+            '처리일자 : ' + (item.처리자ID === 0 ?  "" : item.처리일자.trim())
+          );
+
+          question = target.summernote('code');
+          item.문의내용 = question.substring(0,question.indexOf('<table id="personInfo"'));
+
         }else{
-          Tmplt.find('span#confirm').text(neo.user.USER_NAME);
-          Tmplt.find('span#confirmcontact').text(neo.user.info_hp || neo.user.info_tel);
-          Tmplt.find('span#takeover').text(neo.user.USER_NAME);
-          Tmplt.find('span#takeovercontact').text(neo.user.info_hp || neo.user.info_tel);
+          target.summernote('code', Tmplt + TmpltTable);
+          // target.summernote('insertNode', $(TmpltTable));
         }
 
-        target.summernote('code', Tmplt);
+
 
         if(typeof callback === 'function'){
           return callback();
         }else{
           return;
         }
+      },
+      GetComment : function(){
+        $('table#personInfo').remove();
+        return _me.elem.$edit_q.summernote('code');
       }
     };
 
+    /**
+     * 이벤트 모음
+     */
     _me.events = {
       /**
        * 지사전체 검색 버튼 클릭
@@ -935,6 +1104,15 @@
         if(e.type == 'keyup' && (e.keyCode == 13 || e.key == 'Enter')){
           _me.listData.search = $(this).val().trim();
           return _me.listData.Load();
+        }
+      },
+      /**
+       * AS 기록 검색
+       */
+      onLibrarySearch : function(e){
+        if(e.type == 'keyup' && (e.keyCode == 13 || e.key == 'Enter')){
+          _me.library.search = $(this).val().trim();
+          return _me.library.Load();
         }
       },
       /**
@@ -1067,7 +1245,7 @@
         }
 
         if($(this).data('liveas') === _me.Live.LIVECOMMANDS.ROLLBACK){
-          return neoNotify.Show({            
+          return neoNotify.Show({
             text : '준비중입니다'
           });
         }
@@ -1133,7 +1311,9 @@
       // }
     };
 
-
+    /**
+     * 라이브 AS
+     */
     _me.Live = {
       LIVECOMMANDS : {
         LIVE : "LIVEAS",
@@ -1286,26 +1466,14 @@
                             'style' : 'width:25%;'
                           });
                 if(target_elem.is(_me.selItem.$elem)){
-                  $('span#uploadImage').append(img);
+                  $('span.template').prepend(img);
                   target_data.문의내용 = _me.elem.$edit_q.summernote('code');
                 }else{
-                  var con = $('<div />');
-                  var comment = $(target_data.문의내용);
-                  con.append(comment);
-                  if(comment.hasClass('template')){
-                    $(comment.find('span#uploadImage')).append(img);
-                  }else{
-                    con.append('<span id="uploadImage"></span>');
-                    $(con.find('span#uploadImage')).append(img);
-                  }
-                  target_data.문의내용 = $(con).html();
+                  _me.selItem.imgStack[target_id] = {
+                    id : target_id,
+                    img : img
+                  };
                 }
-                /**
-                 * 1. 지금 선택한 AS건이 AS명령을 보낼때와 같으면 에디터에 뿌려주고
-                 * 2. 다르면 문의내용쪽에 저장해두어야 한다.
-                 * 3. 만약 문의내용에서 템플릿을 적은적이 있다면
-                 * 4. uploadImage 엘리먼트를 찾아서 넣어야한다.
-                 */
 
                 break;
               case _this.LIVECOMMANDS.REEXECUTE:
@@ -1333,6 +1501,7 @@
       _me.listData.init();
       _me.selItem.init();
       _me.elem.init();
+      _me.library.init();
       return callback();
     };
 
