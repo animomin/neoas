@@ -1,0 +1,39 @@
+script(src='/plugins/icheck/icheck.min.js')
+script.    
+  $(document).ready(function(){    
+    var login_ID = localStorage.getItem('login_ID');
+    var login_PWD = localStorage.getItem('login_PWD'); 
+    var onTime = false;
+    if(login_ID && login_PWD){
+      if(login){
+        $('input#id').val(login_ID);
+        $('input#pwd').val(login_PWD);
+        $('input#saveAccount').prop('checked');
+        $('form').submit();
+      }
+    }
+    
+    $('input#saveAccount').iCheck({
+      checkboxClass: 'icheckbox_polaris',
+      radioClass: 'iradio_polaris',
+      increaseArea: '-10%' // optional
+    });
+    
+    $( "form" ).submit(function( event ) {   
+      if($('input#saveAccount').prop('checked')){
+        localStorage.setItem('login_ID', $('input#id').val());
+        localStorage.setItem('login_PWD', $('input#pwd').val());
+      }else{
+        localStorage.removeItem('login_ID');
+        localStorage.removeItem('login_PWD');
+      }
+    });
+    
+    try{
+      WebViewToken.onReady();
+      //- var token = $('input#userToken').val();
+      //- alert(token);
+    }catch(e){
+      console.log(e);
+    }
+  });    

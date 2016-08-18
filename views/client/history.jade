@@ -1,0 +1,295 @@
+extends ../layout
+
+block style
+  link(rel='stylesheet', href='/javascripts/calendar/fullcalendar.css')              
+  link(rel='stylesheet', href='/javascripts/calendar/fullcalendar.print.css', media='print')       
+  link(rel='stylesheet', href='/javascripts/footable/css/footable.bootstrap.min.css')  
+block content
+  div#page-wrapper
+    div.row.border-bottom.white-bg.dashboard-header
+      div.col-sm-4
+        h2 병원명칭 AS접수내역
+        div.ibox
+          div.ibox-content
+            div#calendar
+          div.ibox-content
+            div.statistic-box
+              h4 AS통계
+              div.row.text-center
+                div.col-lg-5
+                  canvas#month(width="40",height="40")
+                  h4#monthTitle
+                div.col-lg-5
+                  canvas#day(width="40",height="40")
+                  h4#dayTitle
+      div.col-sm-8
+        div.ibox
+          div.ibox-title
+            h5 일일 AS내역
+          div.ibox-content
+            table.table#history-table(data-sorting='true',data-paging-size='8',data-paging='true')
+
+                
+block script
+  script(src='/javascripts/calendar/moment.js')
+  script(src='/javascripts/calendar/fullcalendar.js')
+  script(src='/javascripts/calendar/lang/ko.js')
+  script(src='/javascripts/footable/js/footable.min.js')
+  script(src='/javascripts/chartJs/chartJs.js')
+  script(src='/javascripts/neo.const.js')
+  script.
+  script.    
+    var hospnum = !{JSON.stringify(hospnum)};
+    $(document).on('ready',function(){              
+      var date = new Date();
+      
+      var hisTable = $('#history-table');
+      
+      var calendar = $('#calendar').fullCalendar({
+        defaultDate : date.GetToday('YYYY-MM-DD'),
+        editable : false,
+        eventLimit : true, // 더보기 버튼 활성화        
+        theme : true,
+        header: {
+          left : 'prev,next today',
+          center: 'title',
+          right: '<input type="text">'  			  
+        },
+        //- events : defaultEventSource,
+        events : {
+          url : 'history?hospnum=' + hospnum,
+          type : 'GET',
+          dataType : 'json',
+          success : function(json){            
+            json.forEach(function(item){
+              item.id = item.인덱스;
+              item.start = item.접수일자;
+              //- item.title = item.
+              var cName = '';
+              switch (parseInt(item.서비스상태)) {
+                case 0: cName = 'badge-danger';
+                  break;
+                case 1:
+                case 2:
+                case 3: cName = 'badge-primary';
+                  break;
+                case 4: cName = 'badge-success';
+                  break;
+                default:
+              }
+              item.className = cName;
+            });
+          },
+          complete : function(json){      
+            console.log($('#calendar').fullCalendar('getDate'));
+            var eDate = $('#calendar').fullCalendar('getDate')._d;
+            var eventDate = eDate.GetDate_YYYYMMDDHHMMSS("YYYY-MM-DD");
+            var events = [];
+            json.responseJSON.forEach(function(item){
+              var iDate = new Date(item.접수일자);
+              var itemDate = iDate.GetDate_YYYYMMDDHHMMSS("YYYY-MM-DD");
+              if(eventDate === itemDate){
+                return events.push(item);
+              }
+            });
+            LoadEvents(eventDate,events);      
+            LoadMonthChart(eDate,json.responseJSON);
+          }
+        },
+        eventClick : function(e,b,c){
+          var eDate = new Date(e.접수일자);
+          var eventDate = eDate.GetDate_YYYYMMDDHHMMSS("YYYY-MM-DD");
+          
+          var events = c.calendar.clientEvents(function(item){
+            var iDate = new Date(item.접수일자);
+            var itemDate = iDate.GetDate_YYYYMMDDHHMMSS("YYYY-MM-DD");
+            if(eventDate === itemDate){
+              return item;
+            }
+          });
+          return LoadEvents(eDate,events);
+        },
+        dayClick : function(date, jsEvent, view){
+          console.log(date, jsEvent, view);
+          var curDate = date._d.GetDate_YYYYMMDDHHMMSS("YYYY-MM-DD");
+          var peerEvents = view.calendar.getPeerEvents();
+          
+          var events = view.calendar.clientEvents(function(item){
+            var iDate = new Date(item.접수일자);
+            var itemDate = iDate.GetDate_YYYYMMDDHHMMSS("YYYY-MM-DD");
+            if(curDate === itemDate){
+              return item;
+            }
+          });
+          return LoadEvents(curDate,events);
+        },
+        eventLimitClick : function(cellInfo, jsEvent){                    
+          return LoadEvents(cellInfo.segs);
+        }
+      });
+      
+      function LoadEvents(date,data){
+        var newData;
+        if(!data.length || !data) return;
+        
+        $('#dayTitle').text(date+ '일 통계');
+      
+        newData = data.map(function(item){
+          if(typeof item.event === 'object'){
+            item =  item.event;
+          }    
+          if(item.서비스상태 == 4){
+            item.act = '<button type="button" class="btn btn-xs btn-danger btn-outline font-bold history-recall" data-index="'+item.인덱스+'"> 리콜 </button>';
+          }
+          
+          return item;
+        });
+              
+        
+        hisTable.empty().footable({
+          'data-sorting':true,
+          'data-paging' : true,
+          'data-paging-size' : 8,
+          'data-paging-count-format' : '{CP}/{TP}',
+          columns : [
+            {'name':'서비스타입','title':'구분',
+              formatter : function(value){
+                if(value===""||value==="undefined") value=0;
+                value = parseInt(value);
+                switch (value) {
+                  case 0: return "선택없음";
+                  case 1: return "장애";
+                  case 2: return "사용법";
+                  case 3: return "리콜";
+                  default: return "선택없음";                  
+                }
+              }
+            },
+            {'name':'인덱스','title':'인덱스','visible':false},
+            {'name':'접수자','title':'접수자'},
+            {'name':'접수일자', 'title':'접수일자'},
+            {'name' :'서비스상태', 'title':'상태',
+              formatter : function(value){
+                if(value===""||value==="undefined") value=0;
+                value = parseInt(value);
+                switch (value) {
+                  case 0: return "<span class='font-bold text-muted'>접수</span>";
+                  case 1: return "<span class='font-bold text-info'>확인</span>";
+                  case 2: return "<span class='font-bold text-navy'>처리중</span>";
+                  case 3: return "<span class='font-bold text-navy'>처리중</span>";
+                  case 4: return "<span class='font-bold text-success'>완료</span>";
+                  default: return "<span class='font-bold text-muted'>접수</span>";
+                }
+              }
+            },
+            {'name' :'문의내용', 'title':'문의내용', "breakpoints" : "all"},
+            {'name' :'act','title':'ACT'}
+          ],
+          rows : newData 
+        });
+        
+        LoadChart(newData);
+      }
+      function LoadMonthChart(date,data){
+        var a,b;
+        a=0;b=0;
+        data.forEach(function(item){
+          switch(parseInt(item.서비스상태)){
+            case 0: 
+            case 1:
+            case 2:
+            case 3:
+              a++;              
+              break;
+            case 4:b++;
+              break;
+          }
+        });
+        
+        var chart = [
+          {
+            value : a,
+            color: "#dedede",
+            highlight: "#1ab394",
+            label: "미완료"
+          },
+          {
+              value: b,              
+              color: "#a3e1d4",
+              highlight: "#1ab394",
+              label: "완료"
+          }
+        ];
+        
+        var cOptions = {
+            segmentShowStroke: true,
+            segmentStrokeColor: "#fff",
+            segmentStrokeWidth: 2,
+            percentageInnerCutout: 45, // This is 0 for Pie charts
+            animationSteps: 100,
+            animationEasing: "easeOutBounce",
+            animateRotate: true,
+            animateScale: false,
+            responsive: true,
+        };
+    
+    
+        var ctx = document.getElementById("month").getContext("2d");
+        var myNewChart = new Chart(ctx).Doughnut(chart, cOptions);      
+        $('#monthTitle').text(date.getMonth() + 1 +' 월 통계');
+      }
+      function LoadChart(data){
+        var a,b;
+        a=0;b=0;
+        data.forEach(function(item){
+          switch(parseInt(item.서비스상태)){
+            case 0: 
+            case 1:
+            case 2:
+            case 3:
+              a++;              
+              break;
+            case 4:b++;
+              break;
+          }
+        });
+        
+        var chart = [
+          {
+            value : a,
+            color: "#dedede",
+            highlight: "#1ab394",            
+            label: "미완료"
+          },
+          {
+              value: b,
+              color: "#a3e1d4",
+              highlight: "#1ab394",
+              label: "완료"
+          }
+        ];
+        
+        var cOptions = {
+            segmentShowStroke: true,
+            segmentStrokeColor: "#fff",
+            segmentStrokeWidth: 2,
+            percentageInnerCutout: 45, // This is 0 for Pie charts
+            animationSteps: 100,
+            animationEasing: "easeOutBounce",
+            animateRotate: true,
+            animateScale: false,
+            responsive: true,
+        };
+    
+    
+        var ctx = document.getElementById("day").getContext("2d");
+        var myNewChart = new Chart(ctx).Doughnut(chart, cOptions);        
+      }
+      
+      
+    });
+    $(window).bind("load resize scroll", function () {
+      try{
+        Footable.get('#history-table').pageSize(5);
+      }catch(e){console.log(e);}
+    });

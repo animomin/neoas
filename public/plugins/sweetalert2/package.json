@@ -1,0 +1,93 @@
+{
+  "name": "sweetalert2",
+  "version": "4.1.7",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/limonte/sweetalert2.git"
+  },
+  "homepage": "https://limonte.github.io/sweetalert2/",
+  "description": "A replacement for JavaScript's popup boxes, supported fork of sweetalert",
+  "main": "dist/sweetalert2.js",
+  "dependencies": {
+    "es6-promise": "latest"
+  },
+  "devDependencies": {
+    "gulp": "latest",
+    "eslint": "latest",
+    "gulp-autoprefixer": "latest",
+    "gulp-clean-css": "latest",
+    "gulp-rename": "latest",
+    "gulp-rollup": "latest",
+    "gulp-sass": "latest",
+    "gulp-uglify": "latest",
+    "rollup": "latest",
+    "uglify-js": "latest",
+    "gulp-eslint": "latest",
+    "gulp-qunit": "latest"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "author": {
+    "name": "Tristan Edwards",
+    "email": "tristan.edwards@me.com",
+    "url": "http://tristanedwards.me"
+  },
+  "contributors": [
+    {
+      "name": "Limon Monte",
+      "email": "limon.monte@gmail.com",
+      "url": "https://limonte.github.io"
+    },
+    {
+      "name": "Sam Turrell",
+      "email": "sam@samturrell.co.uk",
+      "url": "http://samturrell.co.uk"
+    }
+  ],
+  "keywords": [
+    "sweetalert",
+    "sweetalert2",
+    "alert",
+    "prompt"
+  ],
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "test": "gulp test",
+    "assume-dist-unchanged": "git ls-files dist | tr '\\n' ' ' | xargs git update-index --assume-unchanged",
+    "no-assume-dist-unchanged": "git ls-files dist | tr '\\n' ' ' | xargs git update-index --no-assume-unchanged"
+  },
+  "bugs": {
+    "url": "https://github.com/limonte/sweetalert2/issues"
+  },
+  "license": "MIT",
+  "gitHead": "551f9364f8495bfe6813d0ad4da2f86e9461edec",
+  "_id": "sweetalert2@4.1.7",
+  "_shasum": "00979b72b04ba8a69e423973465c2fabe9eaa7d2",
+  "_from": "sweetalert2@latest",
+  "_npmVersion": "3.10.3",
+  "_nodeVersion": "6.3.1",
+  "_npmUser": {
+    "name": "limonte",
+    "email": "limon.monte@gmail.com"
+  },
+  "dist": {
+    "shasum": "00979b72b04ba8a69e423973465c2fabe9eaa7d2",
+    "tarball": "https://registry.npmjs.org/sweetalert2/-/sweetalert2-4.1.7.tgz"
+  },
+  "maintainers": [
+    {
+      "name": "limonte",
+      "email": "limon.monte@gmail.com"
+    }
+  ],
+  "_npmOperationalInternal": {
+    "host": "packages-16-east.internal.npmjs.com",
+    "tmp": "tmp/sweetalert2-4.1.7.tgz_1471277366678_0.852469626115635"
+  },
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/sweetalert2/-/sweetalert2-4.1.7.tgz"
+}

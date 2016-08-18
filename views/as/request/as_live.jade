@@ -1,0 +1,49 @@
+div.panel-body.as-body
+  h4 실시간 AS 명령 실행   
+  table.table.table-sm.small
+    thead 
+      tr
+        th 명령
+        th 설명
+    tbody
+      // 프로그램 재실행
+      tr
+        td
+          button.btn.btn-success.btn-sm.btn-block.as-lives-item(type='button', data-liveas='프로그램 재실행') 프로그램 재실행
+        td
+          p 
+            | <strong class="text-success">접수자 컴퓨터의 EMR 프로그램</strong>을 종료하고 다시 실행합니다.
+      // 시트롤 스탠바이
+      tr
+        td
+          button.btn.btn-success.btn-sm.btn-block.as-lives-item(type='button', data-liveas='시트롤 스탠바이') 시트롤 스탠바이          
+        td
+          p 
+            | 스탠바이 명칭과 서버를 입력하고 확인을 누르면 접수자의 컴퓨터가 시트롤서버에 스탠바이됩니다.
+            | <br /> 미입력시 <strong class="text-success"> 스탠바이명칭 = 기관명칭 / 스탠바이서버 = medi.seetrol.com </strong> 으로 설정됩니다.            
+      // 최신 셋업 적용
+      tr
+        td 
+          button.btn.btn-success.btn-sm.btn-block.as-lives-item(type='button', data-liveas='최신셋업적용') 최신셋업적용
+        td
+          p 
+            | <strong class="text-success">병원전체 EMR 프로그램</strong>을 
+            | <span class="text-danger font-bold">최신버전</span>으로 업데이트합니다.
+      // 버전롤백
+      tr
+        td
+          button.btn.btn-success.btn-sm.btn-block.as-lives-item(type='button', data-liveas='버전롤백') 버전롤백
+        td
+          p 
+            | <strong class="text-success">접수자 컴퓨터</strong>의 
+            | <strong class="text-success">EMR 프로그램</strong> 버전을 선택한버전으로 
+            | <span class="text-danger font-bold">롤백</span>합니다. <br />
+            span.text-danger.font-bold 단 버전관리 서버에 업로드되어있는 버전만 가능합니다.
+      // 재설치
+      tr
+        td
+          button.btn.btn-success.btn-sm.btn-block.as-lives-item(type='button', data-liveas='재설치',data-timer='600000') 재설치
+        td
+          p <strong class="text-success">접수자 컴퓨터</strong>의 <strong class="text-success">EMR 프로그램</strong>을 재설치합니다.
+      
+        

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<query>
+  <UserInfo>
+  Select USER_ID, user_login_id, user_pw, USER_NAME, user_area, user_position_id,
+		      info_tel, info_hp
+   From  NC_N_USER AS U
+   Inner Join NC_N_INFO AS I
+   On (U.user_id = I.info_user_id)
+   where user_login_id = '%s'
+   And   user_pw = '%s'
+   And   isnull(user_retire,0) = 0
+  </UserInfo>
+  <_NeoMembers>
+    Select USER_ID, user_login_id, USER_NAME, user_area from NC_N_USER
+    Where ISNULL(user_retire,0) = 0
+    And   NOT ISNULL(USER_NAME,'') = ''
+    Order By user_area, USER_ID
+  </_NeoMembers>
+  <_HospInfo>
+    Select %s
+    From NC_H_USER AS U
+    INNER JOIN NC_H_INFO AS I
+    ON U.user_id = i.info_user_id
+    Where U.user_med_id = '%s'
+  </_HospInfo>
+</query>

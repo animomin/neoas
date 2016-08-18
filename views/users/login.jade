@@ -1,0 +1,30 @@
+extends ../layout_member
+block styles
+  include ./includes/styles/login.jade
+block content
+  .middle-box.text-center.loginscreen.animated.fadeInDown
+    div
+      div
+        h1.text-left.logo-name(style="font-size:90px !important;letter-spacing: 0px;") LOGIN
+      
+      form.m-t(role='form',method='get',action='/users/login/do')
+        div.form-group
+          input.form-control(type='text',id='id',name='id',placeholder='아이디',required)
+        div.form-group
+          input.form-control(type='password',id='pwd',name='pwd',placeholder='비밀번호',required)
+        button.btn.btn-success.block.full-width.m-b(type='submit') Login
+        - if(STATUS === false)
+          p.font-bold.text-danger
+            | 아이디 또는 비밀번호를 다시 확인하세요. <br />
+            | 등록되지 않은 아이디이거나, 아이디 또는 비밀번호를 잘못 입력하셨습니다.
+        div.form-group          
+          input#saveAccount.form-control(type='checkbox')
+          label.text-white(for='saveAccount') 로그인 상태 유지
+        input(type='hidden',id='userToken',name='userToken')
+block scripts
+  script
+    | var login = true;
+    if (STATUS === false)
+      | login = !{JSON.stringify(STATUS)};       
+  include ./includes/scripts/login.jade
+  

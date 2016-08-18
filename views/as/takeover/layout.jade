@@ -1,0 +1,23 @@
+div#pane-2.split.split-horizontal.split-noscroll.gray-bg 
+  - var emr = emrs[20] 
+  include ./takeover_list.jade
+div#pane-3.split.split-horizontal.split-noscroll.gray-bg 
+  - var emr = emrs[8] 
+  include ./takeover_list.jade
+div#pane-4.split.split-horizontal.split-noscroll.gray-bg 
+  - var emr = emrs[1] 
+  include ./takeover_list.jade
+
+//
+  div#top.split.white-bg
+    include ./takeover-search.jade
+  div#bottom.split
+    div#pane-2.split.split-horizontal.split-noscroll.white-bg 
+      - var emr = emrs[20] 
+      include ./takeover-list.jade
+    div#pane-3.split.split-horizontal.split-noscroll.white-bg 
+      - var emr = emrs[8] 
+      include ./takeover-list.jade
+    div#pane-4.split.split-horizontal.split-noscroll.white-bg 
+      - var emr = emrs[1] 
+      include ./takeover-list.jade

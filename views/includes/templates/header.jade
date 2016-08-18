@@ -1,0 +1,32 @@
+div.row.border-bottom
+  nav.navbar.navbar-fixed-top
+    div
+      div.navbar-header
+        button.navbar-toggle(type='button',data-toggle='collapse',data-target='#myNavbar')
+          span.icon-bar(style='background-color:#FFFFFF')
+          span.icon-bar(style='background-color:#FFFFFF')
+          span.icon-bar(style='background-color:#FFFFFF')
+          span.icon-bar(style='background-color:#FFFFFF')
+        a.navbar-brand(href='/') NeoSoftBank               
+    
+      div.collapse.navbar-collapse#myNavbar
+        ul.nav.navbar-nav          
+          //- li(class=menu==1 ? 'active' : '')
+          //-   a(href='?menu=1') 방문
+          //- li(class=menu==2 ? 'active' : '')
+          //-   a(href='?menu=2') Q&A
+          //- li(class=menu==3 ? 'active' : '')
+          //-   a(href='?menu=3') 일정
+          //- li(class=menu==4 ? 'active' : '')
+          //-   a(href='?menu=4') 거래처
+          li(class=menu==501 ? 'active' : '')
+            a.navbar-as(href='/as', data-as='501') AS요청
+          li(class=menu==502 ? 'active' : '')
+            a.navbar-as(href='/takeover', data-as='502') AS현황         
+          li(class=menu==503 ? 'active' :'')
+            a.navbar-as(href='/myas', data-as='503') 나의AS         
+        ul.nav.navbar-nav.navbar-right          
+          li
+            a#sign-out(href='/users/logout')
+              i.fa.fa-sign-out
+              | 로그아웃

@@ -1,0 +1,23 @@
+div#accept_search.panel-heading
+  div.form-group
+    div.input-group        
+      span.input-group-btn
+        button.btn.btn-outline.btn-sm.btn-info#as_search_area 전체            
+      input.input.input-sm.form-control#as_search(
+        type='text',
+        placeholder='기관명,기관기호,접수자,프로그램,접수일로 검색')                
+    
+div.sidebar-container
+  ul.nav.nav-tabs.navs-2    
+    li.active
+      a.myas-tab(href='#tab-1',data-toggle='tab',data-type='3', data-name='WORKING') 진행중
+        small.pull-right.badge.badge-danger(style='position: absolute;top: -10px;right: -1px;z-index: 99999;font-size: 15px;') 10
+    li
+      a.myas-tab(href='#tab-2',data-toggle='tab',data-type='4', data-name='DONE') 완료
+        small.pull-right.badge.badge-danger(style='position: absolute;top: -10px;right: -1px;z-index: 99999;font-size: 15px;') 10
+  div.tab-content
+    div#tab-1.tab-pane.fade.in.active.scroll-container(data-name='myas-list')
+      ul.list-group.myas-list(data-type='3', data-name='WORKING')
+    div#tab-2.tab-pane.fade.scroll-container(data-name='myas-list')
+      ul.list-group.myas-list(data-type='4', data-name='DONE')
+  

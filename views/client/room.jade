@@ -1,0 +1,92 @@
+extends ../layout_client
+
+block content  
+  //안보이게함. 테스트용
+  div.hidden#as_command(style='width:100%;')    
+  input.hidden#as_result(type='text')
+  button.hidden#disconnect 연결끊기  
+  
+  .middle-box.text-center.loginscreen.animated.slideInRight
+    div
+      h2.text-white 문의하기 예약접수
+      br
+      blockquote.text-white#as-status
+          p 예약접수되었습니다.             
+          
+      br
+      ul.list-group.clear-list.m-t.small.text-left.text-white.hidden#process
+        li.list-group-item.fist-item.hidden#confirm
+          div.media-body
+            small.pull-right.text-right#confirm-time          
+            span#confirm-person
+        li.list-group-item.hidden#takeover
+          div.media-body
+            small.pull-right.text-right#takeover-time          
+            span#takeover-person          
+        li.list-group-item.hidden#takeoverconfirm
+          div.media-body
+            small.pull-right.text-right#takeoverconfirm-time          
+            span#takeoverconfirm-person
+        li.list-group-item.hidden#done
+          div.media-body
+            small.pull-right.text-right#done-time          
+            span#done-person
+      br
+      div.media-body.text-white
+        i.fa.fa-gear.fa-spin.fa-5x
+      br
+      br
+      br
+      div.media-body.text-left
+        textarea.summernote.text-muted(id='comment',name='comment')    
+      button.btn.btn-white.btn-block.full-width.m-b#cancel(type="button") 접수취소
+      //- div.sk-spinner.sk-spinner-three-bounce.as-spinner
+      //-   div.sk-bounce1
+      //-   div.sk-bounce2
+      //-   div.sk-bounce3
+  
+block scripts  
+  script.    
+    $(document).ready(function(){            
+      NeoClient.room = !{JSON.stringify(index)};     
+      NeoClient.area = !{JSON.stringify(area)};
+      NeoClient.area = NeoClient.area[0];
+      NeoClient._connect();    
+      
+      $('.summernote').summernote({
+        toolbar: false,
+        height: 250,   //set editable area's height        
+        placeholder: '<p>AS예약 접수를 취소하시는 사유를 적어주세요.</p>',
+        lang : 'ko-KR'        
+      });
+      
+      Pace.on('hide', function(){
+          $('.note-placeholder').css('display','block');
+          //- tour.start();
+      });      
+      
+      $('#cancel').on('click',function(event){
+          $('title').html('');
+          NeoClient._AcceptCancel();
+      });
+      
+      // 사용자 AS 실시간 기능 종료
+      $('button#disconnect').on('click',function(event){
+        NeoClient._DisConnect();
+      });
+
+      // 실시간 AS 결과 리턴
+      $('input#as_result').on('click' , function(event){
+        if(!$(this).val()) return false;
+        NeoClient._SendLiveAsResult($(this).val());
+      });
+      
+    });
+    $(window).bind('beforeunload', function(){
+      return NeoClient._DisConnect();
+    });
+    document.addEventListener("contextmenu", function(e){
+        e.preventDefault();
+    }, false);
+    
+  

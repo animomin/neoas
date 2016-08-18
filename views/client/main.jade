@@ -1,0 +1,260 @@
+extends ../layout_client
+
+block content  
+  div#wrapper.animated.fadeInDown 
+    div      
+      div.row
+        div.col-xs-12
+          form(role='form',method='post',action='/clients/require', enctype='multipart/form-data')                 
+            div.ibox.m-b-none#client-detail
+              div.ibox-title
+                h5 AS 예약 접수   
+                //- div.ibox-tools
+                //-   button.btn.btn-warning.btn-xs.btn-outline#client-history 접수내역
+                //-   button.btn.btn-warning.btn-xs.btn-outline#client-help 도움말
+              div.ibox-content
+                p 불편사항을 미리적어주시면 빠르게 도움을 드릴 수 있습니다.
+                p 아래의 접수자 정보를 확인하시고 예약하기 버튼을 클릭해주세요.                               
+                div.form-group
+                  //label 이름
+                  input.form-control(type='text',id='client_name',name='client_name',placeholder='이름')
+                div.form-group
+                  //label 연락처
+                  //- input.form-control(type='text',id='client_contact',name='client_contact',placeholder="연락처 ('-'은 생략하고 입력해주세요.)")
+                  div.input-group
+                    span.input-group-addon 연락처
+                    input.form-control.input.input-block.block(type='text',id='client_contact',name='client_contact')
+                    span.input-group-addon(style='border-left:0;border-right:0;') 내선번호
+                    input.form-control.input.input-block.block(type='text',id='client_contact2',name='client_contact2',disabled='true')
+                
+                textarea.summernote(id='comment',name='comment')              
+              
+                div.col-xs-6
+                  label.btn.btn-primary.btn-block.full-width.m-b(title='사진첨부', for='uploadimage')
+                    input.hide(type='file',accept='image/*' name='uploadimage', id='uploadimage')
+                    span.small 사진첨부
+                div.col-xs-6                             
+                  button.btn.btn-primary.btn-block.full-width.m-b(type='button', id='capture') 캡쳐
+                button.btn.btn-success.block.full-width.m-b(type='submit') 예약하기   
+              
+              
+              input(type='hidden', id='hospnum', name='hospnum')
+              input(type='hidden', id='hospname', name='hospname')
+              input(type='hidden', id='area', name='area')
+              input(type='hidden', id='program', name='program')
+              input(type='hidden', id='exe', name='exe')
+              input(type='hidden', id='pcinfo', name='pcinfo')  
+              input(type='hidden', id='curversion', name='curversion')      
+              input(type='hidden', id='bohum', name='bohum')
+              input(type='hidden', id='hosp_contact', name='hosp_contact')
+              input(type='hidden', id='pacs', name='pacs')
+              input(type='hidden', id='servername', name='servername')
+              input(type='hidden', id='serverid', name='serverid')
+              input(type='hidden', id='serverpw', name='serverpw')
+              input(type='hidden', id='dbname', name='dbname')
+              input(type='hidden', id='certpw', name='certpw')
+              input(type='hidden', id='openperson', name='openperson')
+              input(type='hidden', id='sutak', name='sutak')             
+              input(type='hidden', id='os', name='os')             
+              input(type='hidden', id='sqlversion', name='sqlversion')       
+              input(type='hidden', id='astype', name='astype', value=0)    
+              input(type='hidden', id='masterSuga', name='masterSuga')       
+              input(type='hidden', id='masterDrug', name='masterDrug')       
+              input(type='hidden', id='masterMaterial', name='masterMaterial')       
+                
+block scripts
+  script.
+    var tour;
+    $(document).ready(function(){
+        $('#astype').val('0'); // 자꾸 1로 들어가서 로드되면 0으로 일단 셋팅
+        
+        tour = new Tour({
+        smartPlacement : true,
+        backdrop : true,
+        backdropContainer : '#wrapper',
+        storage: false,
+        keyboard : false,
+        template: "<div class='popover tour' role='tooltip'>" +
+                  "  <div class='arrow'></div>" +
+                  "  <h3 class='popover-title'></h3>" +
+                  "  <div class='popover-content'></div>" +
+                  "  <div class='popover-navigation'>" +
+                  "      <button class='btn btn-default btn-xs' data-role='prev'>« 이전</button>" +
+                  "      <span data-role='separator'>|</span>" +
+                  "      <button class='btn btn-default btn-xs' data-role='next'>다음 »</button>" +
+                  "      <button class='btn btn-default btn-xs' data-role='end'>닫기</button>" +
+                  "  </div>" +                  
+                  "</div>",
+        steps : [
+          {
+            placement: "bottom",
+            element : '#client-easy',
+            title : 'AS예약 간편접수',
+            content : '전달하실 내용이 많거나, 상세내용을 작성할 여유가 없으시면 바로 예약접수할 수 있습니다.'
+          },
+          {
+            placement: "bottom",
+            element : '#client-easy-content',
+            title : 'AS예약 간편접수',
+            content : '접수하시는분의 성함과 연락처를 남겨주세면 담당자가 신속하게 연락드릴 수 있습니다.(선택사항)'
+          },
+          {
+            placement: "top",
+            element : '#client-detail',
+            title : 'AS예약 상세접수',
+            content : '담당자에게 전달할 내용이 있으시면 상세내용을 작성할수 있습니다.'
+          },
+          {
+            placement: "bottom",
+            element : '.note-mybutton',
+            title : 'AS예약 상세접수',
+            content : 'AS예약 접수구분을 선택하여 접수하실 수 있습니다.'            
+          },
+          {
+            placement: "top",
+            element : '#capture',
+            title : 'AS예약 상세접수',
+            content : '현재 사용자의 컴퓨터 화면을 캡쳐해서 같이 보내주실 수 있습니다.'
+          },
+          {
+            placement: "left",
+            element : '#client-history',
+            title : 'AS예약',
+            content : '병원에서 AS접수하셨던 내역을 확인할 수 있으며, 문제가 있는 부분은 리콜을 통해 다시 접수하실 수 있습니다.'
+          },
+          {
+            placement: "left",
+            element : '#client-help',
+            title : 'AS예약',
+            content : '이 도움말을 실행합니다.'
+          }
+        ]
+      });
+      tour.init();
+      
+      
+      
+      $('.summernote').summernote({
+        toolbar: [
+          // [groupName, [list of button]]
+          ['mybutton', ['bug','manual', 'improve','etc']]          
+        ],
+        height: 250,   //set editable area's height
+        codemirror: { // codemirror options
+          theme: 'monokai'
+        },
+        placeholder: '상단의 AS접수 구분을 선택하여주세요. <br><br> ' +
+                    '<p>프로그램장애시 화면을 캡쳐하여 접수하시면 빠른 처리에 도움이 됩니다.</p>',                      
+        lang : 'ko-KR',
+        buttons : {
+          bug : function(context){
+            var ui = $.summernote.ui;
+            var button = ui.button({
+              contents : '프로그램장애',
+              tooltip: '프로그램에 장애가 있을때 선택해주세요.',
+              tooltipPosition : 'top',
+              customClass : ' btn-white btn-astype ',
+              buttonID : 'bug',
+              click : function(){
+                $(this).addClass('active').siblings().removeClass('active');
+                $('input#astype').val('1');                    
+              }
+            });
+            return button.render();
+          },
+          manual : function(context){
+            var ui = $.summernote.ui;
+            var button = ui.button({
+              contents : '사용법문의',
+              tooltip: '프로그램 사용에 궁금하신점이 있으시면 선택해주세요.',
+              tooltipPosition : 'top',
+              customClass : ' btn-white btn-astype ',
+              buttonID : 'manual',
+              click : function(){
+                $(this).addClass('active').siblings().removeClass('active');
+                $('input#astype').val('2');                    
+              }
+            });
+            return button.render();
+          },
+          improve : function(context){
+            var ui = $.summernote.ui;
+            var button = ui.button({
+              contents : '프로그램개선',
+              tooltip: '프로그램 개선사항이 있으시면 선택해주세요.',
+              tooltipPosition : 'top',
+              customClass : ' btn-white btn-astype ',
+              buttonID : 'improve',
+              click : function(){
+                $(this).addClass('active').siblings().removeClass('active');
+                $('input#astype').val('3');                    
+              }
+            });
+            return button.render();
+          },
+          etc : function(context){
+            var ui = $.summernote.ui;
+            var button = ui.button({
+              contents : '기타',
+              tooltip: '기타 문의사항이 있으시면 선택해주세요.',
+              tooltipPosition : 'top',
+              customClass : ' btn-white btn-astype ',
+              buttonID : 'etc',
+              click : function(){
+                $(this).addClass('active').siblings().removeClass('active');
+                $('input#astype').val('4');                    
+              }
+            });
+            return button.render();
+          }
+        }
+      });
+      
+      Pace.on('hide', function(){
+          $('.note-placeholder').css('display','block');
+          //- tour.start();
+      });           
+      
+    });
+    
+    $(document).on('submit', 'form' , function(event){
+      var browser = parseInt(sessionStorage.getItem('browser'));
+      if(browser > 9){
+         event.preventDefault();       
+         $('body').addClass('animated slideOutLeft');
+         $('body').one('webkitAnimationEnd oanimationend msAnimationEnd animationend',   
+         function(e) {
+           event.target.submit();
+         });
+      }
+    });  
+    
+    $(document).on('click', '#capture', function(){
+      //toastr['info']('준비중입니다.');
+      $('title').html("LOCALCAPTURE");
+    });
+      
+    $(document).on('change', '#uploadimage', function(){
+      //console.log($(this));
+      var file = $(this).val();
+      if(file){$('label[title="사진첨부"] span').text(file.split('\\')[file.split('\\').length-1]);}
+      else{$('label[title="사진첨부"] span').text('사진첨부');}
+    });    
+    
+    $(document).on('click', '#client-help',function(event){
+      event.preventDefault();
+      tour.start(true);
+    });
+    
+    $(document).on('click', '#client-history', function(event){
+      event.preventDefault();
+      var url = location.href.replace(/#/gim,'');
+      url += '/history?type=pop&hospnum=' + ($('input#hospnum').val() || '99996654');
+      console.log(url);
+      window.open(url);
+    });
+    //- 
+    //- document.addEventListener("contextmenu", function(e){
+    //-     e.preventDefault();
+    //- }, false);
+    

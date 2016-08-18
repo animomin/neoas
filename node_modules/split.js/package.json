@@ -1,0 +1,86 @@
+{
+  "_args": [
+    [
+      "split.js",
+      "C:\\Users\\재민\\Dropbox\\회사\\nodejs\\neoas"
+    ]
+  ],
+  "_from": "split.js@latest",
+  "_id": "split.js@1.0.7",
+  "_inCache": true,
+  "_installable": true,
+  "_location": "/split.js",
+  "_nodeVersion": "5.0.0",
+  "_npmOperationalInternal": {
+    "host": "packages-12-west.internal.npmjs.com",
+    "tmp": "tmp/split.js-1.0.7.tgz_1467903329519_0.6493212697096169"
+  },
+  "_npmUser": {
+    "email": "nathan@nathancahill.com",
+    "name": "nathancahill"
+  },
+  "_npmVersion": "3.3.9",
+  "_phantomChildren": {},
+  "_requested": {
+    "name": "split.js",
+    "raw": "split.js",
+    "rawSpec": "",
+    "scope": null,
+    "spec": "latest",
+    "type": "tag"
+  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/split.js/-/split.js-1.0.7.tgz",
+  "_shasum": "74990eacaa4118220d6f087d765ef4790405f99f",
+  "_shrinkwrap": null,
+  "_spec": "split.js",
+  "_where": "C:\\Users\\재민\\Dropbox\\회사\\nodejs\\neoas",
+  "author": {
+    "email": "nathan@nathancahill.com",
+    "name": "Nathan Cahill"
+  },
+  "bugs": {
+    "url": "https://github.com/nathancahill/Split.js/issues"
+  },
+  "dependencies": {},
+  "description": "A lightweight utility for creating adjustable split views",
+  "devDependencies": {
+    "eslint": "^1.9.0",
+    "grunt": "^0.4.5",
+    "grunt-contrib-jasmine": "github:nathancahill/grunt-contrib-jasmine",
+    "jasmine": "^2.3.2",
+    "uglifyjs": "^2.4.10"
+  },
+  "directories": {},
+  "dist": {
+    "shasum": "74990eacaa4118220d6f087d765ef4790405f99f",
+    "tarball": "https://registry.npmjs.org/split.js/-/split.js-1.0.7.tgz"
+  },
+  "gitHead": "e58253ba3ddb7398cb8b2925ffbbb1f7efb5b43b",
+  "homepage": "https://github.com/nathancahill/Split.js#readme",
+  "keywords": [
+    "css"
+  ],
+  "license": "MIT",
+  "main": "split.js",
+  "maintainers": [
+    {
+      "name": "nathancahill",
+      "email": "nathan@nathancahill.com"
+    }
+  ],
+  "name": "split.js",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nathancahill/Split.js.git"
+  },
+  "scripts": {
+    "build": "uglifyjs -m -o split.min.js split.js",
+    "test": "grunt jasmine"
+  },
+  "version": "1.0.7"
+}

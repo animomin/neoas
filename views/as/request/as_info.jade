@@ -1,0 +1,34 @@
+div.panel-body  
+  div.m-b-md
+    button.btn.btn-primary.btn-xs.pull-right.as-status-btn(data-type='1') AS 확인하기
+    h2 AS 상태
+  
+  span#hosp-status
+    div.progress.progress-striped
+  h4 AS요청정보
+  table.table.table-bordered.small.m-t-none.m-b-none.m-l-none.m-r-none.table-nowrap    
+    tr
+      th.tb-header(colspan="4") AS 접수/확인/인계/처리자 정보
+    tr
+      th.tb-header 접수자 
+      td.tb-value(data-id='접수자') 
+      th.tb-header 연락처
+      td.tb-value(data-id='접수연락처')                
+    tr
+      th.tb-header 접수일자 
+      td.tb-value(data-id='접수일자')
+      th.tb-header 
+      td.tb-value
+    tr
+      th.tb-header AS확인자
+      td.tb-value(data-id='확인자')  
+      th.tb-header AS인계자
+      td.tb-value(data-id='인계자')  
+    tr
+      th.tb-header AS처리자
+      td.tb-value(data-id='처리자')  
+      th.tb-header 
+      td.tb-value
+    tr
+      th.tb-header 취소사유
+      td.tb-value(data-id='취소사유', colspan='3')

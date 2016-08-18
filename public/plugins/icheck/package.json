@@ -1,0 +1,43 @@
+{
+  "name": "icheck",
+  "version": "1.0.2",
+  "description": "Highly customizable checkboxes and radio buttons (jQuery & Zepto)",
+  "main": "icheck.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fronteed/icheck.git"
+  },
+  "author": {
+    "name": "Damir Sultanov",
+    "email": "info@fronteed.com",
+    "url": "http://fronteed.com/"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fronteed/icheck/issues"
+  },
+  "homepage": "http://fronteed.com/iCheck/",
+  "gitHead": "cd45d5faf4bec01b5cf0a9c214101c56d5111ed8",
+  "_id": "icheck@1.0.2",
+  "scripts": {},
+  "_shasum": "06d08da3d47ae448c153b2639b86e9ad7fdf7128",
+  "_from": "icheck@latest",
+  "_npmVersion": "2.7.5",
+  "_nodeVersion": "0.12.2",
+  "_npmUser": {
+    "name": "justinsisley",
+    "email": "sisley.justin@gmail.com"
+  },
+  "dist": {
+    "shasum": "06d08da3d47ae448c153b2639b86e9ad7fdf7128",
+    "tarball": "https://registry.npmjs.org/icheck/-/icheck-1.0.2.tgz"
+  },
+  "maintainers": [
+    {
+      "name": "justinsisley",
+      "email": "sisley.justin@gmail.com"
+    }
+  ],
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/icheck/-/icheck-1.0.2.tgz"
+}

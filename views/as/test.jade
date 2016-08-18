@@ -1,0 +1,54 @@
+extends ../layout_member
+block styles
+  include ./includes/styles/as.jade  
+block content
+  div#wrapper
+    div.gray-bg#page-wrapper
+      //header include
+      include ../includes/templates/header.jade
+      
+      
+      div#workspace               
+        div#left.split.split-horizontal.white-bg 
+        div#right.split.split-horizontal
+          div#right-top.split.split-horizontal
+            div#hosp-info.split.white-bg
+            div#hosp-more.split.white-bg         
+          div#right-bottom.split.split-horizontal
+            div#as-history.split.white-bg
+            div#as-comment.split.white-bg
+          
+    
+    
+
+block scripts
+  include ./includes/scripts/as.jade  
+  script. 
+    $(document).ready(function(){
+      Split(['#left','#right'], {
+        gutterSize : 3,
+        cursor: 'col-resize',
+        sizes : [25,75]        
+      });
+      Split(['#right-top', '#right-bottom'], {
+        gutterSize : 3,
+        cursor : 'col-resize',
+        sizes : [50,50]
+      });
+      
+      Split(['#hosp-info', '#hosp-more'], {
+        direction : 'vertical',
+        sizes: [50,50],
+        gutterSize : 3,
+        cursor : 'row-resize'
+      });
+      Split(['#as-history', '#as-comment'], {
+        direction : 'vertical',
+        sizes: [50,50],
+        gutterSize : 3,
+        cursor : 'row-resize'
+      });
+      
+    });
+
+    
