@@ -122,7 +122,7 @@
           }
 
           query = util.format(query, where, orderby);
-          logger.info(query);
+          // logger.info(query);
           return callback2();
         },
         function(callback2){
