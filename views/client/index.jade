@@ -139,6 +139,14 @@ block scripts
           // [groupName, [list of button]]
           ['mybutton', ['bug','manual', 'improve','etc']]          
         ],
+        popover : {
+          image: [
+              ['imagesize', ['imageSize100', 'imageSize50', 'imageSize25']],
+              ['float', ['floatLeft', 'floatRight', 'floatNone']],
+              ['view', ['popupImage']],
+              ['remove', ['removeMedia']]
+          ]
+        },
         height: 250,   //set editable area's height
         codemirror: { // codemirror options
           theme: 'monokai'
@@ -203,6 +211,18 @@ block scripts
               click : function(){
                 $(this).addClass('active').siblings().removeClass('active');
                 $('input#astype').val('4');                    
+              }
+            });
+            return button.render();
+          },
+          popupImage : function(context){
+            var ui = $.summernote.ui;
+            var button = ui.button({
+              contents : '<i class="fa fa-image"></i>',
+              tooltip: '크게보기',
+              buttonID : 'popupImage',
+              click : function(){
+                window.open($(context.modules.editor.restoreTarget()).attr('src'), "popup", "fullscreen");
               }
             });
             return button.render();
