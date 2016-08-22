@@ -1,12 +1,13 @@
 a.list-group-item.as-item(data-name='아이템')
   i.fa.fa-hospital-o.fa-4x.pull-left
   div.media-body
-    small.pull-right(data-name='상세정보')
+    small.pull-right.text-right(data-name='상세정보')
       span(data-name='접수일자')
       br
       div.progress.progress-mini
         div.progress-bar.progress-bar-success(data-name='서비스상태', data-value='완료')
-        div.progress-bar.progress-bar-danger(data-name='서비스상태', data-value='현재')      
+        div.progress-bar.progress-bar-danger(data-name='서비스상태', data-value='현재')  
+      span(data-name='인덱스')    
     strong(data-name='기관명칭')
     span.badge(data-name='연결상태')
       i.fa.fa-wifi

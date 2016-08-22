@@ -58,12 +58,12 @@ var NeoClient = {
         $('#process, #takeover').removeClass('hidden');
       }else if(parseInt(_this.serviceStatus) === ConstServiceStatus.TAKEOVERCONFIRM){
         comment = "AS담당자가 전산에서 AS요청을 확인하였습니다.";
-        $('#takeoverconfirm-item').html('AS담당자 : ' + data.item.처리자 + '<br>연락처 : ' + data.item.처리자연락처 + '<br>' + data.item.처리일자);
+        $('#takeoverconfirm-time').html('AS담당자 : ' + data.item.처리자 + '<br>연락처 : ' + data.item.처리자연락처 + '<br>' + data.item.처리일자);
         $('#takeoverconfirm-person').text(comment);
         $('#process, #takeoverconfirm').removeClass('hidden');
       }else if(parseInt(_this.serviceStatus) === ConstServiceStatus.DONE){
         comment = "요청사항을 처리하였습니다.";
-        $('#done-item').html('처리자 : ' + data.item.처리자 + '<br>연락처 : ' + data.item.처리자연락처 + '<br>' + data.item.처리일자);
+        $('#done-time').html('처리자 : ' + data.item.처리자 + '<br>연락처 : ' + data.item.처리자연락처 + '<br>' + data.item.처리일자);
         $('#done-person').text(comment);
         $('#process, #done').removeClass('hidden');
         $('title').html('LIVEASEND');
@@ -114,12 +114,12 @@ var NeoClient = {
     // this.socket.emit('client:leave' , {roomName : this.room});
     //this.socket.disconnect();
     //io.disconnect();
-    if(force){
+    if(force){      
       this.socket.emit(SOCKETEVENT.CLIENT.CANCEL, {id : this.room});
     }
     this.socket.disconnect();
   },
-  _SendLiveAsResult : function(r){    
+  _SendLiveAsResult : function(r){
     this.socket.emit(SOCKETEVENT.CLIENT.LIVEAS , {
       id : this.room,
       RESULT : r,

@@ -148,7 +148,9 @@ var MENU = {
  */
 var neoModules = {
   SetLayout : function(menu, container){
+    sessionStorage.setItem('menu', menu);
     var view = '', start;
+    var m = mobile ? "_m" : "";
     switch (menu) {
       case MENU.REQUEST:
         view = 'as-request-layout';
@@ -165,6 +167,7 @@ var neoModules = {
       default:
         view = 'as-request-layout';
     }
+    view += m;
     container.load('/template/'+ view, function(){
       return start();
     });
@@ -184,7 +187,7 @@ var neoModules = {
 
     var keys = Object.keys(offsetTop);
     keys.forEach(function(item){
-      $('.scroll-container[data-name="'+item+'"]').height($(window).height() - offsetTop[item][offsetTop[item].length - 1] - 50 + 'px');
+      $('.scroll-container[data-name="'+item+'"]').height($(window).height() - offsetTop[item][offsetTop[item].length - 1] - (mobile ? 10 : 50) + 'px');
       $('.scroll-container[data-name="'+item+'"]').css({
           'overflow' : 'auto',
           '-webkit-overflow-scrolling' : 'touch'
@@ -264,6 +267,29 @@ var neoAJAX = {
           if(typeof callback === 'function') return callback(result);
         }
       });
+    },
+    EmrVersion : function(opts){
+      $.ajax({
+        url : opts.url,
+        data : opts.data,
+        dataType : opts.dataType,
+        async : opts.async,
+        method : opts.method,
+        beforeSend : function(){
+          if(typeof opts.beforeSend === 'function'){
+            return opts.beforeSend(opts);
+          }
+        },
+        success : function(data){
+          opts.success(opts, data);
+        },
+        error : function(err){
+          console.log(err);
+        },
+        complete : function(){
+          if(typeof opts.callback === 'function') return opts.callback(opts);
+        }
+      });
     }
   },
 
@@ -288,4 +314,25 @@ var neoAJAX = {
     };
     return spinners[type];
   }
+};
+
+var isMobile = {
+    Android: function() {
+        return navigator.userAgent.match(/Android/i);
+    },
+    BlackBerry: function() {
+        return navigator.userAgent.match(/BlackBerry/i);
+    },
+    iOS: function() {
+        return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+    },
+    Opera: function() {
+        return navigator.userAgent.match(/Opera Mini/i);
+    },
+    Windows: function() {
+        return navigator.userAgent.match(/IEMobile/i);
+    },
+    any: function() {
+        return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
+    }
 };

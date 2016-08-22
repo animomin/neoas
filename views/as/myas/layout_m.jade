@@ -1,0 +1,21 @@
+div#page1
+  include ./myas_list.jade
+div#page2.hidden
+  div.sidebar-container
+    ul.nav.nav-tabs.navs-4
+      li
+        a.as-tab(href='#', data-toggle='tab', data-tab='list') 리스트
+      li.active
+        a.as-tab(href='#mtab-1',data-toggle='tab') 병원정보        
+      li
+        a.as-tab(href='#mtab-2',data-toggle='tab') 실시간AS
+      li
+        a.as-tab(href='#mtab-3',data-toggle='tab') 인계접수
+    div.tab-content
+      div#mtab-1.tab-pane.fade.in.active
+        include ../request/as_info.jade
+        include ../request/hosp_info.jade
+      div#mtab-2.tab-pane.fade
+        include ../request/as_live.jade
+      div#mtab-3.tab-pane.fade
+        include ../request/as_comment.jade

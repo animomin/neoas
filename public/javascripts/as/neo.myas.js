@@ -311,6 +311,7 @@
       data : null,
       id : null,    // 배열의 인덱스 번호
       socket : false,
+      imgStack : {},
       init : function(){
         this.$elem = null;
         this.data = null;
@@ -407,6 +408,13 @@
             _me.elem.$asStatus.addClass('disabled');
           }
 
+          if(mobile){
+            $('#page1').fadeOut('fast', function(){
+              $('#page2').removeClass('hidden');
+              $('#page2').fadeIn('fast');
+            });
+          }
+
         });
       },
       /**
@@ -420,6 +428,7 @@
         var cData = JSON.parse(JSON.stringify(_this.data));
         /* 선택된 AS건의 데이터 갱신 */
         cData.서비스상태 = status;
+        cData.문의내용 = _me.elem.GetComment();
         switch (status) {
           case ASSTATUS.CONFIRM:
             cData.확인자 = neo.user.USER_NAME;
@@ -441,7 +450,7 @@
             cData.인계자지사 = neo.user.user_area;
             cData.인계자연락처 = neo.user.info_hp || neo.user.info_tel;
             cData.인계일자 = (new Date()).GetToday('YYYY-MM-DD HH:MM:SS');
-            cData.문의내용 = _me.elem.$edit.summernote('code');
+            // cData.문의내용 = _me.elem.$edit.summernote('code');
             break;
           case ASSTATUS.DONE:
             if(cData.확인자ID === 0){
@@ -456,7 +465,7 @@
             cData.처리자지사 = neo.user.user_area;
             cData.처리자연락처 = neo.user.info_hp || neo.user.info_tel;
             cData.처리일자 = (new Date()).GetToday('YYYY-MM-DD HH:MM:SS');
-            cData.문의내용 = _me.elem.$edit.summernote('code');
+            // cData.문의내용 = _me.elem.$edit.summernote('code');
             break;
         }
 
@@ -485,10 +494,14 @@
           } });
 
           /* listData에서 해당데이터를 이동시킨다 */
-          _me.listData.MoveData(_this.data, function(){
-            _this.$elem.attr('data-id', _this.id);
-            _me.elem.RefreshElem(_this.$elem, _this.data);
-            _me.elem.RefreshTabCount();
+          // _me.listData.MoveData(_this.data, function(){
+          //   _this.$elem.attr('data-id', _this.id);
+          //   _me.elem.RefreshElem(_this.$elem, _this.data);
+          //   _me.elem.RefreshTabCount();
+          // });
+          _me.listData.Load(function(){
+            _me.elem.clear();
+            $.neoSocket.emitClients();
           });
         });
 
@@ -519,7 +532,7 @@
         tabs : {},
         lists : {},
         _SetTabCount : function(obj, count){
-          return obj.find('small').text(count);
+          return obj.find('span').text(count);
         },
         _SetNoItem : function(obj){
           return obj.append('<a class="list-group-item"><h3 class="text-muted font-bold"> 검색된 데이터가 없습니다. </h3></a>');
@@ -530,7 +543,7 @@
           $item.addClass('animated fadeInUp');
           $item.attr({'data-id' : index, 'data-index' : item.인덱스, 'data-animated' : 'fadeInUp'});
           $item.find('span[data-name="접수일자"]').text(item.접수일자);
-
+          $item.find('span[data-name="인덱스"]').text(item.인덱스);
           //progress-bar
           item.서비스상태 = parseInt(item.서비스상태);
           if(item.서비스상태 === ASSTATUS.DONE){
@@ -604,7 +617,7 @@
         neoAJAX.GetTemplate('as-request-accept_item' , function(view){
           _this.$item = $(view);
         });
-
+        $('#as_search_area').addClass('disabled');
         _this.$search_i = $('input#as_search');
         _this.$tblhosp = $('table tr td.tb-value');
         // _this.$custom = $('di')    // 사용자정의
@@ -630,34 +643,47 @@
         /**
          * Set Layout
          */
-        Split(['#left','#right'], {
-          gutterSize : 3,
-          cursor: 'col-resize',
-          sizes : [20,80]
-        });
-        Split(['#right-col1', '#right-col2'], {
-          gutterSize : 3,
-          direction : 'vertical',
-          sizes: [30,70],
-          cursor : 'row-resize'
-        });
+        if(!mobile){
+          Split(['#left','#right'], {
+            gutterSize : 3,
+            cursor: 'col-resize',
+            sizes : [20,80]
+          });
+          Split(['#right-col1', '#right-col2'], {
+            gutterSize : 3,
+            direction : 'vertical',
+            sizes: [30,70],
+            cursor : 'row-resize'
+          });
 
-        Split(['#pane-1', '#pane-2', '#pane-3'], {
-          gutterSize : 3,
-          cursor : 'col-resize'
-        });
-        Split(['#pane-4', '#pane-5'], {
-          gutterSize : 3,
-          cursor : 'col-resize',
-          sizes : [40,60]
-        });
+          Split(['#pane-1', '#pane-2', '#pane-3'], {
+            gutterSize : 3,
+            cursor : 'col-resize'
+          });
+          Split(['#pane-4', '#pane-5'], {
+            gutterSize : 3,
+            cursor : 'col-resize',
+            sizes : [40,60]
+          });
+        }else{
+          $('#page-wrapper').addClass('no-padding');
+          $('#accept_search').removeClass('panel-heading');
+          $('#accept_search').find('.form-group').addClass('m-b-xs m-t-xs');
+        }
 
         return this.initEvents();
       },
       initEvents : function(){
 
         this.$search_i.bind('keyup', _me.events.onSearch);
-
+        if(mobile){
+          $('a.as-tab[data-tab="list"]').bind('click', function(e){
+            e.preventDefault();
+            $('#page2').fadeOut('fast', function(){
+              $('#page1').fadeIn('fast');
+            });
+          });
+        }
         return;
       },
       clear : function(callback){
@@ -700,139 +726,82 @@
         if(typeof callback === 'function') return callback();
         else return;
       },
-      RefreshTabCount : function(){
-        var data = _me.listData.data;
-        // this.list._SetTabCount(this.list.$acceptTab, data.ACCEPT ? data.ACCEPT.length : 0);
-        // this.list._SetTabCount(this.list.$workingTab, data.WORKING ? data.WORKING.length : 0);
-        // this.list._SetTabCount(this.list.$cancelTab, data.CANCEL ? data.CANCEL.length : 0);
-      },
-      /**
-       * 변경된 AS요청건을 새로고침하는 부분이다
-       * 메세지로 넘어온 요청건은 추가만하고 포커스 이동이 되면 안된다. ( 사용자 AS접수, 다른 네오직원 상태변경 )
-       */
-      RefreshElem : function(elem, data){
-        // var _this = _me.elem;
-        // var parent = $(elem.parent()).data('type');
-        //   if(typeof parent === 'number') parent = parent.toString();
-        // var newOne = null, newParent = null, newTab = null;
-        //
-        // if(data.서비스상태 === ASSTATUS.DONE){
-        //   // elem.find('div.progress-bar-success').css('width' , '100%');
-        //   // elem.find('div.progress-bar-danger').addClass('hidden');
-        //   // // 클리어시키자~
-        //   elem.addClass('fadeOutRightBig');
-        //   elem.one('webkitAnimationEnd oanimationend msAnimationEnd animationend',
-        //   function(e) {
-        //     elem.remove();
-        //     _me.clear();
-        //   });
-        //
-        // }else{
-        //   if(data.서비스상태 === ASSTATUS.CANCEL){
-        //     elem.find('div.progress-bar-success').addClass('hidden');
-        //     elem.find('div.progress-bar-danger').css('width' , '100%');
-        //     newParent = _this.list.$cancel;
-        //     newTab = _this.list.$cancelTab;
-        //   }else{
-        //     elem.find('div.progress-bar-success').css('width' , (data.서비스상태 * 20) + '%');
-        //     elem.find('div.progress-bar-danger').css('width' , '20%');
-        //     newParent = _this.list.$working;
-        //     newTab = _this.list.$workingTab;
-        //   }
-        //   if(parent.indexOf(data.서비스상태) < 0){ /* 새로운 부모에게 가야한다 */
-        //     newOne = elem.clone();
-        //     newOne.bind('click', _me.events.onAccepItemClick);
-        //     elem.addClass('animated fadeOutRightBig');
-        //     elem.one('webkitAnimationEnd oanimationend msAnimationEnd animationend',
-        //     function(e) {
-        //       newTab.tab('show')
-        //             .on('shown.bs.tab', function(){
-        //               _me.options.workTab = newTab.data('name');
-        //               newParent.prepend(newOne);
-        //               elem.remove();
-        //               _me.selItem.Load(newOne);
-        //             });
-        //     });
-        //   }else{
-        //      /* 그자리에 가만히 잇으면 된다! */
-        //      _me.selItem.Load(elem);
-        //   }
-        // }
-
-
-
-      },
       FindElemByID : function(id){
         return $('.as-item[data-index="'+id+'"]');
       },//FindElemByIdD
       SetTemplate : function(force, callback){
-        var Tmplt = "";
+        var Tmplt = "", TmpltTable = "";
         var target = this.$edit;
-        Tmplt = '<span class="template"><h4><b><u>1. 이미지</u></b></h4><h4>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: rgb(107, 113, 122); font-size: 13px; line-height: 1.42857;">{첨부이미지}</span></h4><h4 style="font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; color: rgb(0, 0, 0);"><b><u>2. 문의내용 ( 병원용 )</u></b></h4><h4>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: rgb(107, 113, 122); font-size: 13px; line-height: 18.5714px; font-family: inherit;">{문의내용}</span></h4><h4 style="font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; color: rgb(0, 0, 0);"><b><u>3. 확인내용 ( 담당자용 )</u></b></h4><h4 style="font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; color: rgb(0, 0, 0);">&nbsp; &nbsp;&nbsp;<span style="color: rgb(107, 113, 122); font-size: 13px; line-height: 18.5714px; font-family: inherit;">{오류내용}</span></h4><h4><b><u>4. 처리내용</u></b></h4><h4 style="font-family: &quot;Helvetica Neue&quot;, Helvetica, Arial, sans-serif; color: rgb(0, 0, 0);">&nbsp; &nbsp;&nbsp;<span style="color: rgb(107, 113, 122); font-size: 13px; line-height: 18.5714px; font-family: inherit;">{처리내용}</span></h4><h4>&nbsp; &nbsp;&nbsp;<b><u><br></u></b></h4><table class="table table-bordered"><tbody><tr><td>접수자 정보</td><td>확인자 정보</td><td>인계자 정보</td><td>처리자 정보</td></tr><tr><td><p>접수자 : {접수자}</p><p>연락처 : {접수자연락처}</p></td><td><p>확인자 : {확인자}</p><p>연락처 : {확인자연락처}</p></td><td><p>인계자 : {인계자}</p><p>연락처 : {인계자연락처}</p></td><td><p>처리자 : {처리자}</p><p>연락처 : {처리자연락처}</p></td></tr></tbody></table><h4><b><u><br></u></b></h4><h4><b><u><br></u></b></h4></span>';
-
-        Tmplt = Tmplt.replace('{첨부이미지}', '<span id="uploadImage"></span>');
-        Tmplt = Tmplt.replace('{문의내용}', '<span id="question"></span>');
-        Tmplt = Tmplt.replace('{오류내용}', '<span id="error"></span>');
-        Tmplt = Tmplt.replace('{처리내용}', '<span id="done"></span>');
-        Tmplt = Tmplt.replace('{접수자}', '<span id="accept"></span>');
-        Tmplt = Tmplt.replace('{접수자연락처}','<span id="acceptcontact"></span>');
-        Tmplt = Tmplt.replace('{확인자}','<span id="confirm"></span>');
-        Tmplt = Tmplt.replace('{확인자연락처}','<span id="confirmcontact"></span>');
-        Tmplt = Tmplt.replace('{인계자}','<span id="takeover"></span>');
-        Tmplt = Tmplt.replace('{인계자연락처}','<span id="takeovercontact"></span>');
-        Tmplt = Tmplt.replace('{처리자}','<span id="confirm"></span>');
-        Tmplt = Tmplt.replace('{처리자연락처}','<span id="confirmcontact"></span>');
-
-
         var item = _me.selItem.data;
-        Tmplt = $(Tmplt);
+
+        Tmplt = '<span id="template"><h3>1. 문의내용 ( 병원용 )</h3><span id="question"><p><br></p></span><h3>2. 확인내용 ( 담당자용 )</h3><p><br></p><h3>3. 처리내용 </h3><p><br></p></p></span>';
+        TmpltTable ='<table id="personInfo" class="table table-bordered small"><tbody><tr><td>접수자 정보<br></td><td>확인자 정보<br></td><td>인계자 정보<br></td><td>처리자 정보<br></td></tr><tr><td><span id="iaccept"></span><br></td><td><span id="iconfirm"></span><br></td><td><span id="itakeover"></span><br></td><td><span id="idone"></span><br></td></tr></tbody></table>';
+
         if(item){
 
-          var question = $(item.문의내용.trim());
+          var question = item.문의내용.trim();
+          if(question.indexOf('<span id="template">') >= 0){
+            target.summernote('code', question + TmpltTable);
+          }else{
+            target.summernote('code', Tmplt + TmpltTable);
+            $('span#question').html(item.문의내용.trim());
+          }
 
-          if(!force){ //강제적용
-            if(question.hasClass('template')){
-              target.summernote('code', item.문의내용);
-              return false;
-              // return neoNotify.Show({
-              //   text : '이미 양식지를 적용하여 작성된 문서입니다.',
-              //   type : 'error',
-              //   desktop : false
-              // });
+          // $('span#confirm').html(item.확인내용.trim());
+          // $('span#done').html(item.처리내용.trim());
+          if( _me.selItem.imgStack[item.인덱스]){
+            if($('span#question').length){
+              $('span#question').prepend(_me.selItem.imgStack[item.인덱스].img);
+            }else{
+              $('.note-editable').prepend(_me.selItem.imgStack[item.인덱스].img);
             }
+            delete  _me.selItem.imgStack[item.인덱스];
           }
 
-          var imgs = question.find('img');
-          if(imgs && imgs.length){
-            imgs.each(function(index, item){
-              var subItem = $(item).clone();
-              Tmplt.find('span#uploadImage').append(subItem);
-              $(item).remove();
-            });
-          }
-          Tmplt.find('span#question').html(question);
+          $('.note-editable').find('span#iaccept').html(
+            '접수자 : ' + item.접수자.trim() + '<br>' +
+            '접수자 연락처 : ' + item.접수연락처.trim()
+          );
 
-          Tmplt.find('span#accept').text(item.접수자.trim());
-          Tmplt.find('span#acceptcontact').text(item.접수연락처.trim());
-          Tmplt.find('span#confirm').text(item.확인자.trim() || neo.user.USER_NAME);
-          Tmplt.find('span#confirmcontact').text(item.확인자연락처.trim() || (neo.user.info_hp || neo.user.info_tel));
+          $('.note-editable').find('span#iconfirm').html(
+            '확인자 : ' + item.확인자.trim() + '<br>' +
+            '확인자 연락처 : ' + item.확인자연락처.trim() + '<br>' +
+            '확인일자 : ' + (item.확인자ID === 0 ?  "" : item.확인일자.trim())
+          );
 
-          Tmplt.find('span#takeover').text(item.인계자.trim() || neo.user.USER_NAME);
-          Tmplt.find('span#takeovercontact').text(item.인계자연락처.trim() || (neo.user.info_hp || neo.user.info_tel));
+
+          $('.note-editable').find('span#itakeover').html(
+            '인계자 : ' + item.인계자.trim() + '<br>' +
+            '인계자 연락처 : ' + item.인계자연락처.trim() + '<br>' +
+            '인계일자 : ' + (item.인계자ID === 0 ?  "" : item.인계일자.trim())
+          );
+
+
+          $('.note-editable').find('span#idone').html(
+            '처리자 : ' + item.처리자.trim() + '<br>' +
+            '처리자 연락처 : ' + item.처리자연락처.trim() + '<br>' +
+            '처리일자 : ' + (item.처리자ID === 0 ?  "" : item.처리일자.trim())
+          );
+
+
+          //item.문의내용 = $('span#question').html();
+
         }else{
-          Tmplt.find('span#confirm').text(neo.user.USER_NAME);
-          Tmplt.find('span#confirmcontact').text(neo.user.info_hp || neo.user.info_tel);
-          Tmplt.find('span#takeover').text(neo.user.USER_NAME);
-          Tmplt.find('span#takeovercontact').text(neo.user.info_hp || neo.user.info_tel);
+          target.summernote('code', Tmplt + TmpltTable);
+          // target.summernote('insertNode', $(TmpltTable));
         }
 
-        target.summernote('code', Tmplt);
+
 
         if(typeof callback === 'function'){
           return callback();
         }else{
           return;
         }
+      },
+      GetComment : function(){
+        $('table#personInfo').remove();
+        return _me.elem.$edit.summernote('code');
       }
     };
 
@@ -964,36 +933,23 @@
 
          /* 새로 접속한 친구가 있네 */
          if(data.NEW){
-           /* 전체 지사 검색이 아니네? */
-           if(!_me.options.area){
-             /* 내 담당도 아니네? 뭔데 안봐*/
-             if(data.NEW.area !== neo.user.user_area) return _SocketCheck();
-           }
 
-           /* 있는거야 알림 안해도되 */
-           //if($('.as_item[data-index="'+data.NEW.id+'"]').length) return false;
-           var existItem = $('.as-item[data-index="'+data.NEW.id+'"]');
-           console.log(existItem);
-
-           if(existItem.length) return _SocketCheck();
-
-           /* 내꺼다이~ */
-           neoNotify.Show({
-             title : "NeoSoftBank A/S",
-             text : '새로운 AS요청건이 접수되었습니다.',
-             type : 'info',
-             desktop : true
-           });
-           _me.listData.Load(function(){
-            _SocketCheck();
-           });
            /* 리스트를 주엇네? */
+           /**
+            * 전달은 PASS로 한다면 LIST가 오는 경우는?
+            */
          }else if(data.TYPE === 'LIST' || data.TYPE === 'LEAVE'){
             _SocketCheck();
          }else if(data.TYPE === 'CANCEL'){
-           _me.listData.Load(function(){
-            _SocketCheck();
+           var isExist = false, selIndex = -1;
+           isExist = _me.listData.data.WORKING.some(function(item, index){
+              selIndex = index;
+              return item.인덱스 === data.CLIENT;
            });
+           if(isExist){
+             _me.elem.list.lists.WORKING.find('.as-item[data-index="'+data.CLIENT+'"]').remove();
+             _me.listData.data.WORKING.splice(selIndex,1);
+           }
          }
 
           /**
@@ -1060,65 +1016,110 @@
           }else{
 
             var command = b.data('liveas');
-            var sendData = {
-              id : _me.selItem.data.인덱스,
-              LIVEAS : {
-                member : neo.user.USER_ID,
-                command : _this.LIVECOMMANDS.LIVE + command,
-                params : _this.LIVECOMMANDS.LIVEPARAM + ":" + command,
-                oCommand : command,
-                oParams : {},
-                timer : b.data('timer')
+            swal({
+              title: command + ' 명령을 실행하시겠습니까?',
+              text: "간헐적으로 명령이 실행이 되었음에도 피드백이 오지 않는경우가 있을 수 있습니다.",
+              type: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: '네, 실행합니다.'
+            }).then(function() {
+              var sendData = {
+                id : _me.selItem.data.인덱스,
+                LIVEAS : {
+                  member : neo.user.USER_ID,
+                  command : _this.LIVECOMMANDS.LIVE + command,
+                  params : _this.LIVECOMMANDS.LIVEPARAM + ":" + command,
+                  oCommand : command,
+                  oParams : {},
+                  timer : b.data('timer')
+                }
+              };
+
+
+
+              switch (command) {
+                case _this.LIVECOMMANDS.CAPTURE:
+                  var cDate = new Date();
+                  sendData.LIVEAS.params += '%picName:' + window.btoa(cDate.GetToday('YYYYMMDDHHMMSS') + '' + neo.user.USER_ID + '' + _me.selItem.data.기관코드) + ".jpg";
+                  sendData.LIVEAS.oParams.picName = window.btoa(cDate.GetToday('YYYYMMDDHHMMSS') + '' + neo.user.USER_ID + '' + _me.selItem.data.기관코드) + ".jpg";
+                  break;
+                case _this.LIVECOMMANDS.REEXECUTE:
+                  break;
+                case _this.LIVECOMMANDS.SEETROL:
+                  swal({
+                    title: command,
+                    text: '스탠바이명칭과 서버를 입력해주세요.',
+                    showCloseButton : true,
+                    html:
+                      '<input id="swal-input1" class="swal2-input" autofocus value="'+_me.selItem.data.기관명칭 + _me.selItem.data.기관코드 +'" placeholder="스탠바이명칭">' +
+                      '<input id="swal-input2" class="swal2-input" value="medi.seetrol.com" placeholder="스탠바이 서버">',
+                    preConfirm: function(result) {
+                      return new Promise(function(resolve) {
+                        if (result) {
+                          alert(result);
+                          resolve([
+                            $('#swal-input1').val(),
+                            $('#swal-input2').val()
+                          ]);
+                        }
+                      });
+                    }
+                  }).then(function(result) {
+                    sendData.LIVEAS.params += '%스탠바이명칭:' + result[0];
+                    sendData.LIVEAS.params += '%서버명칭:' + result[1];
+                    // swal(JSON.stringify(sendData.LIVEAS.params));
+                    _me.selItem.onLive(true, command);
+                    return $.neoSocket.emitLiveAS(sendData);
+                  });
+                  return;
+                case _this.LIVECOMMANDS.ROLLBACK:
+                  var versions = {};
+                  neoAJAX.as.EmrVersion({
+                    url : '/versions',
+                    data : {emr : _me.selItem.data.프로그램},
+                    dataType : 'json',
+                    async : true,
+                    method : 'GET',
+                    beforeSend : function(opts){
+
+                    },
+                    success : function(opts, data){
+                      console.log(data);
+                      $.each(data.data, function(i,v){
+                        versions[v.배포버전] = v.배포버전;
+                      });
+                    },
+                    callback : function(opts){
+                      swal({
+                        title : '버전리스트',
+                        text : '적용하실 버전을 선택해주세요.',
+                        input : 'select',
+                        inputOptions : versions,
+                        showCancelButton : true,
+                        closeOnConfirm: false,
+                      }).then(function(inputValue){
+                        if(!inputValue){
+                          swal.close();
+                        }else{
+                          sendData.LIVEAS.params += '%롤백버전:' + inputValue;
+                          _me.selItem.onLive(true, command);
+                          return $.neoSocket.emitLiveAS(sendData);
+                        }
+                      });
+                    }
+                  });
+                  return;
+                case _this.LIVECOMMANDS.LATESTUPDATE:
+                  break;
+                case _this.LIVECOMMANDS.REINSTALL:
+                  break;
+                default:
               }
-            };
-
-            _me.selItem.onLive(true, command);
-
-            switch (command) {
-              case _this.LIVECOMMANDS.CAPTURE:
-                var cDate = new Date();
-                sendData.LIVEAS.params += '%picName:' + window.btoa(cDate.GetToday('YYYYMMDDHHMMSS') + '' + neo.user.USER_ID + '' + _me.selItem.data.기관코드) + ".jpg";
-                sendData.LIVEAS.oParams.picName = window.btoa(cDate.GetToday('YYYYMMDDHHMMSS') + '' + neo.user.USER_ID + '' + _me.selItem.data.기관코드) + ".jpg";
-                break;
-              case _this.LIVECOMMANDS.REEXECUTE:
-                break;
-              case _this.LIVECOMMANDS.SEETROL:
-                swal({
-                  title: command,
-                  text: '스탠바이명칭과 서버를 입력해주세요.',
-                  showCloseButton : true,
-                  html:
-                    '<input id="swal-input1" class="swal2-input" autofocus value="'+_me.selItem.data.기관명칭 + _me.selItem.data.기관코드 +'" placeholder="스탠바이명칭">' +
-                    '<input id="swal-input2" class="swal2-input" value="medi.seetrol.com" placeholder="스탠바이 서버">',
-                  preConfirm: function(result) {
-                    return new Promise(function(resolve) {
-                      if (result) {
-                        alert(result);
-                        resolve([
-                          $('#swal-input1').val(),
-                          $('#swal-input2').val()
-                        ]);
-                      }
-                    });
-                  }
-                }).then(function(result) {
-                  sendData.LIVEAS.params += '%스탠바이명칭:' + result[0];
-                  sendData.LIVEAS.params += '%서버명칭:' + result[1];
-                  // swal(JSON.stringify(sendData.LIVEAS.params));
-                  return $.neoSocket.emitLiveAS(sendData);
-                });
-                return;
-              case _this.LIVECOMMANDS.ROLLBACK:
-                break;
-              case _this.LIVECOMMANDS.LATESTUPDATE:
-                break;
-              case _this.LIVECOMMANDS.REINSTALL:
-                break;
-              default:
-            }
-
-            $.neoSocket.emitLiveAS(sendData);
-
+              _me.selItem.onLive(true, command);
+              $.neoSocket.emitLiveAS(sendData);
+            });
           }
         });
 
@@ -1172,19 +1173,14 @@
                             'style' : 'width:25%;'
                           });
                 if(target_elem.is(_me.selItem.$elem)){
-                  $('span#uploadImage').append(img);
-                  target_data.문의내용 = _me.elem.$edit.summernote('code');
+                  $('span#question').prepend(img);
+                  var question = _me.elem.$edit.summernote('code');
+                  target_data.문의내용 = question.substring(0,question.indexOf('<table id="personInfo"')); //
                 }else{
-                  var con = $('<div />');
-                  var comment = $(target_data.문의내용);
-                  con.append(comment);
-                  if(comment.hasClass('template')){
-                    $(comment.find('span#uploadImage')).append(img);
-                  }else{
-                    con.append('<span id="uploadImage"></span>');
-                    $(con.find('span#uploadImage')).append(img);
-                  }
-                  target_data.문의내용 = $(con).html();
+                  _me.selItem.imgStack[target_id] = {
+                    id : target_id,
+                    img : img
+                  };
                 }
                 /**
                  * 1. 지금 선택한 AS건이 AS명령을 보낼때와 같으면 에디터에 뿌려주고

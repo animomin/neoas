@@ -111,10 +111,8 @@
         function _beforeLoaded(opts, data){
           var _this = _me.listData;
           var tabName = opts.target_list.data('name');
-          var counter = 0;
 
-          _this.data[tabName] = data.data;
-          console.log(_this.data);
+          _this.data[tabName] = data.data || [];
 
           if(data.err && data.err !== 'NODATA'){
             //notify error
@@ -123,17 +121,16 @@
 
           if(data.err === 'NODATA'){
             // nodata template call
-            _me.elem.list._SetTabCount(opts.target_tab, counter);
+            _me.elem.list._SetTabCount(opts.target_tab, []);
             _me.elem.list._SetNoItem(opts.target_list);
 
             return false;
           }
 
           _this.data[tabName].forEach(function(item, index){
-            counter++;
             _me.elem.list._SetNewItem(opts.target_list, item, index, tabName);
           });
-          _me.elem.list._SetTabCount(opts.target_tab, counter);
+          _me.elem.list._SetTabCount(opts.target_tab, _this.data[tabName]);
 
           return opts.target_list.find('div.spiner-example').removeClass('fadeInDown').addClass('fadeOutUp');
         }
@@ -177,10 +174,10 @@
         var _this = _me.selItem;
 
         _this.id = b.data('id');
-        _this.$elem = $('.takeover-items[data-id="'+_this.id+'"]');
+        _this.$elem = $('div[data-name="'+b.data('name')+'"]').find('.takeover-items[data-id="'+_this.id+'"]');
         _this.data = _me.listData.data[b.data('name')][_this.id];
 
-        console.log(_this.data);
+        console.log(_this.data.문의내용);
 
         var cData = JSON.parse(JSON.stringify(_this.data));
         /* 선택된 AS건의 데이터 갱신 */
@@ -201,14 +198,27 @@
               desktop : true
             });
           }
-          /* 소캣으로 클라이언트(상태변경), 다른 직원들에게 메시지 전송 (인계) */
-          $.neoSocket.emitChangeStatus({id : _this.data.인덱스, status : _this.data.서비스상태 });
 
-          _me.listData.data[b.data('name')].splice(_this.id,1); // 데이터에서 삭제
+          _me.listData.data[b.data('name')][_this.id] = _this.data = cData;
+          /* 소캣으로 클라이언트(상태변경), 다른 직원들에게 메시지 전송 (인계) */
+          // $.neoSocket.emitChangeStatus({id : _this.data.인덱스, status : _this.data.서비스상태 });
+          $.neoSocket.emitChangeStatus({id : _this.data.인덱스, status : _this.data.서비스상태, item : {
+            확인일자 : _this.data.확인일자,
+            확인자 : _this.data.확인자,
+            확인자연락처 : _this.data.확인자연락처,
+            인계일자 : _this.data.인계일자,
+            인계자 : _this.data. 인계자,
+            인계자연락처 : _this.data.인계자연락처,
+            처리일자 : _this.data.처리일자,
+            처리자  : _this.data.처리자,
+            처리자연락처 : _this.data.처리자연락처
+          } });
+          // _me.listData.data[b.data('name')].splice(_this.id,1); // 데이터에서 삭제
 
           _this.$elem.removeClass(_this.$elem.data('animated')).addClass('fadeOutRightBig');
           _this.$elem.one('webkitAnimationEnd oanimationend msAnimationEnd animationend',
           function(e){
+            _me.elem.list._SetTabCount(_me.elem.list.tabs[b.data('name')],   _me.listData.data[b.data('name')]);
             _this.$elem.remove();
             _this.init();
           });
@@ -226,8 +236,14 @@
       list : {
         tabs : {},
         lists : {},
-        _SetTabCount : function(obj, count){
-          return obj.find('span').text(count);
+        _SetTabCount : function(obj, data){
+          var counter = 0;
+          data.forEach(function(item){
+            if(item.서비스상태 === ASSTATUS.TAKEOVER){
+              counter++;
+            }
+          });
+          return obj.find('span').text(counter);
         },
         _SetNoItem : function(obj){
           return obj.append('<a class="list-group-item"><h3 class="text-muted font-bold"> 검색된 데이터가 없습니다. </h3></a>');
@@ -248,6 +264,9 @@
           $item.find('small[data-name="인계일자"]').text(item.인계일자);
           $item.find('h5[data-name="기관명칭"]').text(item.기관명칭 + ' (' + item.기관코드 + ')');
           $item.find('div[data-name="문의내용"]').html(item.문의내용);
+
+          var question = $item.find('div[data-name="문의내용"]');
+          question.find('img.img-preview').bind('click', function(){_me.events.onPopupImage(this);});
 
           var $updateBadge = $item.find('span[data-name="업데이트"]');
               $updateBadge.empty();
@@ -278,7 +297,11 @@
                 .text(typename)
                 .addClass(badgename);
 
-            obj.append($item);
+            if(item.응급여부 === 1){
+              obj.prepend($item);
+            }else{
+              obj.append($item);
+            }
           }else{
             $updateBadge.append('<span class="badge badge-success update-badge update-info">UPDATE</span>');
             if(!$item.hasClass('takeover-items-danger')) $item.addClass('takeover-items-update');
@@ -314,10 +337,14 @@
         /**
          * Set Layout
          */
-        Split(['#pane-2', '#pane-3', '#pane-4'], {
-          gutterSize : 3,
-          cursor : 'col-resize'
-        });
+        if(!mobile){
+          Split(['#pane-2', '#pane-3', '#pane-4'], {
+            gutterSize : 3,
+            cursor : 'col-resize'
+          });
+        }else{
+          $('#page-wrapper').addClass('no-padding');
+        }
 
         return this.initEvents();
       },
@@ -369,6 +396,7 @@
        */
       onUpdateAS : function(){
         var _this = $(this);
+        console.log(_this.attr('data-id') , _this.attr('data-index'));
         msg = '해당 AS요청건을 인계받으시겠습니까? <br>';
         msg += '인계받은 AS건은 취소가 불가능합니다. <br> (단, [나의AS]에서 다른직원에게 전달은 가능합니다.)';
         msg += "<br> <small class='font-bold text-danger'>서비스상태를 변경하면 접수자의 컴퓨터에도 알림이 나탑니다.</small> <br> 계속하시겠습니까?";
@@ -464,9 +492,9 @@
 
                   var asData = data.data[0];
                   var program = neo.emrs[asData.프로그램].name;
-
-                  if($('.takeover-items[data-index="'+itemID+'"]').length){
-                    _me.elem.list._SetNewItem(_me.elem.list.lists[program], asData, itemID, program, $('.takeover-items[data-index="'+itemID+'"]'));
+                  var $elem = $('div[data-name="'+program+'"]').find('.takeover-items[data-index="'+itemID+'"]');
+                  if($elem.length){
+                    _me.elem.list._SetNewItem(_me.elem.list.lists[program], asData, itemID, program, $elem);
                     neoNotify.Show({
                       title : "AS 현황",
                       text : 'AS요청건이 업데이트되었습니다. \n (' + asData.기관명칭 + ')',
@@ -476,7 +504,7 @@
                   }else{
                     _me.listData.data[program].push(asData);
                     _me.elem.list._SetNewItem(_me.elem.list.lists[program], asData, itemID, program);
-                    _me.elem.list._SetTabCount(_me.elem.list.tabs[program], _me.listData.data[program].length);
+                    _me.elem.list._SetTabCount(_me.elem.list.tabs[program], _me.listData.data[program]);
                     neoNotify.Show({
                       title : "AS 현황",
                       text : '새로운 AS요청건이 인계접수 되었습니다. \n (' + asData.기관명칭 + ')',
@@ -490,9 +518,14 @@
                 }
               };
               neoAJAX.as.list(options);
-
+            }else{
+              var program = neo.emrs[asData.프로그램].name;
+              var $elem = $('.takeover-items[data-index="'+itemID+'"]');
+              if($elem.length){
+                $elem.remove();
+              }
+              // 상태가 인계접수, 완료, 취소 이면 리스트에서 찾아 지워준다.
             }
-            // 상태가 인계접수, 완료, 취소 이면 리스트에서 찾아 지워준다.
 
           }
 

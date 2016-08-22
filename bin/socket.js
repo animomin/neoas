@@ -173,7 +173,8 @@
     sckMember.slot = [];
 
     io.on('connection', function(socket){
-      console.log('SOCKET CONNECT');
+      console.log('NEW CONNECTION ', socket.handshake.address);
+
       /**
        * JOIN EVENT
        */
@@ -200,13 +201,13 @@
 
        socket.on(SOCKETEVENT.CLIENT.LEAVE, function(data){
          sckClients.remove(data.id, function(){
-           socket.broadcast.emit(SOCKETEVENT.MEMBER.CLIENTS, {TYPE:'LEAVE', CLIENTS : sckClients.slot});
+           socket.broadcast.emit(SOCKETEVENT.MEMBER.CLIENTS, {TYPE:'LEAVE', CLIENTS : sckClients.slot, CLIENT: data.id});
          });
        });
 
        socket.on(SOCKETEVENT.CLIENT.CANCEL, function(data){
          sckClients.remove(data.id, function(){
-           socket.broadcast.emit(SOCKETEVENT.MEMBER.CLIENTS, {TYPE:'CANCEL', CLIENTS : sckClients.slot});
+           socket.broadcast.emit(SOCKETEVENT.MEMBER.CLIENTS, {TYPE:'CANCEL', CLIENTS : sckClients.slot, CLIENT : data.id});
          });
        });
 
@@ -317,7 +318,7 @@
       socket.on(SOCKETEVENT.STATUS, function(data){
         console.log(SOCKETEVENT.STATUS);
         sckClients.find(data.id, function(item){
-          if(item) io.to(item[0].socket).emit(SOCKETEVENT.STATUS, {TYPE : 'STATUS', STATUS : data.status, item : data.item});
+          if(item[0]) io.to(item[0].socket).emit(SOCKETEVENT.STATUS, {TYPE : 'STATUS', STATUS : data.status, item : data.item});
         });
         console.log('MEMBER SEARCH');
         sckMember.slot.forEach(function(item){

@@ -27,6 +27,6 @@ div.row.border-bottom
             a.navbar-as(href='/myas', data-as='503') 나의AS         
         ul.nav.navbar-nav.navbar-right          
           li
-            a#sign-out(href='/users/logout')
+            a#sign-out(href='/users/logout',onClick='localStorage.clear();')
               i.fa.fa-sign-out
               | 로그아웃

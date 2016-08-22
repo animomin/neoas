@@ -72,8 +72,8 @@ var neoConst = {
       statusData : [],
       _getVersions : function(callback){
         var query =global.querys16._Versions_SENSE;
-        if(neoServer16.connection.connected){
-          neoServer16.RecordSet(query, function(err, records){
+        if(server16.connection.connected){
+          server16.RecordSet(query, function(err, records){
             callback(err, records);
           });
         }else{

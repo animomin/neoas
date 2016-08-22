@@ -2,7 +2,7 @@ script(src='/plugins/pnotify-master/dist/pnotify.custom.min.js')
 //- script(src='/plugins/pnotify-master/dist/pnotify.desktop.js')
 script(src='/plugins/sweetalert2/dist/sweetalert2.min.js')    
 script(src='/plugins/sweetalert2/dist/es6-promise.min.js')
-script(src='/plugins/viewerjs/dist/viewer.min.js')    
+script(src='/plugins/viewerjs/dist/viewer.js')    
 script(src='/plugins/summernote/dist/summernote.js')
 script(src='/plugins/summernote/dist/lang/summernote-ko-KR.min.js')   
 script(src='/plugins/split.js/split.js')   
@@ -15,12 +15,17 @@ script(src='/javascripts/as/neo.takeover.js')
 script(src='/javascripts/as/neo.myas.js')
 script(src='/javascripts/neo.socket.js')
 
-script.
+script.  
+  var mobile;
   $(document).ready(function(){
+    mobile = isMobile.any();
+    //- mobile = true;
     /**
      * Set Layout 
      */
-    neoModules.SetLayout(neo.menu, $('#workspace'));
+    var menu = parseInt(sessionStorage.getItem('menu')) || neo.menu;
+    neoModules.SetLayout(menu, $('#workspace'));      
+    $($('a.navbar-as[data-as="'+menu+'"]').parent()).addClass('active').siblings().removeClass('active');
     
     $(document).on('click','a.navbar-as', function(event){
       event.preventDefault();

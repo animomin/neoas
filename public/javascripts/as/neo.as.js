@@ -130,11 +130,10 @@
       search : null,    // 검색어
       init : function(){
         this.data = {};
-        this.area = false;
         this.search = "";
         return;
       },
-      Load : function(callback){
+      Load : function(type,callback){
         /**
          * 1. 오늘자 접수리스트 로드
          * 2. 전체날짜 진행중인거 로드
@@ -144,28 +143,29 @@
         /**
          * 1. 오늘자 접수리스트 로드
          */
-        var options = {
-          target_list : _me.elem.list.$accept,
-          target_tab : _me.elem.list.$acceptTab,
-          beforeSend : _beforeSend,
-          url : 'clients/list',
-          data : {
-            date : _me.options.workDate,
-            // status : _me.options.workState,
-            status : _me.elem.list.$acceptTab.data('type'),
-            search : this.search || "",
-            user : _me.options.user.USER_ID,
-            user_area : _me.options.user.user_area,
-            area : _me.options.area
-          },
-          dataType : 'json',
-          async : true,
-          method : 'GET',
-          success : _beforeLoaded,
-          callback : _afterLoaded
-        };
-        neoAJAX.as.list(options);
-
+          var options = {
+            target_list : _me.elem.list.$accept,
+            target_tab : _me.elem.list.$acceptTab,
+            beforeSend : _beforeSend,
+            url : 'clients/list',
+            data : {
+              date : _me.options.workDate,
+              // status : _me.options.workState,
+              status : _me.elem.list.$acceptTab.data('type'),
+              search : this.search || "",
+              user : _me.options.user.USER_ID,
+              user_area : _me.options.user.user_area,
+              area : _me.options.area
+            },
+            dataType : 'json',
+            async : true,
+            method : 'GET',
+            success : _beforeLoaded,
+            callback : _afterLoaded
+          };
+        if(type === null || type === 'JOIN'){
+          neoAJAX.as.list(options);
+        }
         /**
          * 2. 전체날짜 진행중인거 로드
          */
@@ -187,8 +187,9 @@
           success : _beforeLoaded,
           callback : _afterLoaded
         };
-        neoAJAX.as.list(options);
-
+        if(type === null){
+          neoAJAX.as.list(options);
+        }
         /**
          * 3. 전체날짜 취소된거 로드
          */
@@ -210,7 +211,9 @@
            success : _beforeLoaded,
            callback : _afterLoaded
          };
-         neoAJAX.as.list(options);
+         if(type === null || type === 'CANCEL'){
+           neoAJAX.as.list(options);
+         }
 
         function _beforeSend(opts){
           opts.target_tab.find('span').text('0');
@@ -397,7 +400,13 @@
         return;
       },
       Load : function(elem){
+
         var _this = _me.selItem;
+
+        if(_this.$elem && _this.id != elem.data('id')){
+          _this.data.문의내용 = _me.elem.GetComment();
+        }
+
         _this.$elem = elem;
         _this.id = _this.$elem.data('id');
         _this.data = _me.listData.data[_me.options.workTab][_this.id];
@@ -485,6 +494,13 @@
             _me.elem.$asStatus.addClass('disabled');
           }
 
+          if(mobile){
+            $('#page1').fadeOut('fast', function(){
+              $('#page2').removeClass('hidden');
+              $('#page2').fadeIn('fast');
+            });
+          }
+
         });
       },
       /**
@@ -498,6 +514,7 @@
         var cData = JSON.parse(JSON.stringify(_this.data));
         /* 선택된 AS건의 데이터 갱신 */
         cData.서비스상태 = status;
+        cData.문의내용 = _me.elem.GetComment();
         switch (status) {
           case ASSTATUS.CONFIRM:
             cData.확인자 = neo.user.USER_NAME;
@@ -519,7 +536,7 @@
             cData.인계자지사 = neo.user.user_area;
             cData.인계자연락처 = neo.user.info_hp || neo.user.info_tel;
             cData.인계일자 = (new Date()).GetToday('YYYY-MM-DD HH:MM:SS');
-            cData.문의내용 = _me.elem.GetComment();//_me.elem.$edit_q.summernote('code');
+            // cData.문의내용 = $('span#question').html(); //_me.elem.GetComment();//_me.elem.$edit_q.summernote('code');
             break;
           case ASSTATUS.DONE:
             if(cData.확인자ID === 0){
@@ -534,7 +551,7 @@
             cData.처리자지사 = neo.user.user_area;
             cData.처리자연락처 = neo.user.info_hp || neo.user.info_tel;
             cData.처리일자 = (new Date()).GetToday('YYYY-MM-DD HH:MM:SS');
-            cData.문의내용 = _me.elem.$edit_q.summernote('code');
+            // cData.문의내용 = _me.elem.$edit_q.summernote('code');
             break;
         }
 
@@ -646,7 +663,7 @@
           if(data.err && data.err !== 'NODATA'){
             neoNotify.Show({
               title : 'AS 기록 검색',
-              text : data.err
+              text : data.err.message
             });
             return false;
           }
@@ -728,7 +745,7 @@
         $working : null,
         $cancel : null,
         _SetTabCount : function(obj, count){
-          return obj.find('small').text(count);
+          return obj.find('span').text(count);
         },
         _SetNoItem : function(obj){
           return obj.append('<a class="list-group-item"><h3 class="text-muted font-bold"> 검색된 데이터가 없습니다. </h3></a>');
@@ -739,6 +756,7 @@
           $item.addClass('animated fadeInUp');
           $item.attr({'data-id' : index, 'data-index' : item.인덱스, 'data-animated' : 'fadeInUp'});
           $item.find('span[data-name="접수일자"]').text(item.접수일자);
+          $item.find('span[data-name="인덱스"]').text(item.인덱스);
 
           //progress-bar
           item.서비스상태 = parseInt(item.서비스상태);
@@ -800,7 +818,8 @@
       $liveas : null,           // 실시간 AS 명령 버튼 + 캡쳐버튼
       $asStatus : null,         // AS 상태변경 버튼
       $edit_q : null,           // 문의내용 에디터
-      $edit_d : null,            // 처리내용 에디터,
+      // $edit_c : null,           // 확인내용 에디터
+      // $edit_d : null,            // 처리내용 에디터,
       $status : null,            // 상태바
       init : function(){
 
@@ -834,6 +853,7 @@
           height: 500,
           buttons : _me.editor.buttons
         });
+
         this.SetTemplate(this.$edit_q);
 
         _this.$liveas = $('.as-lives-item');
@@ -844,27 +864,33 @@
         /**
          * Set Layout
          */
-        Split(['#left','#right'], {
-          gutterSize : 3,
-          cursor: 'col-resize',
-          sizes : [20,80]
-        });
-        Split(['#right-col1', '#right-col2'], {
-          gutterSize : 3,
-          direction : 'vertical',
-          sizes: [30,70],
-          cursor : 'row-resize'
-        });
+        if(!mobile){
+          Split(['#left','#right'], {
+            gutterSize : 3,
+            cursor: 'col-resize',
+            sizes : [20,80]
+          });
+          Split(['#right-col1', '#right-col2'], {
+            gutterSize : 3,
+            direction : 'vertical',
+            sizes: [30,70],
+            cursor : 'row-resize'
+          });
 
-        Split(['#pane-1', '#pane-2', '#pane-3'], {
-          gutterSize : 3,
-          cursor : 'col-resize'
-        });
-        Split(['#pane-4', '#pane-5'], {
-          gutterSize : 3,
-          cursor : 'col-resize',
-          sizes : [40,60]
-        });
+          Split(['#pane-1', '#pane-2', '#pane-3'], {
+            gutterSize : 3,
+            cursor : 'col-resize'
+          });
+          Split(['#pane-4', '#pane-5'], {
+            gutterSize : 3,
+            cursor : 'col-resize',
+            sizes : [40,60]
+          });
+        }else{
+          $('#page-wrapper').addClass('no-padding');
+          $('#accept_search').removeClass('panel-heading');
+          $('#accept_search').find('.form-group').addClass('m-b-xs m-t-xs');
+        }
 
         return this.initEvents();
       },
@@ -876,7 +902,14 @@
         this.$liveas.bind('click', _me.events.onExecuteLiveAS);
         this.$asStatus.bind('click', _me.events.onUpdateAS);
         this.$search_library.bind('keyup', _me.events.onLibrarySearch);
-
+        if(mobile){
+          $('a.as-tab[data-tab="list"]').bind('click', function(e){
+            e.preventDefault();
+            $('#page2').fadeOut('fast', function(){
+              $('#page1').fadeIn('fast');
+            });
+          });
+        }
         return;
       },
       clear : function(callback){
@@ -989,45 +1022,27 @@
         var target = this.$edit_q;
         var item = _me.selItem.data;
 
-        Tmplt = '<span class="template"><h3><span style="font-family: inherit; line-height: 1.1;">1. 문의내용 ( 병원용 )</span><br></h3><p>&nbsp; &nbsp; <span id="question"></span>&nbsp; &nbsp;&nbsp;<br></p><h3>3. 확인내용 ( 담당자용 )</h3><p>&nbsp; &nbsp;&nbsp;<br></p><h3>4. 처리내용</h3><p>&nbsp; &nbsp;&nbsp;</p></span>';
+        Tmplt = '<span id="template"><h3>1. 문의내용 ( 병원용 )</h3><span id="question"><p><br></p></span><h3>2. 확인내용 ( 담당자용 )</h3><p><br></p><h3>3. 처리내용 </h3><p><br></p></p></span>';
         TmpltTable ='<table id="personInfo" class="table table-bordered small"><tbody><tr><td>접수자 정보<br></td><td>확인자 정보<br></td><td>인계자 정보<br></td><td>처리자 정보<br></td></tr><tr><td><span id="iaccept"></span><br></td><td><span id="iconfirm"></span><br></td><td><span id="itakeover"></span><br></td><td><span id="idone"></span><br></td></tr></tbody></table>';
 
         if(item){
-          var question;
-          try{
-            question = $(item.문의내용.trim());
-            if(question.length <= 0) question = $('<p />').html(item.문의내용.trim());
-          }catch(e){
-            console.log(e);
-            if(e.message.indexOf('Syntax error') >= 0){
-              question = $('<span />').html('<p>'+item.문의내용.trim()+'</p>');
-            }else{
-              question = $('<span />').text('문의내용 저장중 실패하였습니다.');
-            }
-          }
 
-          if(question.hasClass('template') || question.find('.template').lrngth > 0) {
-            target.summernote('code', item.문의내용.trim() + TmpltTable);
-            if($('.note-editable').find('table').length > 0){
-              $($('.note-editable').find('table')).each(function(i,v){
-                if($(v).attr('id') !== 'personInfo') $(v).remove();
-              });
-            }
+          var question = item.문의내용.trim();
+          if(question.indexOf('<span id="template">') >= 0){
+            target.summernote('code', question + TmpltTable);
           }else{
             target.summernote('code', Tmplt + TmpltTable);
-
-            var imgs = question.find('img');
-            if(imgs && imgs.length){
-              imgs.each(function(index, item){
-                $('.note-editable').prepend($(item).clone());
-                $(item).remove();
-              });
-            }
-            $('.note-editable').find('span#question').html(item.문의내용.trim());
+            $('span#question').html(item.문의내용.trim());
           }
 
+          // $('span#confirm').html(item.확인내용.trim());
+          // $('span#done').html(item.처리내용.trim());
           if( _me.selItem.imgStack[item.인덱스]){
-            $('.note-editable').prepend( _me.selItem.imgStack[item.인덱스].img);
+            if($('span#question').length){
+              $('span#question').prepend(_me.selItem.imgStack[item.인덱스].img);
+            }else{
+              $('.note-editable').prepend(_me.selItem.imgStack[item.인덱스].img);
+            }
             delete  _me.selItem.imgStack[item.인덱스];
           }
 
@@ -1056,8 +1071,8 @@
             '처리일자 : ' + (item.처리자ID === 0 ?  "" : item.처리일자.trim())
           );
 
-          question = target.summernote('code');
-          item.문의내용 = question.substring(0,question.indexOf('<table id="personInfo"'));
+
+          //item.문의내용 = $('span#question').html();
 
         }else{
           target.summernote('code', Tmplt + TmpltTable);
@@ -1093,7 +1108,7 @@
         }else{
           $(this).find('i').remove();
         }
-        return _me.listData.Load(function(){
+        return _me.listData.Load(null,function(){
           $.neoSocket.emitClients();
         });
       },
@@ -1103,7 +1118,7 @@
       onSearch : function(e){
         if(e.type == 'keyup' && (e.keyCode == 13 || e.key == 'Enter')){
           _me.listData.search = $(this).val().trim();
-          return _me.listData.Load();
+          return _me.listData.Load(null);
         }
       },
       /**
@@ -1244,12 +1259,6 @@
           });
         }
 
-        if($(this).data('liveas') === _me.Live.LIVECOMMANDS.ROLLBACK){
-          return neoNotify.Show({
-            text : '준비중입니다'
-          });
-        }
-
         return _me.Live.Send($(this));
       },
       onClients : function(data){
@@ -1277,14 +1286,14 @@
              type : 'info',
              desktop : true
            });
-           _me.listData.Load(function(){
+           _me.listData.Load(data.TYPE, function(){
             _SocketCheck();
            });
            /* 리스트를 주엇네? */
          }else if(data.TYPE === 'LIST' || data.TYPE === 'LEAVE'){
             _SocketCheck();
          }else if(data.TYPE === 'CANCEL'){
-           _me.listData.Load(function(){
+           _me.listData.Load(data.TYPE,function(){
             _SocketCheck();
            });
          }
@@ -1353,66 +1362,111 @@
               desktop : false
             });
           }else{
-
             var command = b.data('liveas');
-            var sendData = {
-              id : _me.selItem.data.인덱스,
-              LIVEAS : {
-                member : neo.user.USER_ID,
-                command : _this.LIVECOMMANDS.LIVE + command,
-                params : _this.LIVECOMMANDS.LIVEPARAM + ":" + command,
-                oCommand : command,
-                oParams : {},
-                timer : b.data('timer')
+
+            swal({
+              title: command + ' 명령을 실행하시겠습니까?',
+              text: "간헐적으로 명령이 실행이 되었음에도 피드백이 오지 않는경우가 있을 수 있습니다.",
+              type: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: '네, 실행합니다.'
+            }).then(function() {
+
+              var sendData = {
+                id : _me.selItem.data.인덱스,
+                LIVEAS : {
+                  member : neo.user.USER_ID,
+                  command : _this.LIVECOMMANDS.LIVE + command,
+                  params : _this.LIVECOMMANDS.LIVEPARAM + ":" + command,
+                  oCommand : command,
+                  oParams : {},
+                  timer : b.data('timer')
+                }
+              };
+
+              switch (command) {
+                case _this.LIVECOMMANDS.CAPTURE:
+                  var cDate = new Date();
+                  sendData.LIVEAS.params += '%picName:' + window.btoa(cDate.GetToday('YYYYMMDDHHMMSS') + '' + neo.user.USER_ID + '' + _me.selItem.data.기관코드) + ".jpg";
+                  sendData.LIVEAS.oParams.picName = window.btoa(cDate.GetToday('YYYYMMDDHHMMSS') + '' + neo.user.USER_ID + '' + _me.selItem.data.기관코드) + ".jpg";
+                  break;
+                case _this.LIVECOMMANDS.REEXECUTE:
+                  break;
+                case _this.LIVECOMMANDS.SEETROL:
+                  swal({
+                    title: command,
+                    text: '스탠바이명칭과 서버를 입력해주세요.',
+                    showCloseButton : true,
+                    html:
+                      '<input id="swal-input1" class="swal2-input" autofocus value="'+_me.selItem.data.기관명칭 + _me.selItem.data.기관코드 +'" placeholder="스탠바이명칭">' +
+                      '<input id="swal-input2" class="swal2-input" value="medi.seetrol.com" placeholder="스탠바이 서버">',
+                    preConfirm: function(result) {
+                      return new Promise(function(resolve) {
+                        if (result) {
+                          resolve([
+                            $('#swal-input1').val(),
+                            $('#swal-input2').val()
+                          ]);
+                        }
+                      });
+                    }
+                  }).then(function(result) {
+                    sendData.LIVEAS.params += '%스탠바이명칭:' + result[0];
+                    sendData.LIVEAS.params += '%서버명칭:' + result[1];
+                    // swal(JSON.stringify(sendData.LIVEAS.params));
+                    _me.selItem.onLive(true, command);
+                    return $.neoSocket.emitLiveAS(sendData);
+                  });
+                  return;
+                case _this.LIVECOMMANDS.ROLLBACK:
+                  var versions = {};
+                  neoAJAX.as.EmrVersion({
+                    url : '/versions',
+                    data : {emr : _me.selItem.data.프로그램},
+                    dataType : 'json',
+                    async : true,
+                    method : 'GET',
+                    beforeSend : function(opts){
+
+                    },
+                    success : function(opts, data){
+                      console.log(data);
+                      $.each(data.data, function(i,v){
+                        versions[v.배포버전] = v.배포버전;
+                      });
+                    },
+                    callback : function(opts){
+                      swal({
+                        title : '버전리스트',
+                        text : '적용하실 버전을 선택해주세요.',
+                        input : 'select',
+                        inputOptions : versions,
+                        showCancelButton : true,
+                        closeOnConfirm: false,
+                      }).then(function(inputValue){
+                        if(!inputValue){
+                          swal.close();
+                        }else{
+                          sendData.LIVEAS.params += '%롤백버전:' + inputValue;
+                          _me.selItem.onLive(true, command);
+                          return $.neoSocket.emitLiveAS(sendData);
+                        }
+                      });
+                    }
+                  });
+                  return;
+                case _this.LIVECOMMANDS.LATESTUPDATE:
+                  break;
+                case _this.LIVECOMMANDS.REINSTALL:
+                  break;
+                default:
               }
-            };
 
-            _me.selItem.onLive(true, command);
-
-            switch (command) {
-              case _this.LIVECOMMANDS.CAPTURE:
-                var cDate = new Date();
-                sendData.LIVEAS.params += '%picName:' + window.btoa(cDate.GetToday('YYYYMMDDHHMMSS') + '' + neo.user.USER_ID + '' + _me.selItem.data.기관코드) + ".jpg";
-                sendData.LIVEAS.oParams.picName = window.btoa(cDate.GetToday('YYYYMMDDHHMMSS') + '' + neo.user.USER_ID + '' + _me.selItem.data.기관코드) + ".jpg";
-                break;
-              case _this.LIVECOMMANDS.REEXECUTE:
-                break;
-              case _this.LIVECOMMANDS.SEETROL:
-                swal({
-                  title: command,
-                  text: '스탠바이명칭과 서버를 입력해주세요.',
-                  showCloseButton : true,
-                  html:
-                    '<input id="swal-input1" class="swal2-input" autofocus value="'+_me.selItem.data.기관명칭 + _me.selItem.data.기관코드 +'" placeholder="스탠바이명칭">' +
-                    '<input id="swal-input2" class="swal2-input" value="medi.seetrol.com" placeholder="스탠바이 서버">',
-                  preConfirm: function(result) {
-                    return new Promise(function(resolve) {
-                      if (result) {
-                        resolve([
-                          $('#swal-input1').val(),
-                          $('#swal-input2').val()
-                        ]);
-                      }
-                    });
-                  }
-                }).then(function(result) {
-                  sendData.LIVEAS.params += '%스탠바이명칭:' + result[0];
-                  sendData.LIVEAS.params += '%서버명칭:' + result[1];
-                  // swal(JSON.stringify(sendData.LIVEAS.params));
-                  return $.neoSocket.emitLiveAS(sendData);
-                });
-                return;
-              case _this.LIVECOMMANDS.ROLLBACK:
-                break;
-              case _this.LIVECOMMANDS.LATESTUPDATE:
-                break;
-              case _this.LIVECOMMANDS.REINSTALL:
-                break;
-              default:
-            }
-
-            $.neoSocket.emitLiveAS(sendData);
-
+              _me.selItem.onLive(true, command);
+              $.neoSocket.emitLiveAS(sendData);
+            });
           }
         });
 
@@ -1466,8 +1520,9 @@
                             'style' : 'width:25%;'
                           });
                 if(target_elem.is(_me.selItem.$elem)){
-                  $('span.template').prepend(img);
-                  target_data.문의내용 = _me.elem.$edit_q.summernote('code');
+                  $('span#question').prepend(img);
+                  var question = _me.elem.$edit_q.summernote('code');
+                  target_data.문의내용 = question.substring(0,question.indexOf('<table id="personInfo"')); //
                 }else{
                   _me.selItem.imgStack[target_id] = {
                     id : target_id,
@@ -1508,7 +1563,12 @@
 
 
     _me.Initialize(function(){
-      _me.listData.Load(function(){
+      try{
+        JSInterface.LoginUser(neo.user.USER_ID, neo.user.user_area);
+      }catch(e){
+        console.log(e);
+      }
+      _me.listData.Load(null,function(){
         $.neoSocket.module = _me;
         $.neoSocket.emitClients();
       });

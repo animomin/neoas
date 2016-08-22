@@ -14,7 +14,7 @@ var neoNotify = {
 
     PNotify.prototype.options.styling = "fontawesome";
 
-    if(_this.options.desktop){
+    if(_this.options.desktop && !mobile){
       PNotify.desktop.permission();
       _ShowDesktopNotify();
     }

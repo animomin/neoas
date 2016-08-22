@@ -123,12 +123,14 @@
               where += "        접수자 like '%"+params.search+"%' ) ";
             }
 
-            var area = "";
-            if(!params.user_area) area = req.session.user.user_area;
-            else area = params.user_area;
-            if(area.trim() === '0000' || area.trim() === '0030') area = "'0000','0030'";
-            if(!params.area){
-              where += " And 지사코드 IN (" + area + ")";
+            if(params.type !== 'MYAS'){
+              var area = "";
+              if(!params.user_area) area = req.session.user.user_area;
+              else area = params.user_area;
+              if(area.trim() === '0000' || area.trim() === '0030') area = "'0000','0030'";
+              if(!params.area){
+                where += " And 지사코드 IN (" + area + ")";
+              }
             }
           }
           query = util.format(query, where, orderby);
