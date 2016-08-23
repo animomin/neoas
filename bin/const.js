@@ -1,4 +1,20 @@
 var neoConst = {
+  settings : {
+    _loadLayouts : function(){
+      fs.readFile('public/settings/layouts/layers_sense.json','utf8', function(error, data) {
+        if (error) {
+          console.log(error);
+        } else {
+          var layouts = JSON.parse(data);
+          var keys = Object.keys(layouts);
+          console.log(keys);
+          keys.forEach(function(item){
+            emrs[item].layouts = layouts[item];
+          });
+        }
+      });
+    }
+  },
   emrs : {
     _statusDataClear : function(callback){
       this[1].statusData =[];
@@ -15,6 +31,7 @@ var neoConst = {
       id : 1,
       name : "Eplus",
       badge : "badge-eplus",
+      layouts : {},
       statusData : [],
       _getVersions : function(callback){
         return;
@@ -24,6 +41,7 @@ var neoConst = {
       id : 2,
       name : "Hplus",
       badge : "badge-eplus",
+      layouts : {},
       statusData : [],
       _getVersions : function(callback){
         return;
@@ -33,6 +51,7 @@ var neoConst = {
       id : 6,
       name : "EplusCL",
       badge : "badge-eplus",
+      layouts : {},
       statusData : [],
       _getVersions : function(callback){
         return;
@@ -42,6 +61,7 @@ var neoConst = {
       id : 7,
       name : "Echart",
       badge : "badge-echart",
+      layouts : {},
       statusData : [],
       _getVersions : function(callback){
         return;
@@ -51,6 +71,7 @@ var neoConst = {
       id : 8,
       name : "MediChart",
       badge : "badge-medi",
+      layouts : {},
       statusData : [],
       _getVersions : function(callback){
         return;
@@ -60,6 +81,7 @@ var neoConst = {
       id : 10,
       name : "HanimacPro",
       badge : "badge-medi",
+      layouts : {},
       statusData : [],
       _getVersions : function(callback){
         return;
@@ -69,6 +91,7 @@ var neoConst = {
       id : 20,
       name : "SENSE",
       badge : "badge-sense",
+      layouts : {},
       statusData : [],
       _getVersions : function(callback){
         var query =global.querys16._Versions_SENSE;

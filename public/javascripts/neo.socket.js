@@ -51,6 +51,7 @@
        */
       _this.socket.on(SOCKETEVENT.CONNECT, function(){
           _this.socket.emit(SOCKETEVENT.MEMBER.JOIN, {id : neo.user.USER_ID, area : neo.user.user_area});
+          _this.socket.emit('version',{mobile : 'android'});
       });
 
       /**

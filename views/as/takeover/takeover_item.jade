@@ -11,7 +11,9 @@ div.social-feed-box.takeover-items.animated.fadeInUp(data-animated='fadeInUp')
         h5(data-name='기관명칭')       
         span.badge(data-name='서비스타입')       
   div.social-body
-    div.takeover-content(data-name='문의내용')
+    div.takeover-program(data-name='실행정보')
+      include ./takeover_item_program.jade
+    div.takeover-content(data-name='문의내용')    
     hr
     div.btn-group      
       button.btn.btn-white.btn-sm(data-name='인계접수')

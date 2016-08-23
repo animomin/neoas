@@ -7,8 +7,11 @@
     global.fs = require('fs');
     global.datetime = require('node-datetime');
     global.logger = require('./logger');
-    global.area = require('./const').area;
-    global.emrs = require('./const').emrs;
+    var neoConst = require('./const');
+    global.area = neoConst.area;
+    global.emrs = neoConst.emrs;
+    neoConst.settings._loadLayouts();
+
     global.server16 = require('../dist/_db/neoServer16');
     global.server22 = require('../dist/_db/neoServer22');
     global.member = require('../dist/Member');
@@ -34,7 +37,8 @@
         CLIENTHISTORY : 403,
         REQUEST : 501,
         TAKEOVER : 502,
-        MYAS : 590
+        MYAS : 503,
+        MANAGE: 504
       },
       users : {
         index : "users",

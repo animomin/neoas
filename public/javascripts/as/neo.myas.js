@@ -640,6 +640,7 @@
         _this.$asStatus = $('.as-status-btn');
         _this.$asStatus.bind('click', _me.events.onUpdateAS);
 
+        $('#as-toolbar-view').removeClass('hidden');
         /**
          * Set Layout
          */

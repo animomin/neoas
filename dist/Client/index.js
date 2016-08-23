@@ -209,6 +209,8 @@
       set += ", 처리일자 = '" + req.처리일자 + "' ";
       set += ", 응급여부 = " + req.응급여부 + " ";
       set += ", 문의내용 = '" + req.문의내용 + "' ";
+      set += ", 실행메뉴 = '" + req.실행메뉴 + "' ";
+      set += ", 세부화면 = '" + req.세부화면 + "' ";
 
       query = util.format(query, req.서비스상태, set, req.인덱스);
       logger.info(query);

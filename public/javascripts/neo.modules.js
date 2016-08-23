@@ -140,7 +140,12 @@ var ASSTATUS = {
 var MENU = {
   REQUEST : 501,
   TAKEOVER : 502,
-  MYAS : 503
+  MYAS : 503,
+  MANAGE : 504
+};
+
+var SETTINGS = {
+  LAYOUT : 0
 };
 
 /**
@@ -163,6 +168,10 @@ var neoModules = {
       case MENU.MYAS:
         view = 'as-myas-layout';
         start = $.neoMY;
+        break;
+      case MENU.MANAGE:
+        view = 'as-manage-layout';
+        start = $.neoMNG;
         break;
       default:
         view = 'as-request-layout';

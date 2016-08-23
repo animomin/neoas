@@ -25,7 +25,9 @@ div.row.border-bottom
             a.navbar-as(href='/takeover', data-as='502') AS현황         
           li(class=menu==503 ? 'active' :'')
             a.navbar-as(href='/myas', data-as='503') 나의AS         
-        ul.nav.navbar-nav.navbar-right          
+          li(class=menu==504 ? 'active' : '')
+            a.navbar-as(href='/manage', data-as='504') AS관리
+        ul.nav.navbar-nav.navbar-right                    
           li
             a#sign-out(href='/users/logout',onClick='localStorage.clear();')
               i.fa.fa-sign-out

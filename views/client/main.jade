@@ -150,9 +150,7 @@ block scripts
         height: 250,   //set editable area's height
         codemirror: { // codemirror options
           theme: 'monokai'
-        },
-        placeholder: '상단의 AS접수 구분을 선택하여주세요. <br><br> ' +
-                    '<p>프로그램장애시 화면을 캡쳐하여 접수하시면 빠른 처리에 도움이 됩니다.</p>',                      
+        },        
         lang : 'ko-KR',
         buttons : {
           bug : function(context){
@@ -231,7 +229,7 @@ block scripts
       });
       
       Pace.on('hide', function(){
-          $('.note-placeholder').css('display','block');
+          //- $('.note-placeholder').css('display','block');
           //- tour.start();
       });           
       
@@ -239,6 +237,19 @@ block scripts
     
     $(document).on('submit', 'form' , function(event){
       var browser = parseInt(sessionStorage.getItem('browser'));
+      
+      if(!$('button.btn-astype').hasClass('active')){
+        var btnG = $('button.btn-astype').parent();
+        btnG.addClass('animated tada').popover({
+          content: "<span class='font-bold text-danger'>AS접수 구분을 선택해주세요.</span>", 
+          placement: "bottom",
+          html : true,
+        }).popover('show').on('shown.bs.popover', function(){
+          setTimeout(function(){btnG.removeClass('animated tada').popover('hide');}, 2000);
+        });
+        event.preventDefault();
+      }
+      
       if(browser > 9){
          event.preventDefault();       
          $('body').addClass('animated slideOutLeft');
@@ -247,7 +258,7 @@ block scripts
            event.target.submit();
          });
       }
-    });  
+    });   
     
     $(document).on('click', '#capture', function(){
       //toastr['info']('준비중입니다.');

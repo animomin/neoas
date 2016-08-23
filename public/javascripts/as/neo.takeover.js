@@ -265,6 +265,10 @@
           $item.find('h5[data-name="기관명칭"]').text(item.기관명칭 + ' (' + item.기관코드 + ')');
           $item.find('div[data-name="문의내용"]').html(item.문의내용);
 
+          $item.find('td.tb-value[data-id="실행파일"]').text(item.실행파일);
+          $item.find('td.tb-value[data-id="실행메뉴"]').text(item.실행메뉴);
+          $item.find('td.tb-value[data-id="세부화면"]').text(item.세부화면);
+
           var question = $item.find('div[data-name="문의내용"]');
           question.find('img.img-preview').bind('click', function(){_me.events.onPopupImage(this);});
 

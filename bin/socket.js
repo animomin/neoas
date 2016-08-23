@@ -2,7 +2,7 @@
     "use strict";
 
     var SOCKETEVENT = {
-
+      VERSION : 'version',
       DISCONNECT : 'disconnect',
       STATUS : 'status',
       MEMBER : {
@@ -328,6 +328,20 @@
           }
         });
 
+      });
+
+      /**
+       * app version check
+       */
+      socket.on(SOCKETEVENT.VERSION, function(data){
+        var versions, folderpath = 'public/apps/' + data.mobile;
+        var path = require('path');
+        versions = fs.readdirSync(folderpath).filter(function(file) {
+          return fs.statSync(path.join(folderpath, file)).isDirectory();
+        });
+
+        versions = versions.sort();        
+        socket.emit(SOCKETEVENT.VERSION, {version : versions[versions.length-1]});
       });
 
     });

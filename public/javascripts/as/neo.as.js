@@ -3,6 +3,7 @@
   var NeoAS = function(){
 
     var _me = this;
+
     /**
      * 공용 옵션 변수
      */
@@ -490,6 +491,21 @@
             }
           });
 
+          var lys = null;
+          _me.elem.$lyExe.empty();
+          _me.elem.$lyMenu.empty();
+          _me.elem.$lyDetail.empty();
+
+          lys = neo.emrs[_this.data.프로그램].layouts;
+          var exes = Object.keys(lys);
+          exes.forEach(function(item){
+            var newItem = $('<option />').text(item);
+            _me.elem.$lyExe.append(newItem);
+          });
+          _me.elem.$lyExe.selectpicker({
+            size : 10
+          }).selectpicker('refresh').selectpicker('val', _this.data.실행파일).trigger('changed.bs.select');
+
           if(_this.data.서비스상태 === ASSTATUS.CANCEL){
             _me.elem.$asStatus.addClass('disabled');
           }
@@ -515,6 +531,8 @@
         /* 선택된 AS건의 데이터 갱신 */
         cData.서비스상태 = status;
         cData.문의내용 = _me.elem.GetComment();
+        cData.실행메뉴 = _me.elem.$lyMenu.selectpicker('val');
+        cData.세부화면 = _me.elem.$lyDetail.selectpicker('val');
         switch (status) {
           case ASSTATUS.CONFIRM:
             cData.확인자 = neo.user.USER_NAME;
@@ -753,8 +771,8 @@
         _SetNewItem : function(obj, item, index, first){
           var $item = _me.elem.$item.clone();
 
-          $item.addClass('animated fadeInUp');
-          $item.attr({'data-id' : index, 'data-index' : item.인덱스, 'data-animated' : 'fadeInUp'});
+          $item.addClass('animated fadeIn');
+          $item.attr({'data-id' : index, 'data-index' : item.인덱스, 'data-animated' : 'fadeIn'});
           $item.find('span[data-name="접수일자"]').text(item.접수일자);
           $item.find('span[data-name="인덱스"]').text(item.인덱스);
 
@@ -820,6 +838,9 @@
       $edit_q : null,           // 문의내용 에디터
       // $edit_c : null,           // 확인내용 에디터
       // $edit_d : null,            // 처리내용 에디터,
+      $lyExe : null,              // 실행파일 멀티박스
+      $lyMenu : null,             // 실행메뉴 멀티박스
+      $lyDetail : null,           // 세부화면 멀티박스
       $status : null,            // 상태바
       init : function(){
 
@@ -844,6 +865,14 @@
         _this.$library = $('div#library');       // 문의내용 검색
         _this.$search_library = $('input#search_library');
         _this.$status = $('div.as_status');
+
+        _this.$lyExe = $('#as-toolbar-execute');
+        _this.$lyMenu = $('#as-toolbar-menu');
+        _this.$lyDetail = $('#as-toolbar-detail');
+        _this.$lyExe.selectpicker({size : 10});
+        _this.$lyMenu.selectpicker({size : 10});
+        _this.$lyDetail.selectpicker({size : 10});
+        $('#as-toolbar-edit').removeClass('hidden');
 
         _this.$edit_q = $('#as_question');
         $(_this.$edit_q).summernote({
@@ -902,6 +931,7 @@
         this.$liveas.bind('click', _me.events.onExecuteLiveAS);
         this.$asStatus.bind('click', _me.events.onUpdateAS);
         this.$search_library.bind('keyup', _me.events.onLibrarySearch);
+        $('.selectpicker').on('changed.bs.select', _me.events.onExeDetailClick);
         if(mobile){
           $('a.as-tab[data-tab="list"]').bind('click', function(e){
             e.preventDefault();
@@ -926,11 +956,6 @@
         this.$edit_q.summernote('code', '');
         // this.SetTemplate(this.$edit_q);
 
-        /**
-         * 상태바 초기화
-         */
-
-
         this.$liveas.each(function(i,v){
 
           if($(v).data('liveas') === _me.Live.LIVECOMMANDS.CAPTURE){
@@ -948,6 +973,12 @@
           }
         });
 
+        this.$lyExe.empty();
+        this.$lyExe.selectpicker('refresh');
+        this.$lyMenu.empty();
+        this.$lyMenu.selectpicker('refresh');
+        this.$lyDetail.empty();
+        this.$lyDetail.selectpicker('refresh');
 
         if(typeof callback === 'function') return callback();
         else return;
@@ -1293,8 +1324,13 @@
          }else if(data.TYPE === 'LIST' || data.TYPE === 'LEAVE'){
             _SocketCheck();
          }else if(data.TYPE === 'CANCEL'){
-           _me.listData.Load(data.TYPE,function(){
+           _me.listData.Load(null,function(){
             _SocketCheck();
+            if(_me.selItem.$elem.length){
+              // _me.selItem.$elem.addClass('active');
+              _me.selItem.$elem = $('a.as-item[data-index="'+_me.selItem.id+'"]');
+              _me.selItem.$elem.addClass('active');
+            }
            });
          }
 
@@ -1314,10 +1350,49 @@
               }
             });
           }
-
-
+      },
+      onExeDetailClick : function(e){
+        var type = $(this).attr('title');
+        var target, ly, preSel;
+        switch(type){
+          case "실행파일":
+            target = _me.elem.$lyMenu;
+            target.empty();
+            // target.selectpicker('destroy');
+            ly = neo.emrs[_me.selItem.data.프로그램].layouts[$(this).selectpicker('val')];
+            preSel = _me.selItem.data.실행메뉴;
+          break;
+          case "실행메뉴":
+            target = _me.elem.$lyDetail;
+            target.empty();
+            // target.selectpicker('destroy');
+            ly = neo.emrs[_me.selItem.data.프로그램].layouts[_me.elem.$lyExe.selectpicker('val')][$(this).selectpicker('val')];
+            preSel = _me.selItem.data.세부화면;
+          break;
+          case "세부화면":
+          return;
         }
-      // }
+
+        if(ly){
+          if(!Array.isArray(ly)){
+            ly = Object.keys(ly);
+          }
+
+          ly.forEach(function(item){
+            var newItem = $('<option />').text(item);
+            target.append(newItem);
+          });
+          target.selectpicker({size : 10}).selectpicker('refresh');
+
+          if(preSel){
+            target.selectpicker('val', preSel).trigger('changed.bs.select');
+          }
+        }
+
+      },
+      onExeApplyClick : function(){
+
+      }
     };
 
     /**

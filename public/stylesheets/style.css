@@ -60,3 +60,9 @@
 .takeover-items-update {
   border :1px solid #1c84c6;
 }
+
+.scrollable-menu {
+    height: auto;
+    max-height: 200px;
+    overflow-x: hidden;
+}

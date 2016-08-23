@@ -13,7 +13,6 @@ router.get('/template/:template', function(req, res, next){
       template = template.replace(/-/gim, '/');
   res.render(template, function(err, view){
     if(err) logger.error(err);
-    console.log(view);
     res.send(view);
   });
 });
@@ -40,6 +39,12 @@ router.get('/versions', function(req, res, next){
     }
     res.send(result);
   });
+});
+
+router.get('/apps/:mobile/:version', function(req, res, next){
+  var file = 'public/apps/' + req.params.mobile + '/' + req.params.version + '/neoas';
+  file += (req.params.mobile === 'android' ? '.apk' : '.ipa');
+  res.download(file);
 });
 
 module.exports = router;
