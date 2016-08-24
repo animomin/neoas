@@ -152,8 +152,7 @@ var SETTINGS = {
  * Modules collections
  */
 var neoModules = {
-  SetLayout : function(menu, container){
-    sessionStorage.setItem('menu', menu);
+  SetLayout : function(menu, container){    
     var view = '', start;
     var m = mobile ? "_m" : "";
     switch (menu) {

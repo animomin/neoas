@@ -122,8 +122,31 @@ div.tabs-container
       div#area.rank-tabs.tab-pane.fade(style='height:100%;')
         div.panel-body.gray-bg(style='height:100%;')           
           div.container-fluid
-            h1 8월 지사별 AS 현황
+            h1 
+              span(data-name='month') 
+              |  지사별 AS 처리현황
             canvas#barChart_area
       div#member.rank-tabs.tab-pane.fade(style='height:100%;')
+        div.panel-body.gray-bg(style='height:100%;')           
+          div.container-fluid
+            h1 
+              span(data-name='month') 
+              |  직원별 AS 처리현황
+            canvas#barChart_member
       div#emr.rank-tabs.tab-pane.fade(style='height:100%;')
+        div.panel-body.gray-bg(style='height:100%;')           
+          div.container-fluid
+            h1 
+              span(data-name='month') 
+              |  프로그램별 AS 처리현황
+            div.col-xs-4
+              canvas#pieChart_emr
+            div.col-xs-8
+              canvas#radarChart_emr
       div#hosp.rank-tabs.tab-pane.fade(style='height:100%;')
+        div.panel-body.gray-bg(style='height:100%;')           
+          div.container-fluid
+            h1 
+              span(data-name='month') 
+              |  병원별 AS 처리현황
+            canvas#barChart_hosp

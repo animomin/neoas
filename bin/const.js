@@ -6,7 +6,7 @@ var neoConst = {
           console.log(error);
         } else {
           var layouts = JSON.parse(data);
-          var keys = Object.keys(layouts);          
+          var keys = Object.keys(layouts);
           keys.forEach(function(item){
             emrs[item].layouts = layouts[item];
           });
@@ -30,6 +30,12 @@ var neoConst = {
       id : 1,
       name : "Eplus",
       badge : "badge-eplus",
+      chart : {
+        backgroundColor : 'rgba(53, 162, 70, 0.5)',
+        hoverbackgroundColor : 'rgba(53, 162, 70, 0.7)',
+        borderColor : 'rgb(53, 162, 70)',
+        borderWidth : 1
+      },
       layouts : {},
       statusData : [],
       _getVersions : function(callback){
@@ -40,6 +46,12 @@ var neoConst = {
       id : 2,
       name : "Hplus",
       badge : "badge-eplus",
+      chart : {
+        backgroundColor : 'rgba(53, 162, 70, 0.5)',
+        hoverbackgroundColor : 'rgba(53, 162, 70, 0.7)',
+        borderColor : 'rgb(53, 162, 70)',
+        borderWidth : 1
+      },
       layouts : {},
       statusData : [],
       _getVersions : function(callback){
@@ -50,6 +62,12 @@ var neoConst = {
       id : 6,
       name : "EplusCL",
       badge : "badge-eplus",
+      chart : {
+        backgroundColor : 'rgba(53, 162, 70, 0.5)',
+        hoverbackgroundColor : 'rgba(53, 162, 70, 0.7)',
+        borderColor : 'rgb(53, 162, 70)',
+        borderWidth : 1
+      },
       layouts : {},
       statusData : [],
       _getVersions : function(callback){
@@ -60,6 +78,12 @@ var neoConst = {
       id : 7,
       name : "Echart",
       badge : "badge-echart",
+      chart : {
+        backgroundColor : 'rgba(141, 59, 255, 0.5)',
+        hoverbackgroundColor : 'rgba(141, 59, 255, 0.7)',
+        borderColor : 'rgb(141, 59, 255)',
+        borderWidth : 1
+      },
       layouts : {},
       statusData : [],
       _getVersions : function(callback){
@@ -70,6 +94,12 @@ var neoConst = {
       id : 8,
       name : "MediChart",
       badge : "badge-medi",
+      chart : {
+        backgroundColor : 'rgba(68, 107, 189, 0.5)',
+        hoverbackgroundColor : 'rgba(68, 107, 189, 0.7)',
+        borderColor : 'rgb(68, 107, 189)',
+        borderWidth : 1
+      },
       layouts : {},
       statusData : [],
       _getVersions : function(callback){
@@ -80,6 +110,12 @@ var neoConst = {
       id : 10,
       name : "HanimacPro",
       badge : "badge-medi",
+      chart : {
+        backgroundColor : 'rgba(68, 107, 189, 0.5)',
+        hoverbackgroundColor : 'rgba(68, 107, 189, 0.7)',
+        borderColor : 'rgb(68, 107, 189)',
+        borderWidth : 1
+      },
       layouts : {},
       statusData : [],
       _getVersions : function(callback){
@@ -90,6 +126,12 @@ var neoConst = {
       id : 20,
       name : "SENSE",
       badge : "badge-sense",
+      chart : {
+        backgroundColor : 'rgba(63, 123, 249, 0.5)',
+        hoverbackgroundColor : 'rgba(63, 123, 249, 0.7)',
+        borderColor : 'rgb(63, 123, 249)',
+        borderWidth : 1
+      },
       layouts : {},
       statusData : [],
       _getVersions : function(callback){

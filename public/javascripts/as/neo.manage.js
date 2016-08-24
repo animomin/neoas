@@ -91,7 +91,6 @@
       member : {
         data : null,
         best : null,
-        chart : [],
         Load : function(){
           var _this = this;
           var rankDate = new Date();
@@ -204,75 +203,121 @@
         var _this = _me.rank;
 
         $('[data-name="month"]').text(_this.month + '월');
-        // switch (tab) {
-        //   case '#best':
-            $('[data-name="전체요청"]').text(_this.area.total.all);
-            $('[data-name="미확인"]').text(_this.area.total.unidentified);
-            $('[data-name="미완료"]').text(_this.area.total.incomplete);
-            $('[data-name="완료"]').text(_this.area.total.complete);
-            $('[data-name="취소"]').text(_this.area.total.cancel);
-            var d = _this.member.best;
-            $('[data-name="best_member"]').text(neo.area[d.처리자지사 + ""] + " " + d.처리자);
-            $('[data-name="best_member_complete"]').text(d.완료 + '건 완료');
-            d = _this.area.best;
-            $('[data-name="best_area"]').text(neo.area[d.지사코드 + ""]);
-            $('[data-name="best_area_complete"]').text(d.완료 + '건 완료');
-            d = _this.emr.best;
-            $('[data-name="best_emr"]').text(neo.emrs[d.프로그램].name);
-            $('[data-name="best_emr_accept"]').text(d.발생건수 + '건 접수');
-            d = _this.hosp.best;
-            $('[data-name="best_hosp"]').text(d.기관명칭);
-            $('[data-name="best_hosp_accept"]').text(d.요청건수 + '건 접수');
-          //   break;
-          // case '#area':
-            var areaCode = Object.keys(_this.area.area);
-            var areaName = areaCode.map(function(item){
-              return neo.area[item+''];
-            });
-            var areaDataSet = [
-              {
-                label : '미확인',
-                backgroundColor: "rgba(237, 85, 101, 0.5)",
-                borderColor : "rgba(237, 85, 101,1)",
-                borderWidth : 1,
-                data :  areaCode.map(function(item){
-                          return _this.area.area[item+''].unidentified;
-                        })
-              },
-              {
-                label : '미완료',
-                backgroundColor: "rgba(248,172,89,0.5)",
-                borderColor : "rgba(248,172,89,1)",
-                borderWidth : 1,
-                data :  areaCode.map(function(item){
-                          return _this.area.area[item+''].incomplete;
-                        })
-              },
-              {
-                label : '완료',
-                backgroundColor: "rgba(28,132,198,0.5)",
-                borderColor : "rgba(28,132,198,1)",
-                borderWidth : 1,
-                data :  areaCode.map(function(item){
-                          return _this.area.area[item+''].complete;
-                        })
-              },
-              {
-                label : '취소',
-                backgroundColor: "rgba(35,198,200,0.5)",
-                borderColor : "rgba(35,198,200,1)",
-                borderWidth : 1,
-                data :  areaCode.map(function(item){
-                          return _this.area.area[item+''].cancel;
-                        })
-              },
-            ];
-            var barData = {
-                labels: areaName,
-                datasets: areaDataSet,
-            };
 
-            var barOptions = {
+        //BEST
+        $('a.rank-tabs[href="#best"]').on('shown.bs.tab', function (e) {
+          $('[data-name="전체요청"]').text(_this.area.total.all);
+          $('[data-name="미확인"]').text(_this.area.total.unidentified);
+          $('[data-name="미완료"]').text(_this.area.total.incomplete);
+          $('[data-name="완료"]').text(_this.area.total.complete);
+          $('[data-name="취소"]').text(_this.area.total.cancel);
+          var d = _this.member.best;
+          $('[data-name="best_member"]').text(neo.area[d.처리자지사 + ""] + " " + d.처리자);
+          $('[data-name="best_member_complete"]').text(d.완료 + '건 완료');
+          d = _this.area.best;
+          $('[data-name="best_area"]').text(neo.area[d.지사코드 + ""]);
+          $('[data-name="best_area_complete"]').text(d.완료 + '건 완료');
+          d = _this.emr.best;
+          $('[data-name="best_emr"]').text(neo.emrs[d.프로그램].name);
+          $('[data-name="best_emr_accept"]').text(d.발생건수 + '건 접수');
+          d = _this.hosp.best;
+          $('[data-name="best_hosp"]').text(d.기관명칭);
+          $('[data-name="best_hosp_accept"]').text(d.요청건수 + '건 접수');
+        });
+
+        //지사별 처리현황
+        $('a.rank-tabs[href="#area"]').on('shown.bs.tab', function (e) {
+            var areaCode = Object.keys(_this.area.area);
+            var ctx = document.getElementById("barChart_area").getContext("2d");
+            var myNewChart = new Chart(ctx,{
+              type : 'bar',
+              data : {
+                  labels: areaCode.map(function(item){return neo.area[item+''];}),
+                  datasets: [
+                    {
+                      label : '미확인',
+                      backgroundColor: "rgba(237, 85, 101, 0.5)",
+                      borderColor : "rgba(237, 85, 101,1)",
+                      borderWidth : 1,
+                      data :  areaCode.map(function(item){
+                                return _this.area.area[item+''].unidentified;
+                              })
+                    },
+                    {
+                      label : '미완료',
+                      backgroundColor: "rgba(248,172,89,0.5)",
+                      borderColor : "rgba(248,172,89,1)",
+                      borderWidth : 1,
+                      data :  areaCode.map(function(item){
+                                return _this.area.area[item+''].incomplete;
+                              })
+                    },
+                    {
+                      label : '완료',
+                      backgroundColor: "rgba(28,132,198,0.5)",
+                      borderColor : "rgba(28,132,198,1)",
+                      borderWidth : 1,
+                      data :  areaCode.map(function(item){
+                                return _this.area.area[item+''].complete;
+                              })
+                    },
+                    {
+                      label : '취소',
+                      backgroundColor: "rgba(35,198,200,0.5)",
+                      borderColor : "rgba(35,198,200,1)",
+                      borderWidth : 1,
+                      data :  areaCode.map(function(item){
+                                return _this.area.area[item+''].cancel;
+                              })
+                    }
+                  ]
+              },
+              options : {
+                  scaleBeginAtZero: true,
+                  scaleShowGridLines: true,
+                  scaleGridLineColor: "rgba(0,0,0,.05)",
+                  scaleGridLineWidth: 1,
+                  barShowStroke: true,
+                  barStrokeWidth: 2,
+                  barValueSpacing: 5,
+                  barDatasetSpacing: 1,
+                  responsive: true
+              }
+            });
+        });
+
+        //직원별 처리현황
+        $('a.rank-tabs[href="#member"]').on('shown.bs.tab', function(e){
+            var ctx = document.getElementById('barChart_member').getContext('2d');
+            var myNewChart = new Chart(ctx, {
+              type : 'bar',
+              data : {
+                labels : _this.member.data.map(function(item){return item.처리자;}),
+                datasets : [
+                  {
+                    label : '완료',
+                    backgroundColor: "rgba(28,132,198,0.5)",
+                    borderColor : "rgba(28,132,198,1)",
+                    borderWidth : 1,
+                    data :  _this.member.data.map(function(item){return item.완료;})
+                  },
+                  {
+                    label : '미완료',
+                    backgroundColor: "rgba(248,172,89,0.5)",
+                    borderColor : "rgba(248,172,89,1)",
+                    borderWidth : 1,
+                    data :  _this.member.data.map(function(item){return item.미완료;})
+                  },
+                  {
+                    label : '취소',
+                    backgroundColor: "rgba(35,198,200,0.5)",
+                    borderColor : "rgba(35,198,200,1)",
+                    borderWidth : 1,
+                    data :  _this.member.data.map(function(item){return item.취소;})
+                  }
+                ]
+              },
+              options : {
                 scaleBeginAtZero: true,
                 scaleShowGridLines: true,
                 scaleGridLineColor: "rgba(0,0,0,.05)",
@@ -282,23 +327,84 @@
                 barValueSpacing: 5,
                 barDatasetSpacing: 1,
                 responsive: true
-            };
-
-
-            var ctx = document.getElementById("barChart_area").getContext("2d");
-
-            $('a.rank-tabs[href="#area"]').on('shown.bs.tab', function (e) {
-                var myNewChart = new Chart(ctx,{
-                  type : 'bar',
-                  data : barData,
-                  options : barOptions
-                });
+              }
             });
+        });
 
-        //     break;
-        //   default:
-        //
-        // }
+        // 프로그램별
+        $('a.rank-tabs[href="#emr"]').on('shown.bs.tab', function(e){
+            var ctx = document.getElementById('pieChart_emr').getContext('2d');
+            var myNewChart = new Chart(ctx, {
+              type : 'pie',
+              data : {
+                labels : _this.emr.emrData.map(function(item){return neo.emrs[item.프로그램].name;}),
+                datasets : [
+                  {
+                    data : _this.emr.emrData.map(function(item){return item.발생건수;}),
+                    backgroundColor : _this.emr.emrData.map(function(item){return neo.emrs[item.프로그램].chart.backgroundColor;}),
+                    hoverbackgroundColor : _this.emr.emrData.map(function(item){return neo.emrs[item.프로그램].chart.hoverbackgroundColor;}),
+                    borderColor : _this.emr.emrData.map(function(item){return neo.emrs[item.프로그램].chart.borderColor;}),
+                    borderWidth : _this.emr.emrData.map(function(item){return neo.emrs[item.프로그램].chart.borderWidth;})
+                  }
+                ]
+              },
+              options : {
+                animateScale : true,
+                title: {
+                    display: true,
+                    text: '프로그램별 AS발생건수',
+                    position: 'bottom',
+                    fontSize : 18
+                },
+                onClick : function(e, emrItem){
+                  var emr = null;
+                  $.each(neo.emrs, function(i,v) {
+                    if (v.name.toUpperCase() === emrItem[0]._view.label.toUpperCase()){
+                      emr = v;
+                      return true;
+                    }
+                  });
+                  var ctx2 = document.getElementById('radarChart_emr').getContext('2d');
+                  var myNewChart2 = new Chart(ctx2, {
+                    type : 'radar',
+                    data : {
+                      labels : _this.emr.exeData.map(function(item){
+                        if(item.프로그램 === emr.id){
+                          return item.실행파일;
+                        }
+                      }),
+                      datasets: [
+                        {
+                          label: "발생건수",
+                          backgroundColor: "rgba(255,99,132,0.2)",
+                          borderColor: "rgba(255,99,132,1)",
+                          pointBackgroundColor: "rgba(255,99,132,1)",
+                          pointBorderColor: "#fff",
+                          pointHoverBackgroundColor: "#fff",
+                          pointHoverBorderColor: "rgba(255,99,132,1)",
+                          data: _this.emr.exeData.map(function(item){
+                            if(item.프로그램 === emr.id){
+                              return item.발생건수;
+                            }
+                          })
+                        }
+                      ],
+                      options: {
+                        scale: {
+                            reverse: true,
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }
+                      }
+                    }
+                  });
+                }
+              }
+            });
+        });
+
+
       }
     };
 

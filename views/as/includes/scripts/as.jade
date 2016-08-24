@@ -37,8 +37,10 @@ script.
       event.preventDefault();
       $(".navbar-collapse").collapse('hide');
       $($(this).parent()).addClass('active').siblings().removeClass('active');
-      neoModules.SetLayout($(this).data('as'), $('#workspace'));      
-    })
+      menu = $(this).data('as');
+      sessionStorage.setItem('menu', menu);
+      neoModules.SetLayout(menu, $('#workspace'));      
+    });  
     
     $(window).bind("load resize scroll", function () {
         //- if (!$("body").hasClass('body-small')) {
