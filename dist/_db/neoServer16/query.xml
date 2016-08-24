@@ -66,6 +66,11 @@
         ALTER TABLE NeoAs..N_Service ADD 세부화면 nvarchar(50) NULL
       END
 
+      IF NOT EXISTS(Select Name From SYSCOLUMNS WHERE NAME = '본사AS' AND ID = OBJECT_ID('N_Service'))
+      BEGIN
+        ALTER TABLE NeoAs..N_Service ADD 본사AS tinyint NULL
+      END
+
       IF EXISTS (SELECT NAME FROM SYSCOLUMNS WHERE name = '접수연락처' AND ID = OBJECT_ID('N_Service')) BEGIN
          IF EXISTS (SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME ='N_Service' AND COLUMN_NAME = '접수연락처' AND DATA_TYPE = 'varchar' AND CHARACTER_MAXIMUM_LENGTH &lt; 20) BEGIN
              ALTER TABLE NeoAs..N_Service ALTER COLUMN 접수연락처 varchar(20) NULL
@@ -112,7 +117,7 @@
            접수연락처, 문의내용, ISNULL(응급여부, 0) AS 응급여부, CONVERT(char(19),접수일자,120) AS 접수일자,
            현재버전, 보험규정, 병원전화, 팍스, 서버이름, 서버아이디,
            서버비밀번호, 데이터베이스, 인증서암호, 오픈담당자, 수탁기관, 실행파일, ISNULL(실행메뉴,'') AS 실행메뉴, ISNULL(세부화면,'') AS 세부화면,
-           운영체제, SQL버전, ISNULL(서비스타입,0) AS 서비스타입, 수가, 약가, 치료재료, ISNULL(취소사유,'') AS 취소사유,
+           운영체제, SQL버전, ISNULL(서비스타입,0) AS 서비스타입, 수가, 약가, 치료재료, ISNULL(취소사유,'') AS 취소사유, ISNULL(본사AS, 0) AS 본사AS,
            ISNULL(확인자, '') AS 확인자, ISNULL(확인자ID,'') AS 확인자ID, ISNULL(확인자지사,'') AS 확인자지사, ISNULL(확인자연락처,'') AS 확인자연락처, ISNULL(CONVERT(char(19),확인일자,120),'') AS 확인일자,
            ISNULL(인계자, '') AS 인계자, ISNULL(인계자ID,'') AS 인계자ID, ISNULL(인계자지사,'') AS 인계자지사, ISNULL(인계자연락처,'') AS 인계자연락처, ISNULL(CONVERT(char(19),인계일자,120),'') AS 인계일자,
            ISNULL(처리자, '') AS 처리자, ISNULL(처리자ID,'') AS 처리자ID, ISNULL(처리자지사,'') AS 처리자지사, ISNULL(처리자연락처,'') AS 처리자연락처, ISNULL(CONVERT(char(19),처리일자,120),'') AS 처리일자
@@ -206,4 +211,56 @@
       SELECT ERROR_NUMBER() AS Status, ERROR_MESSAGE() AS Message;
     END CATCH
   </_SaveCustomInfo>
+  <_RankArea>
+    SELECT 지사코드,
+    SUM(CASE WHEN 서비스상태 = 0 THEN 1 ELSE 0 END) AS 미확인,
+    SUM(CASE WHEN 서비스상태 &gt;= 1 AND 서비스상태 &lt;= 3 THEN 1 ELSE 0 END) AS 미완료,
+    SUM(CASE WHEN 서비스상태 = 4 THEN 1 ELSE 0 END) AS 완료,
+    SUM(CASE WHEN 서비스상태 = 5 THEN 1 ELSE 0 END) AS 취소
+    FROM NeoAs..N_Service
+    WHERE 1=1
+    %s
+    GROUP BY 지사코드
+    ORDER BY 완료 DESC 
+  </_RankArea>
+  <_RankMember>
+    SELECT 처리자ID, 처리자, 처리자지사,
+    SUM(CASE WHEN 서비스상태 &gt;= 1 AND 서비스상태 &lt;= 3 THEN 1 ELSE 0 END) AS 미완료,
+    SUM(CASE WHEN 서비스상태 = 4 THEN 1 ELSE 0 END) AS 완료,
+    SUM(CASE WHEN 서비스상태 = 5 THEN 1 ELSE 0 END) AS 취소
+    FROM NeoAs..N_Service
+    WHERE 1=1
+    AND ISNULL(처리자ID,0) &lt;&gt; 0
+    %s
+    GROUP BY 처리자ID, 처리자, 처리자지사
+    ORDER BY 완료 DESC
+  </_RankMember>
+  <_RankHosp>
+    SELECT 기관코드, 기관명칭,
+    COUNT(기관코드) AS 요청건수,
+    SUM(CASE WHEN 서비스상태 = 0 THEN 1 ELSE 0 END) AS 미확인,
+    SUM(CASE WHEN 서비스상태 &gt;= 1 AND 서비스상태 &lt;= 3 THEN 1 ELSE 0 END) AS 미완료,
+    SUM(CASE WHEN 서비스상태 = 4 THEN 1 ELSE 0 END) AS 완료,
+    SUM(CASE WHEN 서비스상태 = 5 THEN 1 ELSE 0 END) AS 취소
+    FROM NeoAs..N_Service
+    WHERE 1=1
+    %s
+    GROUP BY 기관코드, 기관명칭
+    ORDER BY 요청건수 DESC
+  </_RankHosp>
+  <_RankEmr>
+    SELECT 프로그램, COUNT(프로그램) AS 발생건수
+    FROM NeoAs..N_Service
+    WHERE 1=1
+    %s
+    GROUP BY 프로그램
+    ORDER BY 발생건수 DESC;
+
+    SELECT 프로그램, CASE WHEN ISNULL(실행파일,'') = '' THEN '기타' ELSE 실행파일 END AS 실행파일, COUNT(CASE WHEN ISNULL(실행파일,'') = '' THEN '기타' ELSE 실행파일 END) AS 발생건수
+    FROM NeoAs..N_Service
+    WHERE 1=1
+    %s
+    GROUP BY 프로그램,CASE WHEN ISNULL(실행파일,'') = '' THEN '기타' ELSE 실행파일 END
+    ORDER BY 프로그램, 발생건수 DESC
+  </_RankEmr>
 </query>

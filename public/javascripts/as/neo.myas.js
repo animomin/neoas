@@ -24,7 +24,8 @@
           ['style', ['bold', 'italic', 'underline', 'clear']],
           ['fontsize', ['fontsize']],
           ['color', ['color']],
-          ['para', ['ul', 'ol', 'paragraph']]
+          ['para', ['ul', 'ol', 'paragraph']],
+          ['mybutton2', ['peerAS']]
           // ['picture',['picture']],
       ],
       popover : {
@@ -73,6 +74,17 @@
             tooltip: '크게보기',
             buttonID : 'popupImage',
             click : function(){_me.events.onPopupImage(context);}
+          });
+          return button.render();
+        },
+        peerAS : function(context){
+          var ui = $.summernote.ui;
+          var button = ui.button({
+            contents : '<i class="fa fa-square-o"></i> 본사AS',
+            tooltip : '본사에서 처리해야하는 AS인 경우 체크해주세요.',
+            buttonID : 'peerAS',
+            customClass : 'btn-danger',
+            click : function(){_me.events.onPeerAS($(this));}
           });
           return button.render();
         }
@@ -353,11 +365,11 @@
           /**
            * 응급여부 표시!
            */
-           var Emergency = $('button#emergency').find('i');
-           if(_this.data.응급여부 == 1){
-             Emergency.removeClass('fa-square-o').addClass('fa-check-square-o');
+           var peerAS = $('button#peerAS').find('i');
+           if(_this.data.본사AS == 1){
+             peerAS.removeClass('fa-square-o').addClass('fa-check-square-o');
            }else{
-             Emergency.removeClass('fa-check-square-o').addClass('fa-square-o');
+             peerAS.removeClass('fa-check-square-o').addClass('fa-square-o');
            }
 
           /**
@@ -406,6 +418,8 @@
 
           if(_this.data.서비스상태 === ASSTATUS.DONE){
             _me.elem.$asStatus.addClass('disabled');
+          }else{
+            _me.elem.$asStatus.removeClass('disabled');
           }
 
           if(mobile){
@@ -956,23 +970,28 @@
           /**
            * 소켓 연결 체크
            */
-          function _SocketCheck(){
-            $('span[data-name="연결상태"]').each(function(i,v){
-              $(v).removeClass('badge-info');
-            });
+        function _SocketCheck(){
+          $('span[data-name="연결상태"]').each(function(i,v){
+            $(v).removeClass('badge-info');
+          });
 
-            data.CLIENTS.forEach(function(item){
-              var asItem = $('.as-item[data-index="'+item.id+'"]');
-              var wifi = $(asItem).find('span[data-name="연결상태"]');
-              if(wifi){
-                wifi.addClass('badge-info');
-              }
-            });
-          }
-
-
+          data.CLIENTS.forEach(function(item){
+            var asItem = $('.as-item[data-index="'+item.id+'"]');
+            var wifi = $(asItem).find('span[data-name="연결상태"]');
+            if(wifi){
+              wifi.addClass('badge-info');
+            }
+          });
         }
-      // }
+      },
+      onPeerAS : function(b){
+        _me.selItem.data.본사AS = _me.selItem.data.본사AS === 0 ? 1 : 0;
+        if(_me.selItem.data.본사AS === 1){
+          b.find('i').removeClass('fa-square-o').addClass('fa-check-square-o');
+        }else{
+          b.find('i').removeClass('fa-check-square-o').addClass('fa-square-o');
+        }
+      }
     };
 
 

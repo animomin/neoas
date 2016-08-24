@@ -7,9 +7,11 @@ var mssql = require('mssql'),
 
 fs.readFile(__dirname + '/query.xml','utf8', function(error, data) {
   if (error) {
+    console.log(error);
   } else {
     digester.digest(data, function(error, result) {
       if (error) {
+        console.log(error);
       } else {
         global.querys16 = result.query;
       }
@@ -34,6 +36,7 @@ function disConnect(){
 
 exports.RecordSet = function(query, callback){
     var rs = new mssql.Request(connection);
+    rs.multiple = query.split(';').length > 1;
   	rs.query(query,function(err, recordset){
   		callback(err, recordset);
   	});
@@ -84,7 +87,7 @@ exports.isConnected = function(){
 };
 
 Connect(function(){
-  var query = global.querys16._DataBaseUpdate;
+  var query = querys16._DataBaseUpdate;
   exports.execute(query, function(err,data){
     logger.info('DATABASE UPDATE ::: ', err, data);
     console.log('DATABASE UPDATE ::: ', err, data);

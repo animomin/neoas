@@ -6,8 +6,7 @@ var neoConst = {
           console.log(error);
         } else {
           var layouts = JSON.parse(data);
-          var keys = Object.keys(layouts);
-          console.log(keys);
+          var keys = Object.keys(layouts);          
           keys.forEach(function(item){
             emrs[item].layouts = layouts[item];
           });

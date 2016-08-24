@@ -301,7 +301,31 @@ var neoAJAX = {
       });
     }
   },
-
+  manage : {
+    GetRank : function(opts){
+      $.ajax({
+        url : opts.url,
+        data : opts.data,
+        dataType : opts.dataType,
+        async : opts.async,
+        method : opts.method,
+        beforeSend : function(){
+          if(typeof opts.beforeSend === 'function'){
+            return opts.beforeSend(opts);
+          }
+        },
+        success : function(data){
+          opts.success(opts, data);
+        },
+        error : function(err){
+          console.log(err);
+        },
+        complete : function(){
+          if(typeof opts.callback === 'function') return opts.callback(opts);
+        }
+      });
+    }
+  },
   GetSpinners : function(type){
     var spinners = {
       fadingCircles : '<div class="spiner-example animated fadeInDown">' +
@@ -344,4 +368,15 @@ var isMobile = {
     any: function() {
         return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
     }
+};
+
+var generateColr = function(){
+
+  var letters = '0123456789ABCDEF';
+  var color = '#';
+  for (var i = 0; i < 6; i++ ) {
+      color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+
 };

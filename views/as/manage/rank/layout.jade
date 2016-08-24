@@ -1,0 +1,129 @@
+div.tabs-container
+  div.tabs-left(style='height:100%;')
+    ul.nav.nav-tabs
+      li
+        a.rank-tabs(href='#best',data-toggle='tab') BEST
+      li
+        a.rank-tabs(href='#area',data-toggle='tab') 지사별 처리현황
+      li
+        a.rank-tabs(href='#member',data-toggle='tab') 직원별 처리현황
+      li
+        a.rank-tabs(href='#emr',data-toggle='tab') 프로그램별 처리현황
+      li
+        a.rank-tabs(href='#hosp',data-toggle='tab') 병원별 AS요청현황      
+    div.tab-content(style='height:100%;')
+      div#best.rank-tabs.tab-pane.fade(style='height:100%;')
+        div.panel-body.gray-bg(style='height:100%;')
+          div.row
+            h1 
+              span(data-name='month')
+              |  BEST
+          div.row
+            div.col-lg-4
+              div.widget.style1.gray-bg
+                div.row
+                  div.col-xs-4
+                    i.fa.fa-hospital-o.fa-5x
+                  div.col-xs-8.text-right
+                    span AS 전체요청
+                    h2.font-bold 
+                      span(data-name='전체요청')
+            div.col-lg-2
+              div.widget.style1.red-bg
+                div.row
+                  div.col-xs-4
+                    i.fa.fa-exclamation-triangle.fa-5x
+                  div.col-xs-8.text-right
+                    span AS 미확인
+                    h2.font-bold 
+                      span(data-name='미확인')
+            div.col-lg-2
+              div.widget.style1.yellow-bg
+                div.row
+                  div.col-xs-4
+                    i.fa.fa-refresh.fa-5x.fa-spin
+                  div.col-xs-8.text-right
+                    span AS 미완료
+                    h2.font-bold 
+                      span(data-name='미완료')
+            div.col-lg-2
+              div.widget.style1.blue-bg
+                div.row
+                  div.col-xs-4
+                    i.fa.fa-thumbs-up.fa-5x
+                  div.col-xs-8.text-right
+                    span AS 완료
+                    h2.font-bold 
+                      span(data-name='완료')
+            div.col-lg-2
+              div.widget.style1.lazur-bg
+                div.row
+                  div.col-xs-4
+                    i.fa.fa-ban.fa-5x
+                  div.col-xs-8.text-right
+                    span AS 취소
+                    h2.font-bold 
+                      span(data-name='취소')
+          div.row 
+            div.col-lg-12.text-right.text-muted
+              h3 
+                span(data-name='month') 
+                |  네오소프트뱅크 전체 AS요청건별 처리현황입니다.
+          
+          div.row
+            div.col-lg-3
+              div.widget-head-color-box.navy-bg.p-lg.text-center
+                div.m-b-md
+                  h2.font-bold.no-margins
+                    span(data-name='best_member')
+                  p 
+                    span(data-name='month') 
+                    |  AS 처리를 가장 많이한 직원입니다.                      
+                  p
+                    i.fa.fa-trophy.fa-5x
+                  div
+                    span(data-name='best_member_complete')
+            div.col-lg-3
+              div.widget-head-color-box.blue-bg.p-lg.text-center
+                div.m-b-md
+                  h2.font-bold.no-margins
+                    span(data-name='best_area')
+                  p 
+                    span(data-name='month') 
+                    |  AS 처리를 가장 많이한 지사입니다.                      
+                  p
+                    i.fa.fa-trophy.fa-5x
+                  div
+                    span(data-name='best_area_complete')
+            div.col-lg-3
+              div.widget-head-color-box.lazur-bg.p-lg.text-center
+                div.m-b-md
+                  h2.font-bold.no-margins
+                    span(data-name='best_emr')
+                  p 
+                    span(data-name='month') 
+                    |  가장 적게 AS요청이 접수된 프로그램입니다.
+                  p
+                    i.fa.fa-trophy.fa-5x
+                  div
+                    span(data-name='best_emr_accept')
+            div.col-lg-3
+              div.widget-head-color-box.badge-sense.p-lg.text-center
+                div.m-b-md
+                  h2.font-bold.no-margins
+                    span(data-name='best_hosp')
+                  p 
+                    span(data-name='month') 
+                    |  가장 적게 AS를 요청한 병원입니다.
+                  p
+                    i.fa.fa-trophy.fa-5x
+                  div
+                    span(data-name='best_hosp_accept')
+      div#area.rank-tabs.tab-pane.fade(style='height:100%;')
+        div.panel-body.gray-bg(style='height:100%;')           
+          div.container-fluid
+            h1 8월 지사별 AS 현황
+            canvas#barChart_area
+      div#member.rank-tabs.tab-pane.fade(style='height:100%;')
+      div#emr.rank-tabs.tab-pane.fade(style='height:100%;')
+      div#hosp.rank-tabs.tab-pane.fade(style='height:100%;')

@@ -5,7 +5,6 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var vhost = require('vhost');
 
 require('./bin/config');
 
@@ -36,7 +35,7 @@ app.use(session({
   saveUninitialized: true
 }));
 app.use(express.static(path.join(__dirname, 'public')));
-// app.use(vhost('as.neochart.co.kr', require('./app.js')));
+
 app.use('/', routes);
 app.use('/users', users);
 app.use('/clients', clients);

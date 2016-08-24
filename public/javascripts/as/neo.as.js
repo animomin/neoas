@@ -32,7 +32,8 @@
           ['style', ['bold', 'italic', 'underline', 'clear']],
           ['fontsize', ['fontsize']],
           ['color', ['color']],
-          ['para', ['ul', 'ol', 'paragraph']]
+          ['para', ['ul', 'ol', 'paragraph']],
+          ['mybutton3', ['myhelp']]
           // ['picture',['picture']],
       ],
       popover : {
@@ -118,6 +119,16 @@
             tooltip: '크게보기',
             buttonID : 'popupImage',
             click : function(){_me.events.onPopupImage(context);}
+          });
+          return button.render();
+        },
+        myhelp : function(context){
+          var ui = $.summernote.ui;
+          var button = ui.button({
+            contents : '<i class="fa fa-question"></i>',
+            tooltip: '도움말',
+            buttonID : 'myhelp',
+            click : function(){_me.events.onHelp(context);}
           });
           return button.render();
         }
@@ -508,6 +519,8 @@
 
           if(_this.data.서비스상태 === ASSTATUS.CANCEL){
             _me.elem.$asStatus.addClass('disabled');
+          }else{
+            _me.elem.$asStatus.removeClass('disabled');
           }
 
           if(mobile){
@@ -1390,8 +1403,9 @@
         }
 
       },
-      onExeApplyClick : function(){
-
+      onHelp : function(){
+        var helpImg = document.getElementById('commant_help');
+        _me.events.onPopupImage(helpImg);
       }
     };
 

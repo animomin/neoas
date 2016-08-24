@@ -211,6 +211,7 @@
       set += ", 문의내용 = '" + req.문의내용 + "' ";
       set += ", 실행메뉴 = '" + req.실행메뉴 + "' ";
       set += ", 세부화면 = '" + req.세부화면 + "' ";
+      set += ", 본사AS = " + req.본사AS;
 
       query = util.format(query, req.서비스상태, set, req.인덱스);
       logger.info(query);
@@ -231,8 +232,51 @@
           return callback(data);
         });
       }
-
     };
+
+    exports.GetRank = function(q,req, callback){
+      var params = req.query;
+      async.waterfall([
+        function(callback2){
+          query = q;
+
+          where = "";
+          if(!params.total){
+            where += " AND month(접수일자) = " + params.month;
+          }
+
+          if(req.params.mode !== 'emr'){
+            query = util.format(query, where);
+          }else{
+            query = util.format(query, where, where);
+          }
+          logger.info(query);
+          return callback2();
+        },
+        function(callback2){
+          if(server16.connection.connected){
+            server16.RecordSet(query, function(err, records){
+              return callback2(err, records);
+            });
+          }
+        }
+      ], function(err, records){
+        if(err){
+          logger.error(err);
+          data.err = err;
+          data.data = null;
+        }else if(!records || records.length <= 0 ){
+          data.err = 'NODATA';
+          data.data = null;
+        }else{
+          data.err = null;
+          data.data = records;
+        }
+
+        return callback(data);
+      });
+    };
+
 
 
   function _GetHospInfo(hospnum, fieldname, callback){

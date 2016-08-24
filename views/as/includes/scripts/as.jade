@@ -8,6 +8,7 @@ script(src='/plugins/viewerjs/dist/viewer.js')
 script(src='/plugins/summernote/dist/summernote.js')
 script(src='/plugins/summernote/dist/lang/summernote-ko-KR.min.js')   
 script(src='/plugins/split.js/split.js')   
+script(src='/plugins/chartJs/Chart.min.js')
 script(src='/plugins/socketio/socket.io.js')   
 
 script(src='/javascripts/neo.modules.js')
@@ -15,6 +16,7 @@ script(src='/javascripts/neo.notify.js')
 script(src='/javascripts/as/neo.as.js')
 script(src='/javascripts/as/neo.takeover.js')
 script(src='/javascripts/as/neo.myas.js')
+script(src='/javascripts/as/neo.manage.js')
 script(src='/javascripts/neo.socket.js')
 
 script.  
@@ -42,6 +44,10 @@ script.
         //- if (!$("body").hasClass('body-small')) {
             neoModules.SetElementHeight();
         //- }
+        if(menu === MENU.MANAGE){
+          var height = $(window).height() - 110;
+          $('.tabs-container').height(height);
+        }
     });
     
     Pace.on('hide', function(){
