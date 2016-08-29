@@ -156,6 +156,7 @@
          * 1. 오늘자 접수리스트 로드
          */
           var options = {
+            type : 'JOIN',
             target_list : _me.elem.list.$accept,
             target_tab : _me.elem.list.$acceptTab,
             beforeSend : _beforeSend,
@@ -182,6 +183,7 @@
          * 2. 전체날짜 진행중인거 로드
          */
         options = {
+          type : null,
           target_list : _me.elem.list.$working,
           target_tab : _me.elem.list.$workingTab,
           beforeSend : _beforeSend,
@@ -206,6 +208,7 @@
          * 3. 전체날짜 취소된거 로드
          */
          options = {
+           type : 'CANCEL',
            target_list : _me.elem.list.$cancel,
            target_tab : _me.elem.list.$cancelTab,
            beforeSend : _beforeSend,
@@ -268,114 +271,24 @@
         }
 
         function _afterLoaded(opts){
+          var _this = _me.listData;
           opts.target_list.find('div.spiner-example').remove();
           neoModules.SetElementHeight();
-          if(typeof callback === 'function') return callback();
+
+          if(type === 'JOIN'){
+            if(opts.type === 'JOIN'){
+              callback();
+            }
+          }else{
+            if(opts.type === 'CANCEL'){
+              callback();
+            }
+          }
         }
+
+        // if(typeof callback === 'function') return callback();
 
       },
-      MoveData : function(sItem, callback){
-        /**
-         * 접수에서 접수는 있을수 없고
-         * 접수에서 확인, 인계, 완료
-         * 인계에서 인계
-         * 인계확인에서 인계확인
-         * 데이터가 이동하는 경우는 확인, 인계뿐인다.
-         */
-        var _this = _me.listData;
-        var statusName, tab, list;
-
-        /* find original item */
-        var oKeys = Object.keys(_this.data);
-        var oItem = null, elem = _me.elem.list;
-        /* ACCEPT, WORKING, CANCEL 배열을 하나씩 선택한다. */
-        oKeys.some(function(item, index, arr){
-          if(_this.data[item]){
-            /* 해당 배열에서 움직일 데이터를 찾는다 */
-            oItem = _this.data[item].find(function(data, subindex){
-              if(data.인덱스 === sItem.인덱스){ //찾았다!
-
-                if(item === 'ACCEPT'){
-                  /* 접수 - > 진행중(확인, 인계) */
-                  if(sItem.서비스상태 > ASSTATUS.ACCEPT && sItem.서비스상태 < ASSTATUS.DONE ){
-                    _this.data[item].splice(subindex,1);
-                    _this.data.WORKING.push(data);
-                    _me.selItem.id = _this.data.WORKING.length - 1;
-                  }
-                  /* 접수 - > 취소 */
-                  else if(sItem.서비스상태 === ASSTATUS.CANCEL){
-                    _this.data[item].splice(subindex,1);
-                    _this.data.CANCEL.push(data);
-                    _me.selItem.id = _this.data.CANCEL.length - 1;
-                  }
-                  /* 접수 - > 완료 */
-                  else if(sItem.서비스상태 === ASSTATUS.DONE){
-                    _this.data[item].splice(subindex,1);
-                  }
-                }else if(item === 'WORKING'){
-                  /* 진행 - > 진행 */
-                  if(sItem.서비스상태 > ASSTATUS.ACCEPT && sItem.서비스상태 < ASSTATUS.DONE ){
-
-                  }
-                  /* 진행 - > 취소 */
-                  else if(sItem.서비스상태 === ASSTATUS.CANCEL){
-                    _this.data[item].splice(subindex,1);
-                    _this.data.CANCEL.push(data);
-                    _me.selItem.id = _this.data.CANCEL.length - 1;
-                  }
-
-                  /* 진행 - > 완료 */
-                  else if(sItem.서비스상태 === ASSTATUS.DONE){
-                    _this.data[item].splice(subindex,1);
-                  }
-                }
-                return data;
-              }
-            });
-            return oItem !== null;
-          }
-        });
-
-        if(typeof callback === 'function'){
-          return callback();
-        }else{
-          return false;
-        }
-
-      },
-      GetNewOne : function(newOne, callback){
-        var _this = _me.listData;
-        var newItem;
-        var options = {
-          url : 'clients/item',
-          data : {id : newOne.id},
-          dataType : 'json',
-          async : true,
-          method : 'GET',
-          success : _beforeLoaded,
-          callback : callback
-        };
-        neoAJAX.as.list(options);
-
-        function _beforeLoaded(opts, data){
-          if(data.err){
-            return neoNotify.Show({
-              text : '새로운 AS요청건을 불러오는 도중 오류가 발생하였습니다. 새로고침해주세요. \n ' + data.err,
-              type : 'error',
-              desktop : true
-            });
-          }
-
-          _this.data.ACCEPT.push(data.data[0]);
-          counter = _this.data.ACCEPT.length;
-          newItem = _me.elem.list._SetNewItem(_me.elem.list.$accept, data.data[0], counter - 1, true);
-              newItem.bind('click', _me.events.onAccepItemClick);
-          _me.elem.list._SetTabCount(_me.elem.list.$acceptTab, counter);
-
-          return true;
-        }
-
-      },//GetNewOne
       FindDataByIndex : function(index){  // 배열의 인덱스로 찾기
 
       },//FindDataByIndex
@@ -393,6 +306,24 @@
           if(selItem) return false;
         });
         return selItem;
+      },
+      FindDataInfoByID : function(id){
+        var _this = _me.listData;
+        var selItem = null;
+        var selItemInfo = {};
+        $.each(_this.data, function(index, arr){
+          if(arr && arr.length){
+            selItem = arr.find(function(item,rindex){
+              if(parseInt(item.인덱스) === parseInt(id)){
+                selItemInfo.index = rindex;
+                selItemInfo.tabName = index;
+                return item;
+              }
+            });
+          }
+          if(selItem) return false;
+        });
+        return selItemInfo;
       }
     };
     /**
@@ -412,6 +343,7 @@
         return;
       },
       Load : function(elem){
+        console.log('as item selected');
 
         var _this = _me.selItem;
 
@@ -435,8 +367,10 @@
           progBar.removeClass('progress-mini').addClass('progress-striped active');
           if(_this.data.서비스상태 === ASSTATUS.DONE){
             progBar.find('.progress-bar-success').text(serviceName);
+            _me.elem.$asStatus.addClass('disabled');
           }else{
             //$('#as-confirm').addClass(_this.data.서비스상태 === ASSTATUS.ACCEPT ? '' : 'disabled');
+            _me.elem.$asStatus.removeClass('disabled');
             var asConfirm = _me.elem.$asStatus.filter(function(){return $(this).data('type') == 1;});
 
                 if(_this.data.서비스상태 === ASSTATUS.ACCEPT) asConfirm.removeClass('disabled');
@@ -444,7 +378,6 @@
 
             progBar.find('.progress-bar-danger').text(serviceName);
           }
-
 
           progBarCon.append(progBar);
 
@@ -517,11 +450,7 @@
             size : 10
           }).selectpicker('refresh').selectpicker('val', _this.data.실행파일).trigger('changed.bs.select');
 
-          if(_this.data.서비스상태 === ASSTATUS.CANCEL){
-            _me.elem.$asStatus.addClass('disabled');
-          }else{
-            _me.elem.$asStatus.removeClass('disabled');
-          }
+
 
           if(mobile){
             $('#page1').fadeOut('fast', function(){
@@ -540,6 +469,7 @@
        */
       UpdateAS : function(status){
         var _this = _me.selItem;
+        var tab = _me.elem.list.$workingTab;
         var cData = JSON.parse(JSON.stringify(_this.data));
         /* 선택된 AS건의 데이터 갱신 */
         cData.서비스상태 = status;
@@ -583,6 +513,7 @@
             cData.처리자연락처 = neo.user.info_hp || neo.user.info_tel;
             cData.처리일자 = (new Date()).GetToday('YYYY-MM-DD HH:MM:SS');
             // cData.문의내용 = _me.elem.$edit_q.summernote('code');
+
             break;
         }
 
@@ -611,10 +542,33 @@
           } });
 
           /* listData에서 해당데이터를 이동시킨다 */
-          _me.listData.MoveData(_this.data, function(){
-            _this.$elem.attr('data-id', _this.id);
-            _me.elem.RefreshElem(_this.$elem, _this.data);
-            _me.elem.RefreshTabCount();
+          // _me.listData.MoveData(_this.data, function(){
+          //   _this.$elem.attr('data-id', _this.id);
+          //   _me.elem.RefreshElem(_this.$elem, _this.data);
+          //   _me.elem.RefreshTabCount();
+          // });
+          tab.tab('show');
+          _me.options.workTab = tab.data('name');
+
+          _me.listData.Load(null, function(){
+            $.neoSocket.emitClients();
+
+            if(status === ASSTATUS.DONE){
+              _me.elem.clear();
+              _me.selItem.init();
+            }else{
+              if(_me.selItem.$elem.length){
+                var prevElem = $('a.as-item[data-index="'+_me.selItem.data.인덱스+'"]');
+                if(prevElem.length){
+                  _me.options.workTab = prevElem.parent().data('name');
+                  prevElem.trigger('click');
+                }else{
+                  _me.elem.clear();
+                  _me.selItem.init();
+                }
+              }
+            }
+
           });
         });
 
@@ -776,7 +730,44 @@
         $working : null,
         $cancel : null,
         _SetTabCount : function(obj, count){
-          return obj.find('span').text(count);
+          if(obj && count){
+            return obj.find('span').text(count);
+          }else{
+            obj = _me.listData.data[this.$acceptTab.data('name')];
+            count = 0;
+            if(obj && obj.length){
+              obj.forEach(function(item){
+                if(item){
+                  count += 1;
+                }
+              });
+            }
+            this.$acceptTab.find('span').text(count);
+
+            obj = _me.listData.data[this.$workingTab.data('name')];
+            count = 0;
+            if(obj && obj.length){
+              obj.forEach(function(item){
+                if(item){
+                  count += 1;
+                }
+              });
+            }
+            this.$workingTab.find('span').text(count);
+
+            obj = _me.listData.data[this.$cancelTab.data('name')];
+            count = 0;
+            if(obj && obj.length){
+              obj.forEach(function(item){
+                if(item){
+                  count += 1;
+                }
+              });
+            }
+            this.$cancelTab.find('span').text(count);
+
+            return;
+          }
         },
         _SetNoItem : function(obj){
           return obj.append('<a class="list-group-item"><h3 class="text-muted font-bold"> 검색된 데이터가 없습니다. </h3></a>');
@@ -896,6 +887,13 @@
           buttons : _me.editor.buttons
         });
 
+        if(mobile){
+          $('.note-btn').attr({
+            'title': ''  ,
+            'data-original-title' : ''
+          });
+        }
+
         this.SetTemplate(this.$edit_q);
 
         _this.$liveas = $('.as-lives-item');
@@ -995,68 +993,6 @@
 
         if(typeof callback === 'function') return callback();
         else return;
-      },
-      RefreshTabCount : function(){
-        var data = _me.listData.data;
-        this.list._SetTabCount(this.list.$acceptTab, data.ACCEPT ? data.ACCEPT.length : 0);
-        this.list._SetTabCount(this.list.$workingTab, data.WORKING ? data.WORKING.length : 0);
-        this.list._SetTabCount(this.list.$cancelTab, data.CANCEL ? data.CANCEL.length : 0);
-      },
-      /**
-       * 변경된 AS요청건을 새로고침하는 부분이다
-       * 메세지로 넘어온 요청건은 추가만하고 포커스 이동이 되면 안된다. ( 사용자 AS접수, 다른 네오직원 상태변경 )
-       */
-      RefreshElem : function(elem, data){
-        var _this = _me.elem;
-        var parent = $(elem.parent()).data('type');
-          if(typeof parent === 'number') parent = parent.toString();
-        var newOne = null, newParent = null, newTab = null;
-
-        if(data.서비스상태 === ASSTATUS.DONE){
-          // elem.find('div.progress-bar-success').css('width' , '100%');
-          // elem.find('div.progress-bar-danger').addClass('hidden');
-          // // 클리어시키자~
-          elem.addClass('fadeOutRightBig');
-          elem.one('webkitAnimationEnd oanimationend msAnimationEnd animationend',
-          function(e) {
-            elem.remove();
-            _this.clear();
-          });
-
-        }else{
-          if(data.서비스상태 === ASSTATUS.CANCEL){
-            elem.find('div.progress-bar-success').addClass('hidden');
-            elem.find('div.progress-bar-danger').css('width' , '100%');
-            newParent = _this.list.$cancel;
-            newTab = _this.list.$cancelTab;
-          }else{
-            elem.find('div.progress-bar-success').css('width' , (data.서비스상태 * 20) + '%');
-            elem.find('div.progress-bar-danger').css('width' , '20%');
-            newParent = _this.list.$working;
-            newTab = _this.list.$workingTab;
-          }
-          if(parent.indexOf(data.서비스상태) < 0){ /* 새로운 부모에게 가야한다 */
-            newOne = elem.clone();
-            newOne.bind('click', _me.events.onAccepItemClick);
-            elem.addClass('animated fadeOutRightBig');
-            elem.one('webkitAnimationEnd oanimationend msAnimationEnd animationend',
-            function(e) {
-              newTab.tab('show')
-                    .on('shown.bs.tab', function(){
-                      _me.options.workTab = newTab.data('name');
-                      newParent.prepend(newOne);
-                      elem.remove();
-                      _me.selItem.Load(newOne);
-                    });
-            });
-          }else{
-             /* 그자리에 가만히 잇으면 된다! */
-             _me.selItem.Load(elem);
-          }
-        }
-
-
-
       },
       FindElemByID : function(id){
         return $('.as-item[data-index="'+id+'"]');
@@ -1406,6 +1342,33 @@
       onHelp : function(){
         var helpImg = document.getElementById('commant_help');
         _me.events.onPopupImage(helpImg);
+      },
+
+      onChangeStatus : function(data){
+        console.log(data);
+        if(data.TYPE === 'STATUS'){ // 상태가 변한 이벤트가 와야하고
+          swal.close();
+          _me.listData.Load(null, function(){
+            $.neoSocket.emitClients();
+
+            if(data.STATUS === ASSTATUS.DONE || data.STATUS === ASSTATUS.CANCEL){
+              _me.elem.clear();
+              _me.selItem.init();
+            }else{
+              _me.elem.list.$workingTab.tab('show');
+              if(_me.selItem.$elem.length){
+                var prevElem = $('a.as-item[data-index="'+_me.selItem.data.인덱스+'"]');
+                if(prevElem.length){
+                  _me.options.workTab = prevElem.parent().data('name');
+                  prevElem.trigger('click');
+                }else{
+                  _me.elem.clear();
+                  _me.selItem.init();
+                }
+              }
+            }
+          });
+        }
       }
     };
 

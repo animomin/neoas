@@ -241,8 +241,8 @@
           query = q;
 
           where = "";
-          if(!params.total){
-            where += " AND month(접수일자) = " + params.month;
+          if(parseInt(params.total) === 0){
+            where += " AND LEFT(convert(varchar(10), 접수일자, 120),7) = '" + params.month + "'";
           }
 
           if(req.params.mode !== 'emr'){

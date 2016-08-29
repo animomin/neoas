@@ -2,13 +2,18 @@ div.tabs-container
   div.tabs-left(style='height:100%;')
     ul.nav.nav-tabs
       li
+        div.input-group.date
+          span.input-group-addon
+            i.fa.fa-calendar
+          input.form-control.disabled#rankMonth(type='text')          
+      li
         a.rank-tabs(href='#best',data-toggle='tab') BEST
       li
         a.rank-tabs(href='#area',data-toggle='tab') 지사별 처리현황
       li
         a.rank-tabs(href='#member',data-toggle='tab') 직원별 처리현황
       li
-        a.rank-tabs(href='#emr',data-toggle='tab') 프로그램별 처리현황
+        a.rank-tabs(href='#emr',data-toggle='tab') 프로그램별 발생현황
       li
         a.rank-tabs(href='#hosp',data-toggle='tab') 병원별 AS요청현황      
     div.tab-content(style='height:100%;')
@@ -139,9 +144,9 @@ div.tabs-container
             h1 
               span(data-name='month') 
               |  프로그램별 AS 처리현황
-            div.col-xs-4
+            div.col-xs-5
               canvas#pieChart_emr
-            div.col-xs-8
+            div.col-xs-7
               canvas#radarChart_emr
       div#hosp.rank-tabs.tab-pane.fade(style='height:100%;')
         div.panel-body.gray-bg(style='height:100%;')           

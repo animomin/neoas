@@ -65,6 +65,10 @@
       }
 
       switch (format) {
+        case "YYYY년 MM월":
+          return yyyy + '년 ' + MM + "월";
+        case "YYYY-MM":
+          return yyyy + '-' + MM;
         case "YYYY-MM-DD":
           return yyyy + '-' + MM + '-' + dd;
         case "YYYY-MM-DD HH:MM:SS":
@@ -152,7 +156,7 @@ var SETTINGS = {
  * Modules collections
  */
 var neoModules = {
-  SetLayout : function(menu, container){    
+  SetLayout : function(menu, container){
     var view = '', start;
     var m = mobile ? "_m" : "";
     switch (menu) {

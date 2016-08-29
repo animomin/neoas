@@ -1,4 +1,6 @@
 script(src='/plugins/bootstrap-select/dist/js/bootstrap-select.min.js')
+script(src='/plugins/datepicker/js/bootstrap-datepicker.js')
+script(src='/plugins/datepicker/js/bootstrap-datepicker.kr.js')
 script(src='/plugins/bootstrap-select/dist/js/i18n/defaults-ko_KR.min.js')
 script(src='/plugins/pnotify-master/dist/pnotify.custom.min.js')
 //- script(src='/plugins/pnotify-master/dist/pnotify.desktop.js')
@@ -41,6 +43,9 @@ script.
       sessionStorage.setItem('menu', menu);
       neoModules.SetLayout(menu, $('#workspace'));      
     });  
+    
+    
+        
     
     $(window).bind("load resize scroll", function () {
         //- if (!$("body").hasClass('body-small')) {

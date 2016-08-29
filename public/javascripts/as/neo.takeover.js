@@ -246,7 +246,7 @@
           return obj.find('span').text(counter);
         },
         _SetNoItem : function(obj){
-          return obj.append('<a class="list-group-item"><h3 class="text-muted font-bold"> 검색된 데이터가 없습니다. </h3></a>');
+          return obj.append('<a class="list-group-item takeover-no-item"><h3 class="text-muted font-bold"> 검색된 데이터가 없습니다. </h3></a>');
         },
         _SetNewItem : function(obj, item, index, tabName, $update){
           var $item, isUpdate = false, updateBorder = "";
@@ -256,6 +256,11 @@
           }else{
             $item = _me.elem.$item.clone();
           }
+
+          if(obj.find('.takeover-no-item').length){
+            obj.find('.takeover-no-item').remove();
+          }
+
           $item.addClass('animated fadeInUp');
           $item.attr({'data-id' : index, 'data-index' : item.인덱스, 'data-animated' : 'fadeInUp', 'data-emergency' : item.응급여부});
           $item.find('button[data-name="인계접수"]').attr({'data-id' : index, 'data-index' : item.인덱스, 'data-name' : tabName})
@@ -363,22 +368,6 @@
 
         if(typeof callback === 'function') return callback();
         else return;
-      },
-      RefreshTabCount : function(){
-        var data = _me.listData.data;
-        // this.list._SetTabCount(this.list.$acceptTab, data.ACCEPT ? data.ACCEPT.length : 0);
-        // this.list._SetTabCount(this.list.$workingTab, data.WORKING ? data.WORKING.length : 0);
-        // this.list._SetTabCount(this.list.$cancelTab, data.CANCEL ? data.CANCEL.length : 0);
-      },
-      /**
-       * 변경된 AS요청건을 새로고침하는 부분이다
-       * 메세지로 넘어온 요청건은 추가만하고 포커스 이동이 되면 안된다. ( 사용자 AS접수, 다른 네오직원 상태변경 )
-       */
-      RefreshElem : function(elem, data){
-
-
-
-
       }
     };
 
@@ -471,9 +460,11 @@
       onChangeStatus : function(data){
         console.log(data);
         if(data.TYPE === 'STATUS'){ // 상태가 변한 이벤트가 와야하고
-
+          var itemID = data.item.id;
+          var asData = data.data[0];
+          swal.close();
           if(data.STATUS >= ASSTATUS.TAKEOVER){   // 변한 상태가 인계, 인계접수, 완료, 취소 인것만 처리한다.
-            var itemID = data.item.id;
+
 
             // 상태가 인계이면 새로추가 or 업데이트
             if(data.STATUS === ASSTATUS.TAKEOVER){
@@ -494,10 +485,16 @@
                     });
                   }
 
-                  var asData = data.data[0];
+
                   var program = neo.emrs[asData.프로그램].name;
                   var $elem = $('div[data-name="'+program+'"]').find('.takeover-items[data-index="'+itemID+'"]');
                   if($elem.length){
+                    _me.listData.data[program].some(function(item){
+                      if(item.인덱스 === asData.인덱스){
+                        item = asData;
+                        return item.인덱스 === asData.인덱스;
+                      }
+                    });
                     _me.elem.list._SetNewItem(_me.elem.list.lists[program], asData, itemID, program, $elem);
                     neoNotify.Show({
                       title : "AS 현황",

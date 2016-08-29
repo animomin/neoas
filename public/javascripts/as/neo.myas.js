@@ -647,6 +647,12 @@
           buttons : _me.editor.buttons
         });
         this.SetTemplate(this.$edit);
+        if(mobile){
+          $('.note-btn').attr({
+            'title': ''  ,
+            'data-original-title' : ''
+          });
+        }
 
         _this.$liveas = $('.as-lives-item');
         _this.$liveas.bind('click', _me.events.onExecuteLiveAS);
