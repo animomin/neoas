@@ -52,7 +52,7 @@
           success : _beforeLoaded,
           callback : _afterLoaded
         };
-        neoAJAX.as.list(options);
+        neoAJAX.GetAjax(options);
 
         /**
          * 2. 메디
@@ -76,7 +76,7 @@
           success : _beforeLoaded,
           callback : _afterLoaded
         };
-        neoAJAX.as.list(options);
+        neoAJAX.GetAjax(options);
 
         /**
          * 3. 이플러스
@@ -100,7 +100,7 @@
            success : _beforeLoaded,
            callback : _afterLoaded
          };
-         neoAJAX.as.list(options);
+         neoAJAX.GetAjax(options);
 
         function _beforeSend(opts){
           opts.target_tab.find('span').text('0');
@@ -518,7 +518,7 @@
 
                 }
               };
-              neoAJAX.as.list(options);
+              neoAJAX.GetAjax(options);
             }else{
               var program = neo.emrs[asData.프로그램].name;
               var $elem = $('.takeover-items[data-index="'+itemID+'"]');

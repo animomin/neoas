@@ -233,30 +233,31 @@ var neoAJAX = {
       }
     });
   },
-  as : {
-    list : function(opts){
-      $.ajax({
-        url : opts.url,
-        data : opts.data,
-        dataType : opts.dataType,
-        async : opts.async,
-        method : opts.method,
-        beforeSend : function(){
-          if(typeof opts.beforeSend === 'function'){
-            return opts.beforeSend(opts);
-          }
-        },
-        success : function(data){
-          opts.success(opts, data);
-        },
-        error : function(err){
-          console.log(err);
-        },
-        complete : function(){
-          if(typeof opts.callback === 'function') return opts.callback(opts);
+  GetAjax : function(opts){
+    $.ajax({
+      url : opts.url,
+      data : opts.data,
+      dataType : opts.dataType,
+      async : opts.async,
+      method : opts.method,
+      beforeSend : function(){
+        if(typeof opts.beforeSend === 'function'){
+          return opts.beforeSend(opts);
         }
-      });
-    },
+      },
+      success : function(data){
+        opts.success(opts, data);
+      },
+      error : function(err){
+        console.log(err);
+      },
+      complete : function(){
+        if(typeof opts.callback === 'function') return opts.callback(opts);
+      }
+    });
+  },
+  as : {
+
     UpdateAS : function(elem, data, callback){
       var result;
       $.ajax({
@@ -277,54 +278,6 @@ var neoAJAX = {
         complete : function(){
           elem.find('i.fa-refresh').removeClass('fa-refresh fa-spin').addClass('fa-hospital-o');
           if(typeof callback === 'function') return callback(result);
-        }
-      });
-    },
-    EmrVersion : function(opts){
-      $.ajax({
-        url : opts.url,
-        data : opts.data,
-        dataType : opts.dataType,
-        async : opts.async,
-        method : opts.method,
-        beforeSend : function(){
-          if(typeof opts.beforeSend === 'function'){
-            return opts.beforeSend(opts);
-          }
-        },
-        success : function(data){
-          opts.success(opts, data);
-        },
-        error : function(err){
-          console.log(err);
-        },
-        complete : function(){
-          if(typeof opts.callback === 'function') return opts.callback(opts);
-        }
-      });
-    }
-  },
-  manage : {
-    GetRank : function(opts){
-      $.ajax({
-        url : opts.url,
-        data : opts.data,
-        dataType : opts.dataType,
-        async : opts.async,
-        method : opts.method,
-        beforeSend : function(){
-          if(typeof opts.beforeSend === 'function'){
-            return opts.beforeSend(opts);
-          }
-        },
-        success : function(data){
-          opts.success(opts, data);
-        },
-        error : function(err){
-          console.log(err);
-        },
-        complete : function(){
-          if(typeof opts.callback === 'function') return opts.callback(opts);
         }
       });
     }

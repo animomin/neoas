@@ -1,12 +1,12 @@
 var winston = require('winston');
 require('winston-daily-rotate-file');
 
-if(!require('fs').existsSync('../log')){
-  require('fs').mkdirSync('../log');
+if(!require('fs').existsSync(path.join(__dirname, '../../', 'log'))){
+  require('fs').mkdirSync(path.join(__dirname, '../../', 'log'));
 }
 
-var logOpts = {filename: '../log/neoas.debug.log', json: false};
-var exceptOpts = {filename: '../log/neoas.exceptions.log', json: false};
+var logOpts = {filename: path.join(__dirname, '../../', 'log/neoas.debug.log'), json: false};
+var exceptOpts = {filename: path.join(__dirname, '../../', 'log/neoas.exceptions.log'), json: false};
 
 var logger = new (winston.Logger)({
   transports: [

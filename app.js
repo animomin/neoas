@@ -1,11 +1,13 @@
 var express = require('express');
 var session = require('express-session');
-var path = require('path');
+global.path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+global.rootPath = path.resolve(__dirname);
+console.log(rootPath);
 require('./bin/config');
 
 var routes = require('./routes/index');

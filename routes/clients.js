@@ -23,7 +23,8 @@ router.post('/require', function(req, res, next){
     logger.info(err, fields, files);
     var img = files.uploadimage[0];
     fs.readFile(img.path, function(err, data){
-      var path = "./public/uploads/" + img.originalFilename;
+      // var path = "./public/uploads/" + img.originalFilename;
+      var path = global.path.join(__dirname, '../public/uploads',img.originalFilename);
       fs.writeFile(path, data, function(err){
         if(err) logger.error('(AS Require) IMAGE UPLOAD FAILED :: ', err);
         if(!err){
@@ -50,7 +51,8 @@ router.post('/upload', function(req, res, next){
     logger.info(err, fields, files);
     var img = files.capture[0];
     fs.readFile(img.path, function(err, data){
-      var path = "./public/uploads/" + img.originalFilename;
+      // var path = "./public/uploads/" + img.originalFilename;
+      var path = global.path.join(__dirname, '../public/uploads',img.originalFilename);
       fs.writeFile(path, data, function(err){
         if(err){
           logger.error('Remote Capture Image FAILED :: ', err);

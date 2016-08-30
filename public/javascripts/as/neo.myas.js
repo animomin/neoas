@@ -126,7 +126,7 @@
           success : _beforeLoaded,
           callback : _afterLoaded
         };
-        neoAJAX.as.list(options);
+        neoAJAX.GetAjax(options);
 
         /**
          * 2. 전체날짜 진행중인거 로드
@@ -149,7 +149,7 @@
           success : _beforeLoaded,
           callback : _afterLoaded
         };
-        neoAJAX.as.list(options);
+        neoAJAX.GetAjax(options);
 
         function _beforeSend(opts){
           opts.target_tab.find('span').text('0');
@@ -279,7 +279,7 @@
           success : _beforeLoaded,
           callback : callback
         };
-        neoAJAX.as.list(options);
+        neoAJAX.GetAjax(options);
 
         function _beforeLoaded(opts, data){
           if(data.err){
@@ -1102,7 +1102,7 @@
                   return;
                 case _this.LIVECOMMANDS.ROLLBACK:
                   var versions = {};
-                  neoAJAX.as.EmrVersion({
+                  neoAJAX.GetAjax({
                     url : '/versions',
                     data : {emr : _me.selItem.data.프로그램},
                     dataType : 'json',

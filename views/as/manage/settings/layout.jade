@@ -1,0 +1,67 @@
+div.row
+  div.col-lg-4.p-lg
+    div.ibox
+      div.ibox-title
+        h5 
+          i.fa.fa-cubes
+          |  실행파일 & 실행메뉴 & 세부화면 설정
+        div.ibox-tools
+          a.collapse-link 
+            i.fa.fa-chevron-up
+          a.close-link
+            i.fa.fa-times
+      div.ibox-content
+        div#exe_tree
+  
+  div.col-lg-8.p-lg
+    div.ibox
+      div.ibox-title
+        h5 
+          i.fa.fa-cloud
+          |  파일관리
+          small#upload_path
+        div.ibox-tools
+          a.collapse-link
+            i.fa.fa-chevron-up
+          a.close-link
+            a.fa.fa-times
+      div.ibox-content
+        div.row
+          div.col-xs-3
+            div.ibox.float-e-margins
+              div.ibox-content
+                div.file-manager
+                  form(action='/files', method='post', enctype='multipart/form-data')
+                    select#upload_category.selectpicker(name='category', title='카테고리',data-width="100%", required)
+                      option(value="Android") Android Application
+                      option(value="Agent") Agent Program
+                      option(value="WebPage") WebPage Files
+                    input.input.input-xs.form-control#upload_version(type='text',placeholder='버전', name='version')
+                    input.input.input-xs.form-control#upload_folder(type='text',placeholder='폴더', name='folder', required)
+                    input#upload_date(type='hidden', value='', name='update')
+                    input#upload_file.input.input-xs.form-control(type='file', name='file')
+                    button#upload_btn.btn.btn-primary.btn-block(type='submit') 업로드
+                div.hr-line-dashed
+                h5 카테고리                  
+                ul.folder-list(style='padding:0')                  
+                  li
+                    a.upload-tabs(href='#', data-name='Android')
+                      i.fa.fa-folder
+                      | Android Application
+                  li
+                    a.upload-tabs(href='#', data-name='Agent')
+                      i.fa.fa-folder 
+                      | Agent Program                  
+                  li
+                    a.upload-tabs(href='#', data-name='WebPage')
+                     i.fa.fa-folder
+                     | WebPage files
+          div.col-xs-9.animated.fadeInRight
+            div.row 
+              div.col-xs-12#upload_filebox
+                div.text-center#upload_filebox_unselected       
+                  h3.text-muted 카테고리를 선택해주세요.
+                
+            
+              
+        

@@ -1,7 +1,9 @@
 var neoConst = {
   settings : {
     _loadLayouts : function(){
-      fs.readFile('public/settings/layouts/layers_sense.json','utf8', function(error, data) {
+      //fs.readFile('public/settings/layouts/layers_sense.json','utf8', function(error, data) {
+
+      fs.readFile(rootPath + '/public/settings/layouts/layers_sense.json','utf8', function(error, data) {
         if (error) {
           console.log(error);
         } else {

@@ -7,11 +7,90 @@
 
     _me.settings = {
       layouts : {},
+      layouts_tree : {
+        CreateTreeData : function(key, layout){
+          if(typeof layout === 'undefined') return false;
+          var _this = _me.settings.layouts_tree;
+          var parents = Object.keys(layout);
+          if(parents.length){
+
+            var tree_data = [];
+
+            parents.forEach(function(item){
+              /* 부모..그러니까 실행파일 이름 */
+              tree_data.push({
+                'id' : item ,
+                'parent' : '#',
+                'text' : item
+              });
+
+              /* 실행메뉴 */
+              // var childs = Object.keys(layout[item]);
+              // if(childs.length){
+              //   childs.forEach(function(_item){
+              //     tree_data.push({
+              //       'id' : _item,
+              //       'parent' : item,
+              //       'text' : _item
+              //     });
+              //
+              //     if(layout[item][_item].length){
+              //       var subChilds = layout[item][_item];
+              //       subChilds.forEach(function(__item){
+              //         tree_data.push({
+              //           'id' : __item,
+              //           'parent' : _item,
+              //           'text' : __item
+              //         });
+              //       });
+              //     }
+              //   });
+              // }
+
+
+            });
+
+            _this[key] = tree_data;
+
+          }
+        }
+      },
       init : function(){
         var _this = this;
         $.each(neo.emrs, function(i,v){
           _this.layouts[i] = v.layouts;
+          _this.layouts_tree.CreateTreeData(i,v.layouts);
         });
+      },
+      upload : {
+        data : null,
+        Load : function(type, data){
+          var con  = _me.elem.uploads.con;
+          var icon = '';
+          $('#upload_path').text(data.path);
+          $('.file-box').remove();
+          this.data = data;
+          data.files.forEach(function(item, index){
+            var template = _me.elem.uploads.item;
+            template = template.replace('{{file}}', '/download/' + type.toLowerCase() + '?fdr=' + item.folder + '&fle=' + item.filename);
+            template = template.replace('{{filename}}', item.filename);
+            template = template.replace('{{date}}', item.date);
+            template = template.replace('{{version}}', item.version);
+            template = template.replace('{{folder}}', item.folder);
+            template = template.replace('{{data-index}}', index);
+
+            icon = '';
+            if(item.filename.match(/\.(apk)$/)) icon = '<i class="fa fa-android"></i>';
+            if(item.filename.match(/\.(jpg|jpeg|png|bmp|gif)$/)) icon = '<img class="img-responsive" src="'+data.path.replace('public/','')+'/'+ item.folder + '/' + item.filename +'" />';
+            if(icon === '') icon = '<i class="fa fa-file"></i>';
+
+            template = template.replace('{{icon}}', icon);
+            con.append(template);
+            animationHover($('.file-box:last-child'), 'pulse');
+            $('.file-box:last-child').find('.file-box-delete').bind('click', _me.events.onUploadDelete);
+          });
+
+        }
       }
     };
 
@@ -41,7 +120,7 @@
         Load : function(){
           var _this = this;
 
-          neoAJAX.manage.GetRank({
+          neoAJAX.GetAjax({
             url : '/manage/area',
             data : {
               month : _me.rank.month,
@@ -107,7 +186,7 @@
         Load : function(){
           var _this = this;
 
-          neoAJAX.manage.GetRank({
+          neoAJAX.GetAjax({
             url : '/manage/member',
             data : {
               month : _me.rank.month,
@@ -144,7 +223,7 @@
         Load : function(){
           var _this = this;
 
-          neoAJAX.manage.GetRank({
+          neoAJAX.GetAjax({
             url : '/manage/hosp',
             data : {
               month : _me.rank.month,
@@ -182,7 +261,7 @@
         Load : function(){
           var _this = this;
 
-          neoAJAX.manage.GetRank({
+          neoAJAX.GetAjax({
             url : '/manage/emr',
             data : {
               month : _me.rank.month,
@@ -524,6 +603,19 @@
     _me.elem = {
       $rankTabs : null,
       $rankDate : null,
+      $exeTree : null,
+      uploads : {
+        update : null,
+        category : null,
+        version : null,
+        folder : null,
+        file : null,
+        btn : null,
+        tabs : null,
+        con : null,
+        unsel : null,
+        item : null
+      },
       init : function(){
         var _this = this;
         _this.$rankTabs = $('a.rank-tabs');
@@ -538,11 +630,72 @@
             autoclose: true,
             todayHighlight: true
         });
+
+        _this.$exeTree = $('#exe_tree');
+        _this.$exeTree.jstree({ 'core' : {
+            'data' : _me.settings.layouts_tree[20]
+          },
+          'plugins' : [ 'types' ],
+          'types' : {
+              'default' : {
+                  'icon' : 'fa fa-folder'
+              },
+              'html' : {
+                  'icon' : 'fa fa-file-code-o'
+              },
+              'svg' : {
+                  'icon' : 'fa fa-file-picture-o'
+              },
+              'css' : {
+                  'icon' : 'fa fa-file-code-o'
+              },
+              'img' : {
+                  'icon' : 'fa fa-file-image-o'
+              },
+              'js' : {
+                  'icon' : 'fa fa-file-text-o'
+              }
+
+          }
+        });
+
+        _this.uploads.update = $('#upload_date');
+        _this.uploads.category = $('#upload_category').selectpicker({size:3});
+        _this.uploads.version = $('#upload_version');
+        _this.uploads.folder = $('#upload_folder');
+        _this.uploads.file = $('#upload_file');
+        _this.uploads.form = $('form');
+        _this.uploads.tabs = $('a.upload-tabs');
+        _this.uploads.con = $('#upload_filebox');
+        _this.uploads.unsel = $('#upload_filebox_unselected');
+
+        _this.uploads.item = '<div class="file-box">' +
+                                        '<a href="{{file}}">' +
+                                          '<div class="file">' +
+                                            '<span class="corner"></span>' +
+                                            '<div class="icon">' +
+                                              '{{icon}}' +
+                                            '</div>' +
+                                            '<div class="file-name">{{filename}}' +
+                                              '<br/>' +
+                                              '<small>{{date}}</small>' +
+                                              '<br/> 버전 : {{version}}' +
+                                              '<br/> 폴더 : {{folder}}' +
+                                              '<br/>' +
+                                              '<button class="btn btn-default btn-xs pull-right file-box-delete" {{data-index}}>삭제</button>' +
+                                              '<br/>' +
+                                            '</div>' +
+                                          '</div>' +
+                                        '</a>' +
+                                      '</div>';
+
         return _this.initEvents();
       },
       initEvents : function(){
         var _this = this;
         _this.$rankDate.bind('change', _me.events.onMonthPick);
+        _this.uploads.form.on('submit', _me.events.onUpload);
+        _this.uploads.tabs.bind('click', _me.events.onUploadCategory);
       }
     };
 
@@ -556,6 +709,89 @@
         _me.rank.month = _me.rank.month.replace('월','');
         _me.rank.init();
         $('a.rank-tabs:eq(0)').tab('show');
+      },
+      onUpload : function(e){
+        var uploads = _me.elem.uploads;
+        e.preventDefault();
+
+        if(neo.user.user_position_id != 3){
+          neoNotify.Show({
+            title : '설정',
+            text : '권한이 없습니다.'
+          });
+          return false;
+        }
+
+        uploads.update.val((new Date()).GetToday('YYYY-MM-DD HH:MM:SS'));
+        var formData = new FormData();
+        	  formData.append("category", uploads.category.val());
+        	  formData.append("version", uploads.version.val());
+        	  formData.append("folder", uploads.folder.val());
+            formData.append("file", uploads.file[0].files[0]);
+            formData.append("update", uploads.update.val());
+
+        $.ajax({
+    	    url: '/files',
+    	    data: formData,
+    	    processData: false,
+    	    contentType: false,
+    	    type: 'POST',
+    	    success: function(data){
+    	    	neoNotify.Show({
+              title : '설정',
+              text : '파일업로드 성공'
+            });
+
+            uploads.form.reset();
+    	    },
+          error : function(){
+            neoNotify.Show({
+              title : '설정',
+              text : '파일업로드 실패'
+            });
+            uploads.form.reset();
+          }
+    	  });
+      },
+      onUploadCategory : function(e){
+        e.preventDefault();
+        var _type = $(this).data('name');
+        _me.elem.uploads.tabs.find('i').removeClass('fa-folder-open').addClass('fa-folder');
+        $(this).find('i').removeClass('fa-folder').addClass('fa-folder-open');
+        neoAJAX.GetAjax({
+          url : '/files',
+          data : {type : _type},
+          dataType : 'json',
+          async : true,
+          method : 'GET',
+          beforeSend : function(){
+            var loader = _me.elem.uploads.unsel;
+            loader.find('h3').addClass('hidden');
+            if($('.file-box').length){
+              $('.file-box').remove();
+            }
+            loader.append(neoAJAX.GetSpinners('fadingCircles'));
+            loader = null;
+          },
+          success : function(opts, data){
+
+            return _me.settings.upload.Load(_type, data);
+
+          },
+          callback : function(opts){
+            var loader = _me.elem.uploads.unsel;
+            loader.find('.spiner-example').remove();
+            if(!$('.file-box').length){
+              loader.find('h3').removeClass('hidden');
+            }
+          }
+        });
+      },
+      onUploadDelete : function(e){
+        return neoNotify.Show({
+          title : '설정',
+          text : '준비중입니다.'
+        });
       }
     };
 

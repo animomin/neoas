@@ -2,20 +2,13 @@ var mssql = require('mssql'),
     fs = require('fs'),
     xml_digester = require('xml-digester'),
     digester = xml_digester.XmlDigester({}),
-    dbString = JSON.parse(fs.readFileSync('../lib/server.json', 'UTF-8')),
+    dbString = JSON.parse(fs.readFileSync(path.join(__dirname, '../../../../', 'lib/server.json'), 'UTF-8')),
     connection = new mssql.Connection(dbString.server22);
 
-fs.readFile(__dirname + '/query.xml','utf8', function(error, data) {
-  if (error) {
-  } else {
-    digester.digest(data, function(error, result) {
-      if (error) {
-      } else {
-        global.querys22 = result.query;
-      }
+var xml = fs.readFileSync(path.join(__dirname, 'query.xml'),'utf-8');
+    digester.digest(xml, function(err, result){
+      global.querys22 = result.query;
     });
-  }
-});
 
 function Connect(callback){
   connection.connect(function(err){
@@ -70,7 +63,7 @@ exports.execute = function(query, callback){
 					callback(err);
 					return;
 				}
-        logger.info("(neoServer22)query is commited successfully")
+        logger.info("(neoServer22)query is commited successfully");
 				callback(null,recordset);
 			});
 		});
@@ -80,7 +73,7 @@ exports.execute = function(query, callback){
 
 exports.isConnected = function(){
   return connection.connected;
-}
+};
 
 Connect(function(){
   member.SetNeoMembers();
