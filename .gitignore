@@ -1,2 +1,5 @@
 public/uploads
+public/agent
+public/apps
+public/settings
 .startup.bat
