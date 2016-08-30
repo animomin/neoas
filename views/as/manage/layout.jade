@@ -1,16 +1,16 @@
 div.sidebar-container
   ul.nav.nav-tabs.navs-3
-    li
+    li.active
       a(href='#tab-1',data-toggle='tab') AS처리현황
     li
       a(href='#tab-2',data-toggle='tab') 오류보고
-    li.active
+    li
       a(href='#tab-3',data-toggle='tab') 설정
 div.tab-content
-  div#tab-1.tab-pane.fade
+  div#tab-1.tab-pane.fade.in.active  
     include ./rank/layout.jade
   div#tab-2.tab-pane.fade 오류보고
-  div#tab-3.tab-pane.fade.in.active  
+  div#tab-3.tab-pane.fade
     include ./settings/layout.jade
       
   
