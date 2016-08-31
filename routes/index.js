@@ -111,10 +111,10 @@ router.post('/files', function(req, res, next){
 });
 
 router.get('/download/:category', function(req,res,ext){
-  var file = 'public/';
-  if(req.params.category === 'android') file += 'apps/android/';
-  if(req.params.category === 'agent') file += 'agent/';
-  if(req.params.category === 'webpage') file += 'settings/';
+  var file = "";
+  if(req.params.category === 'android') file = global.path.join(__dirname, '../public/','apps/android/'); //file += 'apps/android/';
+  if(req.params.category === 'agent') file = global.path.join(__dirname, '../public/','agent/'); // file += 'agent/';
+  if(req.params.category === 'webpage') file = global.path.join(__dirname, '../public/','settings/'); //file += 'settings/';
 
   file += req.query.fdr + '/';
   file += req.query.fle;
@@ -124,7 +124,8 @@ router.get('/download/:category', function(req,res,ext){
 });
 
 router.get('/apps/:mobile/:version', function(req, res, next){
-  var file = 'public/apps/' + req.params.mobile + '/' + req.params.version + '/neoas';
+  // var file = 'public/apps/' + req.params.mobile + '/' + req.params.version + '/neoas';
+  var file = global.path.join(__dirname, '../public/apps/', req.params.mobile + '/' + req.params.version + '/neoas');
   file += (req.params.mobile === 'android' ? '.apk' : '.ipa');
   res.download(file);
 });
