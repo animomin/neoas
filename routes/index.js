@@ -59,7 +59,7 @@ router.post('/files', function(req, res, next){
         uploads = JSON.parse(uploads);
     var newData = null;
     uploads[fields.category[0]].files.forEach(function(item,index){
-      if(item.folder === fields.folder[0]){
+      if(item.filename === files.file[0].originalFilename){
         uploads[fields.category[0]].files[index].filename = files.file[0].originalFilename;
         uploads[fields.category[0]].files[index].version = fields.version[0];
         uploads[fields.category[0]].files[index].date = fields.update[0];

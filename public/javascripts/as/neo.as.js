@@ -406,6 +406,17 @@
                 break;
               case '취소사유':
                 return $(v).html(value);
+              case '접수연락처':
+                if(value.indexOf(':') >= 0){
+                  if(value.split(':')[1] !== ''){
+                    value = '<a href="tel:' + value.split(':')[0] + '">' + value.split(':')[0] + '</a> (내선: ' + value.split(':')[1] + ') ';
+                  }else{
+                    value = '<a href="tel:' + value.split(':')[0] + '">' + value.split(':')[0] + '</a>';
+                  }
+                }else{
+                  value = '<a href="tel:' + value.split(':')[0] + '">' + value.split(':')[0] + '</a>';
+                }
+                return $(v).html(value);
               default:
                 value = value;
             }
@@ -1249,7 +1260,10 @@
            /* 전체 지사 검색이 아니네? */
            if(!_me.options.area){
              /* 내 담당도 아니네? 뭔데 안봐*/
-             if(data.NEW.area !== neo.user.user_area) return _SocketCheck();
+             /* 메디본사 0030 을 본사 0000 으로 변경 */
+             var hospArea = data.NEW.area;
+             hospArea = hospArea === '0030' ? '0000' : hospArea;
+             if(hospArea !== neo.user.user_area) return _SocketCheck();
            }
 
            /* 있는거야 알림 안해도되 */

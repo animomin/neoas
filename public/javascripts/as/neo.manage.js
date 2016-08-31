@@ -64,6 +64,7 @@
       },
       upload : {
         data : null,
+        captegory : null,
         Load : function(type, data){
           var con  = _me.elem.uploads.con;
           var icon = '';
@@ -77,11 +78,12 @@
             template = template.replace('{{date}}', item.date);
             template = template.replace('{{version}}', item.version);
             template = template.replace('{{folder}}', item.folder);
-            template = template.replace('{{data-index}}', index);
+            template = template.replace(/{{data-index}}/gim, 'data-index="' + index + '"');
 
             icon = '';
-            if(item.filename.match(/\.(apk)$/)) icon = '<i class="fa fa-android"></i>';
-            if(item.filename.match(/\.(jpg|jpeg|png|bmp|gif)$/)) icon = '<img class="img-responsive" src="'+data.path.replace('public/','')+'/'+ item.folder + '/' + item.filename +'" />';
+
+            if(item.filename.toLowerCase().match(/\.(apk)$/)) icon = '<i class="fa fa-android"></i>';
+            if(item.filename.toLowerCase().match(/\.(jpg|jpeg|png|bmp|gif)$/)) icon = '<img class="img-responsive" src="'+data.path.replace('public/','')+'/'+ item.folder + '/' + item.filename +'" />';
             if(icon === '') icon = '<i class="fa fa-file"></i>';
 
             template = template.replace('{{icon}}', icon);
@@ -670,7 +672,7 @@
         _this.uploads.unsel = $('#upload_filebox_unselected');
 
         _this.uploads.item = '<div class="file-box">' +
-                                        '<a href="{{file}}">' +
+                                        // '<a href="{{file}}">' +
                                           '<div class="file">' +
                                             '<span class="corner"></span>' +
                                             '<div class="icon">' +
@@ -683,10 +685,11 @@
                                               '<br/> 폴더 : {{folder}}' +
                                               '<br/>' +
                                               '<button class="btn btn-default btn-xs pull-right file-box-delete" {{data-index}}>삭제</button>' +
+                                              '<a class="btn btn-default btn-xs pull-right file-box-download" href="{{file}}">다운로드</a>' +
                                               '<br/>' +
                                             '</div>' +
                                           '</div>' +
-                                        '</a>' +
+                                        // '</a>' +
                                       '</div>';
 
         return _this.initEvents();
@@ -741,8 +744,8 @@
               title : '설정',
               text : '파일업로드 성공'
             });
-
-            uploads.form.reset();
+            _me.settings.upload.category.trigger('click');
+            //uploads.form.reset();
     	    },
           error : function(){
             neoNotify.Show({
@@ -756,6 +759,7 @@
       onUploadCategory : function(e){
         e.preventDefault();
         var _type = $(this).data('name');
+        _me.settings.upload.category = $(this);
         _me.elem.uploads.tabs.find('i').removeClass('fa-folder-open').addClass('fa-folder');
         $(this).find('i').removeClass('fa-folder').addClass('fa-folder-open');
         neoAJAX.GetAjax({
@@ -774,9 +778,7 @@
             loader = null;
           },
           success : function(opts, data){
-
             return _me.settings.upload.Load(_type, data);
-
           },
           callback : function(opts){
             var loader = _me.elem.uploads.unsel;

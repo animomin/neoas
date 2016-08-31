@@ -27,7 +27,9 @@ div.row.border-bottom
             a.navbar-as(href='/myas', data-as='503') 나의AS         
           li(class=menu==504 ? 'active' : '')
             a.navbar-as(href='/manage', data-as='504') AS관리
-        ul.nav.navbar-nav.navbar-right                    
+          li
+            a(href='/download/webpage?fdr=help&fle=neoas.pdf') 도움말
+        ul.nav.navbar-nav.navbar-right 
           li
             a#sign-out(href='/users/logout',onClick='localStorage.clear();')
               i.fa.fa-sign-out
