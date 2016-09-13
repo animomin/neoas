@@ -97,6 +97,15 @@
             where += "        처리자 like '%"+params.search+"%' Or ";
             where += "        문의내용 like '%"+params.search+"%' )  ";
             // where += "        인덱스 In ( Select AS인덱스 From N_ServiceReply Where 처리내용 like '%"+params.search+"%'))";
+            orderby = " 접수일자 DESC ";
+          }else if(params.type === 'DATAVIEW'){
+
+            where = " AND CONVERT(char(10), 접수일자, 120) Between '" + params.startDate + "' AND '" + params.endDate + "' ";
+            if(params.area){
+              where += " AND 지사코드 = '" + params.area + "' ";
+            }
+
+            orderby = " 접수일자 DESC, 서비스상태";
 
           }else{
             switch (params.status) {
@@ -129,6 +138,7 @@
               where += " And ( ";
               where += "        기관코드 like '%"+params.search+"%' Or ";
               where += "        기관명칭 like '%"+params.search+"%' Or ";
+              where += "        CONVERT(char(18), 접수일자, 21) like '%"+params.search+"%' Or ";               
               where += "        접수자 like '%"+params.search+"%' ) ";
             }
           }

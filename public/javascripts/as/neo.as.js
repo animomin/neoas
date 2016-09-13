@@ -151,6 +151,9 @@
          * 2. 전체날짜 진행중인거 로드
          * 3. 전체날짜 취소된거 로드
          */
+         var onLoaded_Join = false;
+         var onLoaded_Work = false;
+         var onLoaded_Cancel = false;
 
         /**
          * 1. 오늘자 접수리스트 로드
@@ -275,15 +278,33 @@
           opts.target_list.find('div.spiner-example').remove();
           neoModules.SetElementHeight();
 
-          if(type === 'JOIN'){
-            if(opts.type === 'JOIN'){
-              callback();
-            }
-          }else{
-            if(opts.type === 'CANCEL'){
-              callback();
+          if(opts.type === 'JOIN') onLoaded_Join = true;
+          if(opts.type === null) onLoaded_Work = true;
+          if(opts.type === 'CANCEL') onLoaded_Cancel = true;
+
+          if(typeof callback === 'function'){
+
+            if(!type){
+              if(onLoaded_Join && onLoaded_Work && onLoaded_Cancel) return callback();
+            }else{
+              if(type === 'JOIN'){
+                if(onLoaded_Join) return callback();
+              }
+              if(type === 'CANCEL'){
+                if(onLoaded_Cancel) return callback();
+              }
             }
           }
+
+          // if(type === 'JOIN'){
+          //   if(opts.type === 'JOIN'){
+          //     callback();
+          //   }
+          // }else{
+          //   if(opts.type === 'CANCEL'){
+          //     callback();
+          //   }
+          // }
         }
 
         // if(typeof callback === 'function') return callback();
@@ -333,12 +354,14 @@
       $elem : null,
       data : null,
       id : null,    // 배열의 인덱스 번호
+      index : null, // 데이터의 id값
       socket : false,
       imgStack : {},
       init : function(){
         this.$elem = null;
         this.data = null;
         this.id = null;
+        this.index = null;
         this.socket = false;
         return;
       },
@@ -353,6 +376,7 @@
 
         _this.$elem = elem;
         _this.id = _this.$elem.data('id');
+        _this.index = _this.$elem.data('index');
         _this.data = _me.listData.data[_me.options.workTab][_this.id];
 
 
@@ -483,7 +507,7 @@
         var tab = _me.elem.list.$workingTab;
         var cData = JSON.parse(JSON.stringify(_this.data));
         /* 선택된 AS건의 데이터 갱신 */
-        cData.서비스상태 = status;
+        cData.서비스상태 = parseInt(cData.서비스상태) !== ASSTATUS.TAKEOVERCONFIRM ? status : cData.서비스상태;
         cData.문의내용 = _me.elem.GetComment();
         cData.실행메뉴 = _me.elem.$lyMenu.selectpicker('val');
         cData.세부화면 = _me.elem.$lyDetail.selectpicker('val');
@@ -673,7 +697,6 @@
           }
 
           data.data.forEach(function(item, index){
-
             var newItem = _this._SetNewItem(opts.target_list, item, index);
           });
           return opts.target_list.find('div.spiner-example').removeClass('fadeInDown').addClass('fadeOutUp');
@@ -694,6 +717,10 @@
         $item.find('small[data-name="인계일자"]').text(item.인계일자);
         $item.find('h5[data-name="기관명칭"]').text(item.기관명칭 + ' (' + item.기관코드 + ')');
         $item.find('div[data-name="문의내용"]').html(item.문의내용);
+
+        $item.find('td[data-id="실행파일"]').text(item.실행파일);
+        $item.find('td[data-id="실행메뉴"]').text(item.실행메뉴);
+        $item.find('td[data-id="세부화면"]').text(item.세부화면);
 
         var $updateBadge = $item.find('span[data-name="업데이트"]');
             $updateBadge.empty();
@@ -1144,10 +1171,21 @@
        * AS확인, 인계접수, 처리완료
        */
       onUpdateAS : function(){
-        if($(this).hasClass('disabled')) return false;
-        //alert($(this).data('type'));
         var type = parseInt($(this).data('type'));
         var msg;
+
+        if($(this).hasClass('disabled')) return false;
+
+        if(_me.selItem.data.서비스상태 === ASSTATUS.TAKEOVERCONFIRM && type === ASSTATUS.DONE){
+          return neoNotify.Show({
+            title : "NeoSoftBank A/S",
+            text : '해당 A/S 요청건은 처리담당자만 완료처리가 가능합니다.',
+            desktop : false
+          });
+        }
+
+        //alert($(this).data('type'));
+
         switch (type) {
           case ASSTATUS.CONFIRM:
             msg = "해당 AS요청건을 확인처리합니다.";
@@ -1291,9 +1329,17 @@
             _SocketCheck();
             if(_me.selItem.$elem){
               if(_me.selItem.$elem.length){
-                // _me.selItem.$elem.addClass('active');
-                _me.selItem.$elem = $('a.as-item[data-index="'+_me.selItem.id+'"]');
-                _me.selItem.$elem.addClass('active');
+                if(_me.selItem.index === parseInt(data.CLIENT)){
+                  neoNotify.Show({
+                    title : "NeoSoftBank A/S",
+                    text : '열람중이던 A/S 요청건이 취소되었습니다.',
+                    type : 'info',
+                    desktop : true
+                  });
+                  _me.elem.clear();
+                  _me.selItem.init();
+                }
+
               }
             }
            });
@@ -1367,20 +1413,27 @@
           _me.listData.Load(null, function(){
             $.neoSocket.emitClients();
 
-            if(data.STATUS === ASSTATUS.DONE || data.STATUS === ASSTATUS.CANCEL){
-              _me.elem.clear();
-              _me.selItem.init();
-            }else{
-              _me.elem.list.$workingTab.tab('show');
+            if(_me.selItem.$elem){
               if(_me.selItem.$elem.length){
-                var prevElem = $('a.as-item[data-index="'+_me.selItem.data.인덱스+'"]');
-                if(prevElem.length){
-                  _me.options.workTab = prevElem.parent().data('name');
-                  prevElem.trigger('click');
-                }else{
-                  _me.elem.clear();
-                  _me.selItem.init();
+                if(_me.selItem.index === parseInt(data.item.id)){
+                  var msg = ASSTATUS.ServiceName(data.STATUS);
+
+                  neoNotify.Show({
+                    title : "NeoSoftBank A/S",
+                    text : '작업중이던 A/S 요청건이 ' + msg + '되었습니다.',
+                    type : 'info',
+                    desktop : true
+                  });
+
+                  if(data.STATUS <= ASSTATUS.TAKEOVERCONFIRM){
+                    _me.selItem.$elem = $('a.as-item[data-index="'+_me.selItem.index+'"]');
+                    _me.selItem.$elem.addClass('active').trigger('click');
+                  }else{
+                    _me.elem.clear();
+                    _me.selItem.init();
+                  }
                 }
+
               }
             }
           });

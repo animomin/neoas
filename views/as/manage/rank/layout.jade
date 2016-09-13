@@ -8,6 +8,8 @@ div.tabs-container
           input.form-control.disabled#rankMonth(type='text')          
       li
         a.rank-tabs(href='#best',data-toggle='tab') BEST
+      //- li
+      //-   a.rank-tabs(href='#data', data-toggle='tab') A/S 전체현황
       li
         a.rank-tabs(href='#area',data-toggle='tab') 지사별 처리현황
       li
@@ -15,7 +17,8 @@ div.tabs-container
       li
         a.rank-tabs(href='#emr',data-toggle='tab') 프로그램별 발생현황
       li
-        a.rank-tabs(href='#hosp',data-toggle='tab') 병원별 AS요청현황      
+        a.rank-tabs(href='#hosp',data-toggle='tab') 병원별 A/S요청현황   
+      
     div.tab-content(style='height:100%;')
       div#best.rank-tabs.tab-pane.fade(style='height:100%;')
         div.panel-body.gray-bg(style='height:100%;')
@@ -124,6 +127,8 @@ div.tabs-container
                     i.fa.fa-trophy.fa-5x
                   div
                     span(data-name='best_hosp_accept')
+      div#data.rank-tabs.tab-pane.fade(style='height:100%;')
+        include ./dataView.jade
       div#area.rank-tabs.tab-pane.fade(style='height:100%;')
         div.panel-body.gray-bg(style='height:100%;')           
           div.container-fluid

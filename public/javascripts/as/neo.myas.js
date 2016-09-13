@@ -104,11 +104,13 @@
          * 1. 전체날짜 작업중인거
          * 2. 전체날짜 완료한거
          */
+         var onLoaded_work = false;
 
         /**
          * 1. 전체날짜 작업중인거
          */
         var options = {
+          type : 'WORK',
           target_list : _me.elem.list.lists.WORKING,
           target_tab : _me.elem.list.tabs.WORKING,
           beforeSend : _beforeSend,
@@ -129,9 +131,10 @@
         neoAJAX.GetAjax(options);
 
         /**
-         * 2. 전체날짜 진행중인거 로드
+         * 2. 전체날짜 완료한거 로드
          */
         options = {
+          type : 'DONE',
           target_list : _me.elem.list.lists.DONE,
           target_tab : _me.elem.list.tabs.DONE,
           beforeSend : _beforeSend,
@@ -194,7 +197,9 @@
         function _afterLoaded(opts){
           opts.target_list.find('div.spiner-example').remove();
           neoModules.SetElementHeight();
-          if(typeof callback === 'function') return callback();
+          if(opts.type === 'WORK'){
+            if(typeof callback === 'function') return callback();
+          }
         }
 
       },
@@ -322,12 +327,14 @@
       $elem : null,
       data : null,
       id : null,    // 배열의 인덱스 번호
+      index : null, // 데이터 id
       socket : false,
       imgStack : {},
       init : function(){
         this.$elem = null;
         this.data = null;
         this.id = null;
+        this.index = null;
         this.socket = false;
         return;
       },
@@ -335,10 +342,17 @@
         var _this = _me.selItem;
         _this.$elem = elem;
         _this.id = _this.$elem.data('id');
+        _this.index = _this.$elem.data('index');
         _this.data = _me.listData.data[_me.options.workTab][_this.id];
 
 
         _me.elem.clear(function(){
+
+          if(_this.data.서비스상태 === ASSTATUS.DONE){
+            _me.elem.$asStatus.addClass('disabled');
+          }else{
+            _me.elem.$asStatus.removeClass('disabled');
+          }
 
           /**
            * AS 상태바 로드
@@ -416,11 +430,7 @@
             }
           });
 
-          if(_this.data.서비스상태 === ASSTATUS.DONE){
-            _me.elem.$asStatus.addClass('disabled');
-          }else{
-            _me.elem.$asStatus.removeClass('disabled');
-          }
+
 
           if(mobile){
             $('#page1').fadeOut('fast', function(){
@@ -536,6 +546,8 @@
           });
         }
       }
+
+
     };
 
     /**
@@ -613,6 +625,7 @@
       $tblhosp : null,          // 병원정보테이블
       $custom : null,           // 사용자정의
       $library : null,          // 문의내용 검색
+      $search_library : null,   // 기록검색입력박스
       $liveas : null,           // 실시간 AS 명령 버튼 + 캡쳐버튼
       $asStatus : null,         // AS 상태변경 버튼
       $edit : null,           // 문의내용 에디터
@@ -637,6 +650,8 @@
         // _this.$custom = $('di')    // 사용자정의
         // _this.library = $();       // 문의내용 검색
         _this.$status = $('div.as_status');
+        _this.$library = $('div#library');       // 문의내용 검색
+        _this.$search_library = $('input#search_library');
 
         _this.$edit = $('#as_question');
         $(_this.$edit).summernote({
@@ -658,6 +673,7 @@
         _this.$liveas.bind('click', _me.events.onExecuteLiveAS);
 
         _this.$asStatus = $('.as-status-btn');
+        $('.as-status-btn[data-type="1"]').addClass('disabled');
         _this.$asStatus.bind('click', _me.events.onUpdateAS);
 
         $('#as-toolbar-view').removeClass('hidden');
@@ -695,7 +711,7 @@
         return this.initEvents();
       },
       initEvents : function(){
-
+        this.$search_library.bind('keyup', _me.events.onLibrarySearch);
         this.$search_i.bind('keyup', _me.events.onSearch);
         if(mobile){
           $('a.as-tab[data-tab="list"]').bind('click', function(e){
@@ -826,6 +842,134 @@
       }
     };
 
+
+    _me.library = {
+      $list : null,
+      $item : null,
+      search : null,
+      init : function(){
+        var _this = this;
+        _this.search = "";
+        _this.$list = _me.elem.$library || $('div#library');
+        neoAJAX.GetTemplate('as-takeover-takeover_item' , function(view){
+          _this.$item = $(view);
+        });
+        return;
+      },
+      Load : function(){
+        var _this = _me.library;
+
+        if(_this.search + "" === ""){
+          var $input = _me.elem.$search_library || $('input#search_library');
+          $input.addClass('animated tada').popover({
+            content: "<span class='font-bold text-danger'>검색어를 입력해주세요.</span>",
+            placement: "bottom",
+            html : true,
+          }).popover('show').on('shown.bs.popover',function(){
+            setTimeout(function(){
+              $input.removeClass('animated tada').popover('hide');
+            }, 2000);
+          });
+
+          return false;
+        }
+
+        var options = {
+          target_list : _this.$list,
+          beforeSend : _beforeSend,
+          url : 'clients/list',
+          data : {
+            type : 'HISTORY',
+            search : _this.search
+          },
+          dataType : 'json',
+          async : true,
+          method : 'GET',
+          success : _beforeLoaded,
+          callback : _afterLoaded
+        };
+        neoAJAX.GetAjax(options);
+
+        function _beforeSend(opts){
+          opts.target_list.empty();
+          opts.target_list.append(neoAJAX.GetSpinners('fadingCircles'));
+        }
+
+        function _beforeLoaded(opts, data){
+          // console.log(data);
+          if(data.err && data.err !== 'NODATA'){
+            neoNotify.Show({
+              title : 'AS 기록 검색',
+              text : data.err.message
+            });
+            return false;
+          }
+
+          if(data.err === 'NODATA'){
+            neoNotify.Show({
+              title : 'AS 기록 검색',
+              text : '검색결과가 없습니다.'
+            });
+            return false;
+          }
+
+          data.data.forEach(function(item, index){
+
+            var newItem = _this._SetNewItem(opts.target_list, item, index);
+          });
+          return opts.target_list.find('div.spiner-example').removeClass('fadeInDown').addClass('fadeOutUp');
+        }
+
+        function _afterLoaded(opts){
+          opts.target_list.find('div.spiner-example').remove();
+        }
+      },
+      _SetNewItem : function(obj, item, index){
+        var _this = _me.library;
+        var $item = _this.$item.clone();
+
+        $item.addClass('animated fadeInUp');
+        $item.attr({'data-id' : index, 'data-index' : item.인덱스, 'data-animated' : 'fadeInUp', 'data-emergency' : item.응급여부});
+        $item.find('button[data-name="인계접수"]').remove();
+        $item.find('a[data-name="인계자"]').text(item.인계자);
+        $item.find('small[data-name="인계일자"]').text(item.인계일자);
+        $item.find('h5[data-name="기관명칭"]').text(item.기관명칭 + ' (' + item.기관코드 + ')');
+        $item.find('div[data-name="문의내용"]').html(item.문의내용);
+
+        var $updateBadge = $item.find('span[data-name="업데이트"]');
+            $updateBadge.empty();
+        if(item.응급여부 === 1){
+          $updateBadge.append('<span class="badge badge-danger update-badge update-danger ">응급</span>');
+          $item.addClass('takeover-items-danger');
+        }
+
+        var badgename, typename;
+        switch (parseInt(item.서비스타입)) {
+          case 0:
+            badgename = 'badge-done'; typename='선택없음';
+            break;
+          case 1:
+            badgename = 'badge-warning'; typename='장애';
+            break;
+          case 2:
+            badgename = 'badge-primary'; typename='사용법';
+            break;
+          case 3:
+            badgename = 'badge-info'; typename='개선';
+            break;
+          case 4:
+            badgename = 'badge-echart'; typename='기타';
+            break;
+        }
+        $item.find('span.badge[data-name="서비스타입"]')
+            .text(typename)
+            .addClass(badgename);
+
+        obj.append($item);
+        return $item;
+      }
+    };
+
     _me.events = {
 
       /**
@@ -853,6 +997,16 @@
       onTabClick : function(e){
         _me.options.workTab = $(this).data('name');
         $.neoSocket.emitClients();
+      },
+
+      /**
+       * AS 기록 검색
+       */
+      onLibrarySearch : function(e){
+        if(e.type == 'keyup' && (e.keyCode == 13 || e.key == 'Enter')){
+          _me.library.search = $(this).val().trim();
+          return _me.library.Load();
+        }
       },
 
       /**
@@ -996,6 +1150,45 @@
           b.find('i').removeClass('fa-square-o').addClass('fa-check-square-o');
         }else{
           b.find('i').removeClass('fa-check-square-o').addClass('fa-square-o');
+        }
+      },
+
+      onChangeStatus : function(data){
+        console.log(data);
+        if(data.TYPE === 'STATUS'){ // 상태가 변한 이벤트가 와야하고
+          swal.close();
+          _me.listData.Load(function(){
+            $.neoSocket.emitClients();
+
+            if(_me.selItem.$elem){
+              if(_me.selItem.$elem.length){
+                if(_me.selItem.index === parseInt(data.item.id)){
+                  if(data.STATUS === ASSTATUS.CANCEL){
+                    msg = "취소";
+                  }else{
+                    msg = "업데이트";
+                  }
+
+
+                  neoNotify.Show({
+                    title : "NeoSoftBank A/S",
+                    text : '작업중이던 A/S 요청건이 ' + msg + '되었습니다.',
+                    type : 'info',
+                    desktop : true
+                  });
+
+                  if(data.STATUS !== ASSTATUS.CANCEL){
+                    _me.selItem.$elem = $('a.as-item[data-index="'+_me.selItem.index+'"]');
+                    _me.selItem.$elem.addClass('active').trigger('click');
+                  }else{
+                    _me.elem.clear();
+                    _me.selItem.init();
+                  }
+                }
+
+              }
+            }
+          });
         }
       }
     };
@@ -1241,6 +1434,7 @@
       _me.listData.init();
       _me.selItem.init();
       _me.elem.init();
+      _me.library.init();
       return callback();
     };
 

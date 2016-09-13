@@ -1,0 +1,83 @@
+div.panel-body.as-body
+  div.m-b-md#as-comment-toolbar       
+    h4 AS 문의내용  
+    
+    div#as-toolbar-edit.hidden
+      div.form-group.form-inline
+        lebel.font-bold 실행파일 정보 : 
+        select#as-toolbar-execute.selectpicker(title='실행파일',data-live-search="true",data-width="fit")
+        select#as-toolbar-menu.selectpicker(title='실행메뉴',data-live-search="true",data-width="fit")
+        select#as-toolbar-detail.selectpicker(title='세부화면',data-live-search="true",data-width="fit")    
+    div#as-toolbar-view.hidden
+      include ../takeover/takeover_item_program.jade
+    
+    div#as-toolbar-func
+      div.form-group.form-inline.well.well-sm
+        button.btn.btn-info.btn-sm 사용자화면 캡쳐
+        button.btn.btn-info.btn-sm A/S 인계
+        button.btn.btn-info.btn-sm A/S 처리완료
+        button.btn.btn-danger.btn-sm
+          i.fa.fa-square-o
+          |  응급
+         
+          
+  //textarea.summernote#as_question    
+  div#comment
+    h3  1. 문의내용
+      button.btn.btn-default.btn-xs
+        i.fa.fa-pencil
+        |  수정하기
+    div#question.well.well-sm
+      |  오류내용이다아아아
+    h3  2. 확인내용
+      button.btn.btn-default.btn-xs
+        i.fa.fa-pencil
+        |  수정하기
+    div#confirm.well.well-sm
+      | 확인내용이네~~~
+    h3  3. 처리내용
+      button.btn.btn-default.btn-xs
+        i.fa.fa-pencil
+        |  수정하기
+    div#done.well.well-sm
+      | 처리내용이다아아앙
+    
+    table.table.table-sm.table-bordered
+      tr
+        th 접수자
+        th 확인자
+        th 인계자
+        th 처리자
+      tr
+        td
+          ul
+            li 접수자 : 
+              span(data-name='접수자') 
+            li 연락처 :
+              span(data-name='접수연락처') 
+            li 접수일 :
+              span(data-name='접수일자') 
+        td
+          ul
+            li 확인자 : 
+              span(data-name='확인자') 
+            li 연락처 :
+              span(data-name='확인자연락처') 
+            li 확인일 :
+              span(data-name='확인일자') 
+        td
+          ul
+            li 인계자 : 
+              span(data-name='인계자') 
+            li 연락처 :
+              span(data-name='인계자연락처') 
+            li 인계일 :
+              span(data-name='인계일자') 
+        td
+          ul
+            li 처리자 : 
+              span(data-name='처리자') 
+            li 연락처 :
+              span(data-name='처리자연락처') 
+            li 처리일 :
+              span(data-name='처리일자') 

@@ -25,7 +25,7 @@ block content
                     span.input-group-addon 연락처
                     input.form-control.input.input-block.block(type='text',id='client_contact',name='client_contact',value='01034304020')
                     span.input-group-addon(style='border-left:0;border-right:0;') 내선번호
-                    input.form-control.input.input-block.block(type='text',id='client_contact2',name='client_contact2',disabled='true')
+                    input.form-control.input.input-block.block(type='text',id='client_contact2',name='client_contact2')
                 
                 textarea.summernote(id='comment',name='comment')              
               
@@ -240,6 +240,22 @@ block scripts
     $(document).on('submit', 'form' , function(event){
       var browser = parseInt(sessionStorage.getItem('browser'));
       
+      var tel = $('#client_contact').val().trim();
+      if($('#client_contact2').val().trim()){
+        tel = tel + ":" + $('#client_contact2').val().trim();
+        if(tel.length > 20){
+          var contactG = $('#client_contact').parent();
+          contactG.addClass('animated tada').popover({
+            content: "<span class='font-bold text-danger'>연락처가 너무 깁니다. <br> 연락처+내선번호 19자 이하로 입력해주세요. </span>", 
+            placement: "bottom",
+            html : true,
+          }).popover('show').on('shown.bs.popover', function(){
+            setTimeout(function(){contactG.removeClass('animated tada').popover('destroy');}, 5000);
+          });
+          return event.preventDefault();
+        }
+      }
+      
       if(!$('button.btn-astype').hasClass('active')){
         var btnG = $('button.btn-astype').parent();
         btnG.addClass('animated tada').popover({
@@ -247,9 +263,9 @@ block scripts
           placement: "bottom",
           html : true,
         }).popover('show').on('shown.bs.popover', function(){
-          setTimeout(function(){btnG.removeClass('animated tada').popover('hide');}, 2000);
+          setTimeout(function(){btnG.removeClass('animated tada').popover('destroy');}, 2000);         
         });
-        event.preventDefault();
+        return event.preventDefault();
       }
       
       if(browser > 9){

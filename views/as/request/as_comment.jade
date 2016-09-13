@@ -3,10 +3,14 @@ div.panel-body.as-body
     h4 AS 문의내용  
     
     div#as-toolbar-edit.hidden
-      select#as-toolbar-execute.selectpicker(title='실행파일',data-live-search="true",data-width="fit")
-      select#as-toolbar-menu.selectpicker(title='실행메뉴',data-live-search="true",data-width="fit")
-      select#as-toolbar-detail.selectpicker(title='세부화면',data-live-search="true",data-width="fit")    
+      div.form-group.form-inline
+        lebel.font-bold 실행파일 정보 : 
+        select#as-toolbar-execute.selectpicker(title='실행파일',data-live-search="true",data-width="fit")
+        select#as-toolbar-menu.selectpicker(title='실행메뉴',data-live-search="true",data-width="fit")
+        select#as-toolbar-detail.selectpicker(title='세부화면',data-live-search="true",data-width="fit")    
     div#as-toolbar-view.hidden
       include ../takeover/takeover_item_program.jade
     
+          
   textarea.summernote#as_question    
+  

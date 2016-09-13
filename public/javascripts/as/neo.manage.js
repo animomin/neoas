@@ -148,7 +148,7 @@
             success : function(opts,data){
               if(data.err){
                 return neoNotify.Show({
-                  title : '지사별 AS처리현황',
+                  title : '지사별 A/S처리현황',
                   text : data.err === 'NODATA' ? _NODATA : data.err.message,
                   desktop : false
                 });
@@ -205,7 +205,7 @@
             success : function(opts,data){
               if(data.err){
                 return neoNotify.Show({
-                  title : '직원별 AS처리현황',
+                  title : '직원별 A/S처리현황',
                   text : data.err === 'NODATA' ? _NODATA : data.err.message,
                   desktop : false
                 });
@@ -242,7 +242,7 @@
             success : function(opts,data){
               if(data.err){
                 return neoNotify.Show({
-                  title : '병원별 AS접수현황',
+                  title : '병원별 A/S접수현황',
                   text : data.err === 'NODATA' ? _NODATA : data.err.message,
                   desktop : false
                 });
@@ -281,7 +281,7 @@
             success : function(opts,data){
               if(data.err){
                 return neoNotify.Show({
-                  title : '프로그램별 AS발생현황',
+                  title : '프로그램별 A/S발생현황',
                   text : data.err === 'NODATA' ? _NODATA : data.err.message,
                   desktop : false
                 });
@@ -295,6 +295,67 @@
               console.log(_this);
             }
           });
+        }
+      },
+      dataView : {
+        options : {
+          startDate : null,
+          endDate : null,
+          program : null,
+          exe : null,
+          status : null,
+          area : null,
+          hospnum : null,
+          hospname : null,
+          aceept : null,
+          confirm : null,
+          takover : null,
+          done : null,
+          content : null
+        },
+        data : null,
+        Load : function(opts){
+          var _this = this;
+          _this.options = opts;
+          _this.options.type = 'DATAVIEW';
+
+
+          neoAJAX.GetAjax({
+            url : '/clients/list',
+            data : _this.options,
+            dataType : 'json',
+            method : 'GET',
+            async : false,
+            beforeSend : function(){
+              _this.data = null;
+              _me.elem.$dataTable.find('tbody').empty();
+            },
+            success : function(opts,data){
+              if(data.err){
+                return neoNotify.Show({
+                  title : '프로그램별 A/S 전체현황',
+                  text : data.err === 'NODATA' ? _NODATA : data.err.message,
+                  desktop : false
+                });
+              }
+              _this.data = data.data;
+
+              _this.data.forEach(function(item, index){
+                var newItem = $(_me.elem.$dataItem);
+
+                newItem.find('td').each(function(i,v){
+                  $(v).html(item[$(v).data('name')]);
+                });
+
+                _me.elem.$dataTable.find('tbody').append(newItem);
+              });
+              //_this.best = _this.data[0];
+            },
+            callback : function(){
+
+            }
+          });
+
         }
       },
       init : function(){
@@ -599,12 +660,24 @@
               }
             });
         });
+
+        // A/S 전체현황
+        $('a.rank-tabs[href="#data"]').on('shown.bs.tab', function(e){
+          if(_this.dataView.data) return;
+          _this.dataView.Load({
+            startDate : (new Date()).GetToday('YYYY-MM-DD'),
+            endDate : (new Date()).GetToday('YYYY-MM-DD'),
+            area : neo.user.user_area
+          });
+        });
       }
     };
 
     _me.elem = {
       $rankTabs : null,
       $rankDate : null,
+      $dataTable : null,
+      $dataItem : null,
       $exeTree : null,
       uploads : {
         update : null,
@@ -632,6 +705,21 @@
             autoclose: true,
             todayHighlight: true
         });
+
+        _this.$dataTable = $('table#data-table');
+        _this.$dataItem = '<tr>' +
+                            '<td data-name="응급여부"></td>' +
+                            '<td data-name="기관코드"></td>' +
+                            '<td data-name="기관명칭"></td>' +
+                            '<td data-name="지사코드"></td>' +
+                            '<td data-name="서비스상태"></td>' +
+                            '<td data-name="접수자"></td>' +
+                            '<td data-name="확인자"></td>' +
+                            '<td data-name="인계자"></td>' +
+                            '<td data-name="처리자"></td>' +
+                            '<td data-name="문의내용"></td>' +
+                          '</tr>';
+
 
         _this.$exeTree = $('#exe_tree');
         _this.$exeTree.jstree({ 'core' : {
