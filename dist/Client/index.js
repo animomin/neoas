@@ -110,7 +110,7 @@
           }else{
             switch (params.status) {
               case ASSTATUS.ACCEPT:
-              where = " AND CONVERT(char(10), 접수일자, 120) = '" + params.date + "' ";
+              where = " AND ( CONVERT(char(10), 접수일자, 120) = '" + params.date + "' OR 서비스상태 = " + ASSTATUS.ACCEPT + ") ";
               where += " AND 서비스상태 = " + ASSTATUS.ACCEPT;
               orderby = " 접수일자 DESC ";
               break;
@@ -138,7 +138,7 @@
               where += " And ( ";
               where += "        기관코드 like '%"+params.search+"%' Or ";
               where += "        기관명칭 like '%"+params.search+"%' Or ";
-              where += "        CONVERT(char(18), 접수일자, 21) like '%"+params.search+"%' Or ";               
+              where += "        CONVERT(char(18), 접수일자, 21) like '%"+params.search+"%' Or ";
               where += "        접수자 like '%"+params.search+"%' ) ";
             }
           }
