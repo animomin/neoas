@@ -492,58 +492,61 @@
 
             // 상태가 인계이면 새로추가 or 업데이트
             if(data.STATUS === ASSTATUS.TAKEOVER){
-            var _this = _me.listData;
-            var newItem;
-            var options = {
-              url : 'clients/item',
-              data : {id : itemID},
-              dataType : 'json',
-              async : true,
-              method : 'GET',
-              success : function(opts, item){
+              var _this = _me.listData;
+              var newItem;
+              var options = {
+                url : 'clients/item',
+                data : {id : itemID},
+                dataType : 'json',
+                async : true,
+                method : 'GET',
+                success : function(opts, item){
 
-                if(item.err){
-                  return neoNotify.Show({
-                    text : '새로운 AS요청건을 불러오는 도중 오류가 발생하였습니다. 새로고침해주세요. \n ' + data.err,
-                    type : 'error',
-                    desktop : true
-                  });
+                  if(item.err){
+                    return neoNotify.Show({
+                      text : '새로운 AS요청건을 불러오는 도중 오류가 발생하였습니다. 새로고침해주세요. \n ' + data.err,
+                      type : 'error',
+                      desktop : true
+                    });
+                  }
+
+                  item = item.data[0];
+                  var program = neo.emrs[item.프로그램].name;
+                  var $elem = $('div[data-name="'+program+'"]').find('.takeover-items[data-index="'+itemID+'"]');
+                  if($elem && $elem.length){
+                    _me.listData.data[program].some(function(_item,_index){
+                      if(_item.인덱스 === item.인덱스){
+                        _item = item;
+                        itemID = _index;
+                        return _item.인덱스 === item.인덱스;
+                      }
+                    });
+                    //itemID가 아닌듯
+                    _me.elem.list._SetNewItem(_me.elem.list.lists[program], item, itemID, program, $elem);
+                    neoNotify.Show({
+                      title : "AS 현황",
+                      text : 'AS요청건이 업데이트되었습니다. \n (' + item.기관명칭 + ')',
+                      type : 'info',
+                      desktop : true
+                    });
+                  }else{
+                    //여기도
+                    _me.listData.data[program].push(item);
+                    _me.elem.list._SetNewItem(_me.elem.list.lists[program], item, _me.listData.data[program].length-1, program);
+                    _me.elem.list._SetTabCount(_me.elem.list.tabs[program], _me.listData.data[program]);
+                    neoNotify.Show({
+                      title : "AS 현황",
+                      text : '새로운 AS요청건이 인계접수 되었습니다. \n (' + item.기관명칭 + ')',
+                      type : 'info',
+                      desktop : true
+                    });
+                  }
+
+                  return true;
+
                 }
-
-                item = item.data[0];
-                var program = neo.emrs[item.프로그램].name;
-                var $elem = $('div[data-name="'+program+'"]').find('.takeover-items[data-index="'+itemID+'"]');
-                if($elem && $elem.length){
-                  _me.listData.data[program].some(function(_item){
-                    if(_item.인덱스 === item.인덱스){
-                      _item = item;
-                      return _item.인덱스 === item.인덱스;
-                    }
-                  });
-                  _me.elem.list._SetNewItem(_me.elem.list.lists[program], item, itemID, program, $elem);
-                  neoNotify.Show({
-                    title : "AS 현황",
-                    text : 'AS요청건이 업데이트되었습니다. \n (' + item.기관명칭 + ')',
-                    type : 'info',
-                    desktop : true
-                  });
-                }else{
-                  _me.listData.data[program].push(item);
-                  _me.elem.list._SetNewItem(_me.elem.list.lists[program], item, itemID, program);
-                  _me.elem.list._SetTabCount(_me.elem.list.tabs[program], _me.listData.data[program]);
-                  neoNotify.Show({
-                    title : "AS 현황",
-                    text : '새로운 AS요청건이 인계접수 되었습니다. \n (' + item.기관명칭 + ')',
-                    type : 'info',
-                    desktop : true
-                  });
-                }
-
-                return true;
-
-              }
-            };
-            neoAJAX.GetAjax(options);
+              };
+              neoAJAX.GetAjax(options);
             }else{
               // var program = neo.emrs[asData.프로그램].name;
               var $elem = $('.takeover-items[data-index="'+itemID+'"]');
