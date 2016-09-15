@@ -1176,6 +1176,8 @@
 
         if($(this).hasClass('disabled')) return false;
 
+        if(!_me.selItem.data) return console.log('as not selected');
+
         if(_me.selItem.data.서비스상태 === ASSTATUS.TAKEOVERCONFIRM && type === ASSTATUS.DONE){
           return neoNotify.Show({
             title : "NeoSoftBank A/S",

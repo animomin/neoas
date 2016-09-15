@@ -1014,6 +1014,7 @@
        */
       onUpdateAS : function(){
         if($(this).hasClass('disabled')) return false;
+        if(!_me.selItem.data) return console.log('as not selected');
         //alert($(this).data('type'));
         var type = parseInt($(this).data('type'));
         var msg;
