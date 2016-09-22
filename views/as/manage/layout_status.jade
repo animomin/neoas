@@ -38,18 +38,5 @@ div.row.p-sm.m-l-sm.m-r-sm
                   
   div.col-lg-9.col-md-8
     div.ibox
-      div.ibox-content  
-        table.table.table-responsive#data-table
-          thead 
-            tr
-              th 응급
-              th 기관코드
-              th 기관명칭
-              th 담당지사
-              th 처리상태
-              th 접수자
-              th 확인자
-              th 인계자
-              th 처리자
-              th 내용
-          tbody
+      div.ibox-content.small  
+        table.table.table-responsive#data-table(data-paging="true",data-paging-size='15',data-sorting='true')        

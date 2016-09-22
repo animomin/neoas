@@ -58,11 +58,6 @@
         elem.$search.bind('click', searchClick);
         elem.$keyword.bind('keyup', keywordKeyUp);
 
-        elem.$dataTable = elem.$table.DataTable({
-            'searching': false,
-            'destroy': true
-        });
-
         this.init();
     }
 
@@ -107,7 +102,7 @@
                 console.log(e);
             },
             btnSearch_OnClick: function(e, _this) {
-                console.log(e);
+                _this.Load();
             }
         },
         init: function() {
@@ -150,12 +145,51 @@
                     Pace.start();
                 },
                 success: function(opt, records) {
-                    console.log(records.data);
-                    _this.elem.$dataTable.destroy();
+                    var $table = _this.elem.$table;
 
-                    _this.elem.$table.DataTable({
-                        searching: false,
-                        'ajax': records.data
+                    records.data.forEach(function(_item, _index){
+                        var temp = ASSTATUS.ServiceBackGround(_item.서비스상태);
+                            temp.value = _item;
+                            records.data[_index] = JSON.parse(JSON.stringify(temp));
+                    });
+
+                    $table.footable({
+                        "columns" : [
+                            { 'name' : '인덱스' , 'title' : 'ID', 'style' : { 'width' : 50, 'maxWidth' : 50 } },
+                            { 'name' : '기관코드', 'title' : '기관번호' },
+                            { 'name' : '기관명칭', 'title' : '기관명칭' },
+                            { 'name' : '프로그램', 'title' : '프로그램',
+                                formatter : function(value){
+                                    if(value === "" || typeof value === "undefined") value = 0;
+                                    switch(parseInt(value)){
+                                        case 1: return "<span class='badge badge-eplus'>Eplus</span>";
+                                        case 8: return "<span class='badge badge-medi'>Medi</span>";
+                                        case 20 : return "<span class='badge badge-sense'>Sense</span>";
+                                    }
+                                }
+                            },
+                            { 'name' : '지사코드', 'title' : '담당지사',
+                                formatter : function(value){
+                                    if(value === '' || typeof value === 'undefined') value = '0000';
+                                    return neo.area[value];
+                                }
+                            },
+                            { 'name' : '서비스상태' , 'title' : '상태',
+                                formatter : function(value){
+                                    value = parseInt(value);
+                                    return ASSTATUS.ServiceName(value);
+                                }
+                            },
+                            { 'name' : '접수자' , 'title' : '접수자' },
+                            { 'name' : '접수일자' , 'title' : '접수일', 'type' : 'date', 'formatString' : 'YYYY-MM-DD' },
+                            { 'name' : '확인자' , 'title' : '확인자' },
+                            { 'name' : '확인일자' , 'title' : '확인일', 'type' : 'date', 'formatString' : 'YYYY-MM-DD' },
+                            { 'name' : '인계자' , 'title' : '인계자' },
+                            { 'name' : '인계일자' , 'title' : '인계일', 'type' : 'date', 'formatString' : 'YYYY-MM-DD' },
+                            { 'name' : '처리자' , 'title' : '처리자' },
+                            { 'name' : '처리일자' , 'title' : '처리일', 'type' : 'date', 'formatString' : 'YYYY-MM-DD' },
+                        ],
+                        "rows" : records.data
                     });
                 },
                 callback: function() {

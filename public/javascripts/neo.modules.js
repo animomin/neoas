@@ -136,6 +136,22 @@ var ASSTATUS = {
             case this.CANCEL:
                 return '취소';
         }
+    },
+    ServiceBackGround : function(s){
+        switch (s) {
+            case this.ACCEPT:
+                return {"options": {"style": {'background-color' : '#fcf8e3'}}, 'value' : ""};
+            case this.CONFIRM:
+                return {"options": {"style": {'background-color' : '#dff0d8'}}, 'value' : ""};
+            case this.TAKEOVER:
+                return {"options": {"style": {'background-color' : '#dff0d8'}}, 'value' : ""};
+            case this.TAKEOVERCONFIRM:
+                return {"options": {"style": {'background-color' : '#dff0d8'}}, 'value' : ""};
+            case this.DONE:
+                return {"options": {"style": {'background-color' : '#f7f7f7'}}, 'value' : ""};
+            case this.CANCEL:
+                return {"options": {"style": {'background-color' : '#f2dede', 'text-decoration': 'line-through'}}, 'value' : ""};
+        }
     }
 };
 
