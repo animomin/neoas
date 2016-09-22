@@ -129,7 +129,7 @@
             var options = _this.search_options;
             options.mode = 0;
 
-            if (options.view_mode === VIEWMODE.AREA) {
+            if (options.view_mode == VIEWMODE.AREA) {
                 options.view_mode_value = _this.user_area;
             } else {
                 options.view_mode_value = _this.user_id;
