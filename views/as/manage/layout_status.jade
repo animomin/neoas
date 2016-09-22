@@ -1,0 +1,55 @@
+div.row.p-sm.m-l-sm.m-r-sm
+  div.col-xs-12
+    h2.m-t-none 
+      i.fa.fa-history
+      |  A/S 처리내역  
+  div.col-lg-3.col-md-4.text-muted
+    div.ibox
+      div.ibox-title
+        h4
+          i.fa.fa-search
+          | 검 색 옵 션
+      div.ibox-content
+        fieldset
+          p.font-bold 서비스 상태
+          div.well.well-xs.m-none.p-xs.text-center
+            div.btn-group
+              button.btn.btn-default.service_status(type='button', data-status='0') 접수
+              button.btn.btn-default.service_status(type='button', data-status='1') 확인
+              button.btn.btn-default.service_status(type='button', data-status='2') 인계
+              button.btn.btn-default.service_status(type='button', data-status='3') 인계확인
+              button.btn.btn-default.service_status(type='button', data-status='4') 완료
+              button.btn.btn-default.service_status(type='button', data-status='5') 취소    
+          hr
+          p.font-bold A/S 보기옵션
+          div.well.well-xs.m-none.p-xs.text-center
+            div.radio.radio-info.radio-inline
+              input.view_mode(type='radio',name='list-kind',id='my',value='1')
+              label(for='my') 내가 처리한 A/S                      
+            div.radio.radio-info.radio-inline
+              input.view_mode(type='radio',name='list-kind',id='area',value='0')
+              label(for='area') 지사 A/S          
+          hr
+          p 문의내용,확인자,인계자,처리자,접수일자로 검색            
+          div.form-group            
+            input.form-control.keyword#keyword(type='text')
+          
+          button.btn.btn-primary.btn-block#btnSearch 검색
+                  
+  div.col-lg-9.col-md-8
+    div.ibox
+      div.ibox-content  
+        table.table.table-responsive#data-table
+          thead 
+            tr
+              th 응급
+              th 기관코드
+              th 기관명칭
+              th 담당지사
+              th 처리상태
+              th 접수자
+              th 확인자
+              th 인계자
+              th 처리자
+              th 내용
+          tbody

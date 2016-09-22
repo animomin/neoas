@@ -40,7 +40,15 @@ script.
     $(document).on('click','a.navbar-as', function(event){
       event.preventDefault();
       $(".navbar-collapse").collapse('hide');
-      $($(this).parent()).addClass('active').siblings().removeClass('active');
+      //$($(this).parent()).addClass('active').siblings().removeClass('active');
+      var _this = $(this);
+      $('a.navbar-as').each(function(i,v){
+        if($(v).data('as') === $(_this).data('as') ){
+          $($(v).parent()).addClass('active');
+        }else{
+          $($(v).parent()).removeClass('active');
+        }
+      });
       menu = $(this).data('as');
       sessionStorage.setItem('menu', menu);
       neoModules.SetLayout(menu, $('#workspace'));      
@@ -58,7 +66,9 @@ script.
           $('.tabs-container').height(height);
         }
     });
-    
+    Pace.options = {
+      ajax: false
+    };
     Pace.on('hide', function(){
         $('#workspace').removeClass('hidden');
         //- tour.start();

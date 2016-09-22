@@ -8,14 +8,16 @@ block content
   
   .middle-box.text-center.loginscreen.animated.slideInRight
     div
-      h2.text-white 문의하기 예약접수
-      br
-      blockquote.text-white#as-status
-          p 예약접수되었습니다.             
-          
-      br
-      ul.list-group.clear-list.m-t.small.text-left.text-white.hidden#process
-        li.list-group-item.fist-item.hidden#confirm
+      h2.text-white 
+        i.fa.fa-gear.fa-spin
+        |  문의하기 예약접수
+      br      
+      ul.list-group.clear-list.m-t.small.text-left.text-white#process
+        li.list-group-item.fist-item.animated.fadeInUp
+          div.media-body
+            small.pull-right.text-right#accept-time
+            span#accept-person A/S가 접수되었습니다.
+        li.list-group-item.hidden#confirm
           div.media-body
             small.pull-right.text-right#confirm-time          
             span#confirm-person
@@ -31,19 +33,17 @@ block content
           div.media-body
             small.pull-right.text-right#done-time          
             span#done-person
+      br      
       br
-      div.media-body.text-white
-        i.fa.fa-gear.fa-spin.fa-5x
-      br
-      br
-      br
-      div.media-body.text-left
-        textarea.summernote.text-muted(id='comment',name='comment')    
-      button.btn.btn-white.btn-block.full-width.m-b#cancel(type="button") 접수취소
-      //- div.sk-spinner.sk-spinner-three-bounce.as-spinner
-      //-   div.sk-bounce1
-      //-   div.sk-bounce2
-      //-   div.sk-bounce3
+      div.as-cancel
+        div.media-body.text-left
+          textarea.summernote.text-muted(id='comment',name='comment')    
+        button.btn.btn-white.btn-block.full-width.m-b#cancel(type="button") 접수취소
+      div.as-done.hidden
+        div.col-xs-6
+          button.btn.btn-white.btn-block.full-width.m-b#new(type='button') 새로작성
+        div.col-xs-6
+          button.btn.btn-white.btn-block.full-width.m-b#close(type='button') 닫기
   
 block scripts  
   script.    
@@ -68,6 +68,13 @@ block scripts
       $('#cancel').on('click',function(event){
           $('title').html('');
           NeoClient._AcceptCancel();
+      });
+      
+      $('#new').on('click', function(event){
+        $('title').html('LIVEASNEW');
+      });
+      $('#close').on('click', function(event){
+        $('title').html('LIVEASCLOSE');
       });
       
       // 사용자 AS 실시간 기능 종료

@@ -1,5 +1,13 @@
 div.social-feed-box.takeover-items.animated.fadeInUp(data-animated='fadeInUp')
-  span(data-name='업데이트')  
+  span(data-name='업데이트')
+  div.pull-right.social-action.dropdown
+    button.dropdown-toggle.btn-white(data-toggle='dropdown', aria-expanded='false')
+      i.fa.fa-angle-down
+    ul.dropdown-menu.m-t-xs
+      li
+        a.takeover-option(href='#',data-option='this') 펼치기(선택한 A/S)
+      li
+        a.takeover-option(href='#',data-option='all') 펼치기(전체 A/S)  
   div.social-action.pull-right
     a.pull-right(href='#', data-name='인계자')
     br
@@ -13,10 +21,11 @@ div.social-feed-box.takeover-items.animated.fadeInUp(data-animated='fadeInUp')
         h5(data-name='기관명칭')       
         span.badge(data-name='서비스타입')       
   div.social-body
-    div.takeover-program(data-name='실행정보')
-      include ./takeover_item_program.jade
-    div.takeover-content(data-name='문의내용')    
-    hr
+    div.takeover-body.hidden
+      div.takeover-program(data-name='실행정보')
+        include ./takeover_item_program.jade
+      div.takeover-content(data-name='문의내용')    
+      hr
     div.btn-group      
       button.btn.btn-white.btn-sm(data-name='인계접수')
         i.fa.fa-get-pocket

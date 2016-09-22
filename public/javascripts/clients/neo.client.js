@@ -47,43 +47,47 @@ var NeoClient = {
       var comment = "";
       _this.serviceStatus = data.STATUS;
       if(parseInt(_this.serviceStatus) === ConstServiceStatus.CONFIRM){
-        comment = "담당자가 확인하였습니다.";
+        comment = "▷ 담당자가 확인하였습니다.";
         $('#confirm-time').html('확인자 : ' + data.item.확인자 + '<br>연락처 : ' + data.item.확인자연락처 + '<br>' + data.item.확인일자);
         $('#confirm-person').text('AS요청을 확인하였습니다.');
-        $('#process,#confirm').removeClass('hidden');
+        $('#confirm').removeClass('hidden').addClass('animated fadeInUp');
       }else if(parseInt(_this.serviceStatus) === ConstServiceStatus.TAKEOVER){
-        comment = "AS요청이 전산에 등록되었습니다.";
+        comment = "▷ AS요청이 전산에 등록되었습니다.";
         $('#takeover-time').html('접수자 : ' + data.item.인계자 + '<br>연락처 : ' + data.item.인계자연락처 + '<br>' + data.item.인계일자 );
         $('#takeover-person').text(comment);
-        $('#process, #takeover').removeClass('hidden');
+        $('#takeover').removeClass('hidden').addClass('animated fadeInUp');
       }else if(parseInt(_this.serviceStatus) === ConstServiceStatus.TAKEOVERCONFIRM){
-        comment = "AS담당자가 전산에서 AS요청을 확인하였습니다.";
+        comment = "▷ AS담당자가 전산에서 AS요청을 확인하였습니다.";
         $('#takeoverconfirm-time').html('AS담당자 : ' + data.item.처리자 + '<br>연락처 : ' + data.item.처리자연락처 + '<br>' + data.item.처리일자);
         $('#takeoverconfirm-person').text(comment);
-        $('#process, #takeoverconfirm').removeClass('hidden');
+        $('#takeoverconfirm').removeClass('hidden').addClass('animated fadeInUp');
       }else if(parseInt(_this.serviceStatus) === ConstServiceStatus.DONE){
-        comment = "요청사항을 처리하였습니다.";
+        comment = "▷ 요청사항을 처리하였습니다.";
         $('#done-time').html('처리자 : ' + data.item.처리자 + '<br>연락처 : ' + data.item.처리자연락처 + '<br>' + data.item.처리일자);
         $('#done-person').text(comment);
-        $('#process, #done').removeClass('hidden');
-        $('title').html('LIVEASEND');
+        $('#done').removeClass('hidden').addClass('animated fadeInUp');
+        $('.as-cancel').addClass('hidden');
+        $('.as-done').removeClass('hidden');
+        //$('title').html('LIVEASEND');
         return;
       }
 
       // _this._ServiceTimeout();
-      var browser = parseInt(sessionStorage.getItem('browser'));
-      if(browser > 9){
-        $('.middle-box').removeClass('slideInRight').addClass('slideOutLeft');
-        $('.middle-box').one('webkitAnimationEnd oanimationend msAnimationEnd animationend',
-        function(e) {
-          $('title').html("STATUSUPDATE" + comment);
-          $('#as-status').find('p').text(comment);
-          $('.middle-box').removeClass('slideOutLeft').addClass('slideInRight');
-        });
-      }else{
-        $('title').html("STATUSUPDATE" + comment);
-        $('#as-status').find('p').text(comment);
-      }
+      // var browser = parseInt(sessionStorage.getItem('browser'));
+      // if(browser > 9){
+      //   $('.middle-box').removeClass('slideInRight').addClass('slideOutLeft');
+      //   $('.middle-box').one('webkitAnimationEnd oanimationend msAnimationEnd animationend',
+      //   function(e) {
+      //     $('title').html("STATUSUPDATE" + comment);
+      //     // $('#as-status').find('p').text(comment);
+      //     $('.middle-box').removeClass('slideOutLeft').addClass('slideInRight');
+      //   });
+      // }else{
+      //   $('title').html("STATUSUPDATE" + comment);
+      //   // $('#as-status').find('p').text(comment);
+      // }
+      $('title').html("STATUSUPDATE" + comment);
+
 
     });
     _this.socket.on('message', function(data){
@@ -114,7 +118,7 @@ var NeoClient = {
     // this.socket.emit('client:leave' , {roomName : this.room});
     //this.socket.disconnect();
     //io.disconnect();
-    if(force){      
+    if(force){
       this.socket.emit(SOCKETEVENT.CLIENT.CANCEL, {id : this.room});
     }
     this.socket.disconnect();

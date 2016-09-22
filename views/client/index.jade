@@ -241,20 +241,22 @@ block scripts
       var browser = parseInt(sessionStorage.getItem('browser'));
       
       var tel = $('#client_contact').val().trim();
+            
       if($('#client_contact2').val().trim()){
         tel = tel + ":" + $('#client_contact2').val().trim();
-        if(tel.length > 20){
-          var contactG = $('#client_contact').parent();
-          contactG.addClass('animated tada').popover({
-            content: "<span class='font-bold text-danger'>연락처가 너무 깁니다. <br> 연락처+내선번호 19자 이하로 입력해주세요. </span>", 
-            placement: "bottom",
-            html : true,
-          }).popover('show').on('shown.bs.popover', function(){
-            setTimeout(function(){contactG.removeClass('animated tada').popover('destroy');}, 5000);
-          });
-          return event.preventDefault();
-        }
       }
+      if(tel.length > 20){
+        var contactG = $('#client_contact').parent();
+        contactG.addClass('animated tada').popover({
+          content: "<span class='font-bold text-danger'>연락처가 너무 깁니다. <br> 연락처+내선번호 19자 이하로 입력해주세요. </span>", 
+          placement: "bottom",
+          html : true,
+        }).popover('show').on('shown.bs.popover', function(){
+          setTimeout(function(){contactG.removeClass('animated tada').popover('destroy');}, 5000);
+        });
+        return event.preventDefault();
+      }
+      
       
       if(!$('button.btn-astype').hasClass('active')){
         var btnG = $('button.btn-astype').parent();
