@@ -292,7 +292,7 @@
     exports.GetASHistory = function(req, callback) {
         var params = req.query;
         var temp = "";
-        console.log("????");
+        
         async.waterfall([
             function(callback2) {
                 console.log(params);
@@ -306,6 +306,9 @@
                         temp = temp.replace(/{ID}/gi, params.view_mode_value);
                         where += temp;
                     }
+
+                    where += " AND (접수일자 Between '" + params.startDate + "' AND '" + params.endDate + "') ";
+
                     if (params.keyword !== '') {
 
                         where += " And ( ";

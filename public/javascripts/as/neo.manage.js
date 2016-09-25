@@ -40,6 +40,7 @@
         }
 
         var elem = this.elem;
+        elem.$date = $('input.accept-date');
         elem.$service_status = $('button.service_status');
         elem.$view_mode = $('input.view_mode');
         elem.$keyword = $('input#keyword');
@@ -48,11 +49,13 @@
 
 
         var me = this;
+        var dateChange = function(e) { me.events.Date_OnChange(e, me); };
         var statusClick = function(e) { me.events.ServiceStatus_OnClick(e, me); };
         var viewClick = function(e) { me.events.ViewMode_OnClick(e, me); };
         var searchClick = function(e) { me.events.btnSearch_OnClick(e, me); };
-        var keywordKeyUp = function(e) { me.events.Keyword_OnKeyUp(e, me); };
+        var keywordKeyUp = function(e) { me.events.Keyword_OnKeyUp(e, me); };        
 
+        elem.$date.bind('change', dateChange);
         elem.$service_status.bind('click', statusClick);
         elem.$view_mode.bind('click', viewClick);
         elem.$search.bind('click', searchClick);
@@ -65,11 +68,19 @@
         user_id: null,
         user_area: null,
         search_options: {
+            //startDate : (new Date()).GetToday('YYYY-MM-DD'),
+            startDate : (function(){
+                var todate = new Date((new Date()).GetToday('YYYY-MM-DD'));
+                todate.setMonth(todate.getMonth()-1);
+                return todate.GetDate_CustomFormat('YYYY-MM-DD');
+            }),
+            endDate : (new Date()).GetToday('YYYY-MM-DD'),
             service_status: [ASSTATUS.ACCEPT, ASSTATUS.CONFIRM, ASSTATUS.TAKEOVER, ASSTATUS.TAKEOVERCONFIRM, ASSTATUS.DONE, ASSTATUS.CANCEL],
             view_mode: VIEWMODE.AREA,
             keyword: ''
         },
         elem: {
+            $date : null,
             $service_status: null,
             $view_mode: null,
             $keyword: null,
@@ -78,6 +89,14 @@
             $dataTable: null
         },
         events: {
+            Date_OnChange : function(e, _this){
+                var selDate = $(e.target).val();
+                if($(e.target).data('name') === 'start'){
+                    _this.search_options.startDate = selDate;
+                }else{
+                    _this.search_options.endDate = selDate;
+                }
+            },
             ServiceStatus_OnClick: function(e, _this) {
                 $(e.target).toggleClass('active');
                 var status = $(e.target).data('status');
@@ -99,7 +118,13 @@
                 _this.search_options.view_mode = $(e.target).val();
             },
             Keyword_OnKeyUp: function(e, _this) {
-                console.log(e);
+                // if(e.type == 'keyup' && (e.keyCode == 13 || e.key == 'Enter')){
+                if(e.type == 'keyup'){
+                    _this.search_options.keyword = $(e.target).val().trim();    
+                    if(e.keyCode == 13 || e.key == 'Enter'){   
+                        _this.Load();             
+                    }
+                }
             },
             btnSearch_OnClick: function(e, _this) {
                 _this.Load();
@@ -107,7 +132,23 @@
         },
         init: function() {
             var _this = this;
-            var $elem = this.elem.$service_status;
+            var $elem = null;
+
+            $elem = this.elem.$date;
+            $elem.each(function(i,v){
+                $(v).val($(v).data('name') === 'start' ? _this.search_options.startDate : _this.search_options.endDate );
+                $(v).datepicker({
+                    format : 'yyyy-mm-dd',
+                    language:'kr',
+                    startView: 2,
+                    keyboardNavigation: false,
+                    forceParse: false,
+                    autoclose: true,
+                    todayHighlight: true
+                });
+            });
+
+            $elem = this.elem.$service_status;
             $elem.each(function(i, v) {
                 var selected = _this.search_options.service_status.some(function(_i) {
                     return $(v).data('status') == _i;

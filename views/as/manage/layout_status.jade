@@ -11,6 +11,12 @@ div.row.p-sm.m-l-sm.m-r-sm
           | 검 색 옵 션
       div.ibox-content
         fieldset
+          p.font-bold 접수일자
+          div.well.well-xs.m-none.p-xs.text-center
+            div.input-daterange.input-group
+              input.input-sm.form-control.accept-date(type='text', data-name='start')
+              span.input-group-addon ~
+              input.input-sm.form-control.accept-date(type='text', data-name='end')
           p.font-bold 서비스 상태
           div.well.well-xs.m-none.p-xs.text-center
             div.btn-group
