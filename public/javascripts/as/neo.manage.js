@@ -198,7 +198,7 @@
 
                     $table.footable({
                         "columns": [
-                            { 'name': '인덱스', 'title': 'ID', 'style': { 'width': 50, 'maxWidth': 50 } },
+                            { 'name': '인덱스', 'title': 'ID', 'style': { 'width': 50, 'maxWidth': 50 },  'breakpoints' : 'xs' },
                             { 'name': '기관코드', 'title': '기관번호' },
                             { 'name': '기관명칭', 'title': '기관명칭' },
                             {
@@ -222,7 +222,8 @@
                                 formatter: function(value) {
                                     if (value === '' || typeof value === 'undefined') value = '0000';
                                     return neo.area[value];
-                                }
+                                },
+                                'breakpoints' : 'xs'
                             },
                             {
                                 'name': '서비스상태',
@@ -230,16 +231,18 @@
                                 formatter: function(value) {
                                     value = parseInt(value);
                                     return ASSTATUS.ServiceName(value);
-                                }
+                                },
+                                'breakpoints' : 'xs'
                             },
-                            { 'name': '접수자', 'title': '접수자' },
-                            { 'name': '접수일자', 'title': '접수일', 'type': 'date', 'formatString': 'YYYY-MM-DD' },
-                            { 'name': '확인자', 'title': '확인자' },
-                            { 'name': '확인일자', 'title': '확인일', 'type': 'date', 'formatString': 'YYYY-MM-DD' },
-                            { 'name': '인계자', 'title': '인계자' },
-                            { 'name': '인계일자', 'title': '인계일', 'type': 'date', 'formatString': 'YYYY-MM-DD' },
-                            { 'name': '처리자', 'title': '처리자' },
-                            { 'name': '처리일자', 'title': '처리일', 'type': 'date', 'formatString': 'YYYY-MM-DD' },
+                            { 'name': '접수자', 'title': '접수자', 'breakpoints' : 'md sm xs' },
+                            { 'name': '접수일자', 'title': '접수일', 'type': 'date', 'formatString': 'YYYY-MM-DD', 'breakpoints' : 'md sm xs' },
+                            { 'name': '확인자', 'title': '확인자', 'breakpoints' : 'md sm xs' },
+                            { 'name': '확인일자', 'title': '확인일', 'type': 'date', 'formatString': 'YYYY-MM-DD', 'breakpoints' : 'md sm xs' },
+                            { 'name': '인계자', 'title': '인계자', 'breakpoints' : 'md sm xs' },
+                            { 'name': '인계일자', 'title': '인계일', 'type': 'date', 'formatString': 'YYYY-MM-DD', 'breakpoints' : 'md sm xs' },
+                            { 'name': '처리자', 'title': '처리자', 'breakpoints' : 'md sm xs' },
+                            { 'name': '처리일자', 'title': '처리일', 'type': 'date', 'formatString': 'YYYY-MM-DD', 'breakpoints' : 'md sm xs' },
+                            { 'name' : '문의내용', 'title': '내용', 'breakpoints' : 'all'}
                         ],
                         "rows": records.data
                     });

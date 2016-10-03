@@ -1,48 +1,43 @@
 div.row.p-sm.m-l-sm.m-r-sm
   div.col-xs-12
-    h2.m-t-none 
+    h3.m-t-none 
       i.fa.fa-history
       |  A/S 처리내역  
-  div.col-lg-3.col-md-4.text-muted
-    div.ibox
-      div.ibox-title
-        h4
-          i.fa.fa-search
-          | 검 색 옵 션
+  div.col-xs-12
+    div.ibox.m-b-none.small
       div.ibox-content
-        fieldset
-          p.font-bold 접수일자
-          div.well.well-xs.m-none.p-xs.text-center
-            div.input-daterange.input-group
-              input.input-sm.form-control.accept-date(type='text', data-name='start')
-              span.input-group-addon ~
-              input.input-sm.form-control.accept-date(type='text', data-name='end')
-          p.font-bold 서비스 상태
-          div.well.well-xs.m-none.p-xs.text-center
-            div.btn-group
-              button.btn.btn-default.service_status(type='button', data-status='0') 접수
-              button.btn.btn-default.service_status(type='button', data-status='1') 확인
-              button.btn.btn-default.service_status(type='button', data-status='2') 인계
-              button.btn.btn-default.service_status(type='button', data-status='3') 인계확인
-              button.btn.btn-default.service_status(type='button', data-status='4') 완료
-              button.btn.btn-default.service_status(type='button', data-status='5') 취소    
-          hr
-          p.font-bold A/S 보기옵션
-          div.well.well-xs.m-none.p-xs.text-center
-            div.radio.radio-info.radio-inline
-              input.view_mode(type='radio',name='list-kind',id='my',value='1')
-              label(for='my') 내가 처리한 A/S                      
-            div.radio.radio-info.radio-inline
-              input.view_mode(type='radio',name='list-kind',id='area',value='0')
-              label(for='area') 지사 A/S          
-          hr
-          p 문의내용,확인자,인계자,처리자,접수일자로 검색            
-          div.form-group            
-            input.form-control.keyword#keyword(type='text')
-          
-          button.btn.btn-primary.btn-block#btnSearch 검색
+        div.row.no-padding
+          div.col-lg-3.b-r.text-center
+            div.form-group              
+              div.input-daterange.input-group
+                  input.input-sm.form-control.accept-date(type='text', data-name='start')
+                  span.input-group-addon ~
+                  input.input-sm.form-control.accept-date(type='text', data-name='end')
+          div.col-lg-3.b-r.text-center
+            div.form-group              
+              div.btn-group
+                  button.btn.btn-default.service_status(type='button', data-status='0') 접수
+                  button.btn.btn-default.service_status(type='button', data-status='1') 확인
+                  button.btn.btn-default.service_status(type='button', data-status='2') 인계
+                  button.btn.btn-default.service_status(type='button', data-status='3') 인계확인
+                  button.btn.btn-default.service_status(type='button', data-status='4') 완료
+                  button.btn.btn-default.service_status(type='button', data-status='5') 취소
+          div.col-lg-1.b-r
+            div.form-group                            
+              div.radio.radio-info.radio-inline
+                input.view_mode(type='radio',name='list-kind',id='my',value='1')
+                label(for='my') 내가 처리한 A/S                      
+              div.radio.radio-info.radio-inline
+                input.view_mode(type='radio',name='list-kind',id='area',value='0')
+                label(for='area') 지사 A/S      
+          div.col-lg-3             
+            div.form-group
+              input.form-control.keyword#keyword(type='text',placeholder='검색어를 입력해주세요.')         
+          div.col-lg-2   
+            button.btn.btn-primary.btn-block#btnSearch 검색          
+ 
                   
-  div.col-lg-9.col-md-8
+  div.col-xs-12.m-t-none
     div.ibox
       div.ibox-content.small  
-        table.table.table-responsive#data-table(data-paging="true",data-paging-size='15',data-sorting='true')        
+        table.table.table-responsive#data-table(data-paging="true",data-paging-size='15',data-sorting='true',data-toggle-column="last")        

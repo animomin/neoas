@@ -193,7 +193,7 @@ var neoModules = {
                 start = $.neoMY;
                 break;
             case MENU.MANAGE_STATUS:
-                alert('A/S처리내역 메뉴는 작업중입니다.');
+                // alert('A/S처리내역 메뉴는 작업중입니다.');
                 view = 'as-manage-layout_status';
                 start = $.neoMNG;
                 param = menu;
