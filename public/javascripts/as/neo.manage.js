@@ -4,13 +4,54 @@
         AREA: 0,
         MY: 1
     };
+    var _NODATA = '결과없음';
+
+    var chartOptions = {
+        scaleBeginAtZero: true,
+        scaleShowGridLines: true,
+        scaleGridLineColor: "rgba(0,0,0,.05)",
+        scaleGridLineWidth: 1,
+        barShowStroke: true,
+        barStrokeWidth: 2,
+        barValueSpacing: 5,
+        barDatasetSpacing: 1,
+        responsive: true,
+        events: false,
+        tooltips: {enabled: false},
+        hover: {animationDuration: 0},
+        animation: {
+            duration: 1,
+            onComplete: function () {
+                var chartInstance = this.chart,
+                    ctx = chartInstance.ctx;
+                ctx.font = Chart.helpers.fontString(Chart.defaults.global.defaultFontSize, Chart.defaults.global.defaultFontStyle, Chart.defaults.global.defaultFontFamily);
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillStyle = 'darkgray';
+
+                this.data.datasets.forEach(function (dataset, i) {
+                    var meta = chartInstance.controller.getDatasetMeta(i);
+                    meta.data.forEach(function (bar, index) {
+                        data = dataset.data[index];
+                        ctx.fillText(data, bar._model.x, bar._model.y - 5);
+                    });
+                });
+            }
+        }
+    };
 
     var NeoManage = function(menu) {
         var _menu = menu;
         var _me = this;
+
         var manage = null;
         if (_menu === MENU.MANAGE_STATUS) {
             manage = new AsHistory();
+        }else if(_menu === MENU.MANAGE_STATISTIC) {
+            manage = new AsRank();
+            manage.Init(manage,function(){
+              manage.Load();
+            })
         }
 
 
@@ -29,6 +70,430 @@
         // });
 
     };
+
+    function AsRank(){
+      var _this = this;
+      this.options.month = (new Date()).GetToday('YYYY-MM');
+
+      var elem = this.elem;
+      elem.$month = $('input#rankMonth');
+      elem.$canvas = $('canvas');
+      elem.$table = $('tbody');
+
+      elem.$month.val(this.options.month.replace('-', '년 ') + '월');
+      $('.input-group.date').datepicker({
+          format : 'yyyy년 mm월',
+          language:'kr',
+          minViewMode: 1,
+          keyboardNavigation: false,
+          forceParse: false,
+          autoclose: true,
+          todayHighlight: true
+      }).bind('hide', function(e){
+        selDate = new Date($(this).datepicker('getDate'));
+        _this.events.onMonthPick(selDate, _this);
+      });
+
+
+    }
+    AsRank.prototype = {
+      /* DOM elements */
+      elem : {
+        $month : null,
+        $canvas : null,
+        $table : null
+      },
+
+      /* DOM Events */
+      events : {
+        onMonthPick : function(selDate, _this){
+          console.log();
+          _this.options.month = selDate.GetDate_CustomFormat("YYYY-MM");
+          _this.Load();
+        }
+      },
+
+      /* Search */
+      options : {
+        month : null
+      },
+
+      company : {
+        data : null,
+        Load : function(opt){
+          var _this = this;
+          neoAJAX.GetAjax({
+            url : '/manage/total',
+            data : {
+              month : opt.month
+            },
+            dataType : 'json',
+            method : 'GET',
+            async : false,
+            beforeSend : function(){
+              _this.data = null;
+              $('h1.total_as').text('0 건');
+            },
+            success : function(opts,data){
+              if(data.err){
+                return neoNotify.Show({
+                  title : '전체 A/S처리현황',
+                  text : data.err === 'NODATA' ? _NODATA : data.err.message,
+                  desktop : false
+                });
+              }
+              _this.data = data.data[0];
+
+            },
+            callback : function(){
+              if(!_this.data) return false;
+              $('h1.total_as').each(function(i,v){
+                $(v).text(
+                  _this.data[$(v).data('kind')] + ' 건'
+                );
+              });
+            }
+          })
+        }
+      },
+
+      area : {
+        data : null,
+        area : null,
+        Load : function(opt){
+          var _this = this;
+
+          neoAJAX.GetAjax({
+            url : '/manage/area',
+            data : {
+              month : opt.month
+            },
+            dataType : 'json',
+            method : 'GET',
+            async : false,
+            beforeSend : function(){
+              // 지사별 AS건수 AREA LOADING SHOW
+              _this.area = {};
+              _this.data = null;
+              if(window.areaAllChart){
+                window.areaAllChart.destroy();
+                window.areaTakeoverChart.destroy();
+                window.areaTakeoverTable.empty();
+              }
+              $('span#area_all_total').text('0건');
+            },
+            success : function(opts,data){
+              if(data.err){
+                return neoNotify.Show({
+                  title : '지사별 A/S처리현황',
+                  text : data.err === 'NODATA' ? _NODATA : data.err.message,
+                  desktop : false
+                });
+              }
+              _this.data = data.data;
+              var count = 0;
+              _this.data.forEach(function(item){
+
+                if(!_this.area[item.지사코드]){
+                  _this.area[item.지사코드] = {
+                    unidentified : 0,
+                    incomplete : 0,
+                    complete : 0,
+                    cancel : 0,
+                    takeover : 0,
+                    emergency : 0
+                  };
+                }
+                _this.area[item.지사코드].unidentified = item.미확인;
+                _this.area[item.지사코드].incomplete = item.미완료;
+                _this.area[item.지사코드].complete =  item.완료;
+                _this.area[item.지사코드].cancel =   item.취소;
+                _this.area[item.지사코드].takeover = item.인계;
+                _this.area[item.지사코드].emergency = item.응급;
+                count += item.미확인 +
+                        item.미완료 +
+                        item.완료 +
+                        item.취소;
+              });
+              $('span#area_all_total').text(count+'건');
+
+            },
+            callback : function(){
+              if(!_this.data) return false;
+              var areaCode = Object.keys(_this.area);
+              var ctx = document.getElementById("barChart_area_all").getContext("2d");
+              var myNewChart = new Chart(ctx,{
+                    type : 'bar',
+                    data : {
+                        labels: areaCode.map(function(item){return neo.area[item+''];}),
+                        datasets: [
+                          {
+                            label : '완료',
+                            backgroundColor: "rgba(28,132,198,0.5)",
+                            borderColor : "rgba(28,132,198,1)",
+                            borderWidth : 1,
+                            data :  areaCode.map(function(item){
+                                      return _this.area[item+''].complete;
+                                    })
+                          },
+                          {
+                            label : '미완료',
+                            backgroundColor: "rgba(248,172,89,0.5)",
+                            borderColor : "rgba(248,172,89,1)",
+                            borderWidth : 1,
+                            data :  areaCode.map(function(item){
+                                      return _this.area[item+''].incomplete;
+                                    })
+                          },
+                          {
+                            label : '미확인',
+                            backgroundColor: "rgba(237, 85, 101, 0.5)",
+                            borderColor : "rgba(237, 85, 101,1)",
+                            borderWidth : 1,
+                            data :  areaCode.map(function(item){
+                                      return _this.area[item+''].unidentified;
+                                    })
+                          },
+                          {
+                            label : '취소',
+                            backgroundColor: "rgba(35,198,200,0.5)",
+                            borderColor : "rgba(35,198,200,1)",
+                            borderWidth : 1,
+                            data :  areaCode.map(function(item){
+                                      return _this.area[item+''].cancel;
+                                    })
+                          }
+                        ]
+                    },
+                    options : chartOptions
+                  });
+              window.areaAllChart = myNewChart;
+              areaCode.forEach(function(a,b){
+                if(a === '0000' || a === '0030' || a === '0040'){
+                  areaCode.splice(b,1);
+                }
+              });
+              ctx = document.getElementById("barChart_area_takeover").getContext("2d");
+              myNewChart = new Chart(ctx,{
+                type : 'bar',
+                data : {
+                    labels: areaCode.map(function(item){return neo.area[item+''];}),
+                    datasets: [
+                      {
+                        label : '인계건',
+                        backgroundColor: "rgba(28,132,198,0.5)",
+                        borderColor : "rgba(28,132,198,1)",
+                        borderWidth : 1,
+                        data :  areaCode.map(function(item){
+                                  return _this.area[item+''].takeover;
+                                })
+                      },
+                      {
+                        label : '인계건(응급)',
+                        backgroundColor: "rgba(248,172,89,0.5)",
+                        borderColor : "rgba(248,172,89,1)",
+                        borderWidth : 1,
+                        data :  areaCode.map(function(item){
+                                  return _this.area[item+''].emergency;
+                                })
+                      }
+                    ]
+                },
+                options : chartOptions
+              });
+              window.areaTakeoverChart = myNewChart;
+              var elem =  _this.parent.elem;
+              var $table = elem.$table.filter('[data-kind="area_takeover"]');
+              areaCode.forEach(function(item){
+
+                var newMember = $('<tr>');
+                    newMember.append($('<td>').text(neo.area[item+'']));
+                    newMember.append($('<td>').addClass('text-right').text(
+                      '('+_this.area[item+''].takeover + ' * 3000) + '+
+                      '('+_this.area[item+''].emergency +' * 5000) = '
+                    ));
+                    newMember.append($('<td>').text(
+                      ((_this.area[item+''].takeover*3000) + (_this.area[item+''].emergency*5000)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    ));
+                    newMember.appendTo($table);
+              });
+              window.areaTakeoverTable = $table;
+
+              var chartHeight = $table.parent().parent().siblings().height();
+              var tableHeight = $table.parent().parent().height();
+
+              $table.parent().parent().css({
+                'height' : chartHeight + 'px',
+                'overflow-y' : 'scroll',
+                'overflow-x' : 'hidden'
+              });
+
+            }
+
+          });
+
+        }
+      },
+
+      member : {
+        data : null,
+        Load : function(opt){
+          var _this = this;
+          neoAJAX.GetAjax({
+            url : '/manage/member',
+            data : {
+              month : opt.month
+            },
+            dataType : 'json',
+            method : 'GET',
+            async : false,
+            beforeSend : function(){
+              // 직원별 AS건수 AREA LOADING SHOW
+              _this.data = null;
+              if(window.memberAllChart){
+                window.memberAllChart.destroy();
+                window.memberTakeoverChart.destroy();
+                window.memberTakeoverTable.empty();
+              }
+              $('span#member_all_total').text('0건');
+            },
+            success : function(opts,data){
+              if(data.err){
+                return neoNotify.Show({
+                  title : '직원별 A/S처리현황',
+                  text : data.err === 'NODATA' ? _NODATA : data.err.message,
+                  desktop : false
+                });
+              }
+              _this.data = data.data;
+              var count = 0;
+              _this.data.forEach(function(_item){
+                count += _item.완료 +
+                         _item.미완료 +
+                         _item.취소;
+              });
+              $('span#member_all_total').text(count+'건');
+            },
+            callback : function(){
+              console.log(_this);
+              if(!_this.data) return false;
+              var ctx = document.getElementById('barChart_member_all').getContext('2d');
+              var myNewChart = new Chart(ctx, {
+                type : 'bar',
+                data : {
+                  labels : _this.data.map(function(item){return item.처리자;}),
+                  datasets : [
+                    {
+                      label : '완료',
+                      backgroundColor: "rgba(28,132,198,0.5)",
+                      borderColor : "rgba(28,132,198,1)",
+                      borderWidth : 1,
+                      data :  _this.data.map(function(item){return item.완료;})
+                    },
+                    {
+                      label : '미완료',
+                      backgroundColor: "rgba(248,172,89,0.5)",
+                      borderColor : "rgba(248,172,89,1)",
+                      borderWidth : 1,
+                      data :  _this.data.map(function(item){return item.미완료;})
+                    },
+                    {
+                      label : '취소',
+                      backgroundColor: "rgba(35,198,200,0.5)",
+                      borderColor : "rgba(35,198,200,1)",
+                      borderWidth : 1,
+                      data :  _this.data.map(function(item){return item.취소;})
+                    }
+                  ]
+                },
+                options : chartOptions
+              });
+              window.memberAllChart = myNewChart;
+
+              _this.data = _this.data.filter(function(item){
+                if(parseInt(item.인계) > 0 || parseInt(item.응급) > 0){
+                  return item;
+                }
+              });
+
+
+              ctx = document.getElementById("barChart_member_takeover").getContext("2d");
+              myNewChart = new Chart(ctx,{
+                  type : 'bar',
+                  data : {
+                    labels : _this.data.map(function(item){return item.처리자;}),
+                    datasets : [
+                      {
+                        label : '인계건',
+                        backgroundColor: "rgba(28,132,198,0.5)",
+                        borderColor : "rgba(28,132,198,1)",
+                        borderWidth : 1,
+                        data :  _this.data.map(function(item){return item.인계;})
+                      },
+                      {
+                        label : '인계건(응급)',
+                        backgroundColor: "rgba(248,172,89,0.5)",
+                        borderColor : "rgba(248,172,89,1)",
+                        borderWidth : 1,
+                        data :  _this.data.map(function(item){return item.응급;})
+                      }
+                    ]
+                  },
+                  options : chartOptions
+
+              });
+              window.memberTakeoverChart = myNewChart;
+              var elem =  _this.parent.elem;
+              var $table = elem.$table.filter('[data-kind="member_takeover"]');
+              _this.data.forEach(function(_item){
+                  var newMember = $('<tr>');
+                      newMember.append($('<td>').text(_item.처리자));
+                      newMember.append($('<td>').addClass('text-right').text(
+                        '('+_item.인계 + ' * 3000) + '+
+                        '('+_item.응급 +' * 5000) = '
+                      ));
+                      newMember.append($('<td>').text(
+                        ((_item.인계*3000) + (_item.응급*5000)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                      ));
+                      newMember.appendTo($table);
+              });
+
+              window.memberTakeoverTable = $table;
+              //
+              // var chartHeight = $table.parent().parent().siblings().height();
+              // var tableHeight = $table.parent().parent().height();
+              //
+              // $table.parent().parent().css({
+              //   'height' : chartHeight + 'px',
+              //   'overflow-y' : 'scroll',
+              //   'overflow-x' : 'hidden'
+              // });
+
+            }
+          });
+        }
+      },
+
+      /* Initialize */
+      Init : function(_me, callback){
+        $.each(_me, function(i,v){
+          v.Init = _me.Init;
+          v.Init();
+          v.parent = _me;
+        });
+        if(typeof callback === 'function'){
+          return callback();
+        }
+      },
+
+      Load : function(){
+        var _this = this;
+        _this.area.Load(this.options);
+        _this.member.Load(this.options);
+        _this.company.Load(this.options);
+
+      }
+    }
 
     function AsHistory() {
         this.user_id = neo.user.USER_ID;
@@ -53,7 +518,7 @@
         var statusClick = function(e) { me.events.ServiceStatus_OnClick(e, me); };
         var viewClick = function(e) { me.events.ViewMode_OnClick(e, me); };
         var searchClick = function(e) { me.events.btnSearch_OnClick(e, me); };
-        var keywordKeyUp = function(e) { me.events.Keyword_OnKeyUp(e, me); };        
+        var keywordKeyUp = function(e) { me.events.Keyword_OnKeyUp(e, me); };
 
         elem.$date.bind('change', dateChange);
         elem.$service_status.bind('click', statusClick);
@@ -63,7 +528,6 @@
 
         this.init();
     }
-
     AsHistory.prototype = {
         user_id: null,
         user_area: null,
@@ -120,9 +584,9 @@
             Keyword_OnKeyUp: function(e, _this) {
                 // if(e.type == 'keyup' && (e.keyCode == 13 || e.key == 'Enter')){
                 if(e.type == 'keyup'){
-                    _this.search_options.keyword = $(e.target).val().trim();    
-                    if(e.keyCode == 13 || e.key == 'Enter'){   
-                        _this.Load();             
+                    _this.search_options.keyword = $(e.target).val().trim();
+                    if(e.keyCode == 13 || e.key == 'Enter'){
+                        _this.Load();
                     }
                 }
             },
@@ -175,6 +639,7 @@
             } else {
                 options.view_mode_value = _this.user_id;
             }
+            options.service_status = options.service_status.toString();
 
             neoAJAX.GetAjax({
                 url: '/as/history',
@@ -216,6 +681,17 @@
                                     }
                                 }
                             },
+                            {   'name' : '본사AS', 'title' : '본사AS',
+                                formatter : function(value){
+                                  switch (parseInt(value)) {
+                                    case 0:
+                                      return "<i class='fa fa-square-o'></i>"
+                                    case 1:
+                                      return "<i class='fa fa-check-square-o'></i>"
+                                    default:
+                                  }
+                                }
+                            },
                             {
                                 'name': '지사코드',
                                 'title': '담당지사',
@@ -224,6 +700,20 @@
                                     return neo.area[value];
                                 },
                                 'breakpoints' : 'xs'
+                            },
+                            {
+                                'name' : '담당자',
+                                'title' : '담당자',
+                                formatter : function(value){
+                                  switch (parseInt(value)) {
+                                    case 0:
+                                      return '미정';
+                                    default:
+                                      return neo.users.find(function(_user){
+                                        return _user.USER_ID === parseInt(value);
+                                      }).USER_NAME;
+                                  }
+                                }
                             },
                             {
                                 'name': '서비스상태',

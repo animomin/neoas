@@ -61,10 +61,13 @@ script.
         //- if (!$("body").hasClass('body-small')) {
             neoModules.SetElementHeight();
         //- }
-        if(menu === MENU.MANAGE){
-          var height = $(window).height() - 110;
-          $('.tabs-container').height(height);
+        if(menu === MENU.MANAGE_STATUS || menu === MENU.MANAGE_STATISTIC){
+        //-   var height = $(window).height() - 110;
+        //-   $('#workspace').height(height);
+          var workspace = $('#workspace');
+              workspace.css('overflow','overlay');
         }
+        
     });
     Pace.options = {
       ajax: false

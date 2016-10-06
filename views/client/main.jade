@@ -60,7 +60,8 @@ block content
               input(type='hidden', id='astype', name='astype', value=0)    
               input(type='hidden', id='masterSuga', name='masterSuga')       
               input(type='hidden', id='masterDrug', name='masterDrug')       
-              input(type='hidden', id='masterMaterial', name='masterMaterial')       
+              input(type='hidden', id='masterMaterial', name='masterMaterial') 
+              input(type='hidden', id='manager', name='manager') 
                 
 block scripts
   script.
@@ -239,7 +240,8 @@ block scripts
       var browser = parseInt(sessionStorage.getItem('browser'));
       
       var tel = $('#client_contact').val().trim();
-      if($('#client_contact2').val().trim()){
+      var tel2 = $('#client_contact2').val().trim();
+      if(tel2.length > 0){
         tel = tel + ":" + $('#client_contact2').val().trim();
       }
       if(tel.length > 20){

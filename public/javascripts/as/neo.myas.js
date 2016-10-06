@@ -936,6 +936,8 @@
         $item.find('h5[data-name="기관명칭"]').text(item.기관명칭 + ' (' + item.기관코드 + ')');
         $item.find('div[data-name="문의내용"]').html(item.문의내용);
 
+        $item.find('a.takeover-option').bind('click', _me.events.onTakeoverOption);
+
         var $updateBadge = $item.find('span[data-name="업데이트"]');
             $updateBadge.empty();
         if(item.응급여부 === 1){
@@ -1191,7 +1193,40 @@
             }
           });
         }
+      },
+
+      onTakeoverOption: function(e) {
+          e.preventDefault();
+          var opt = $(this).data('option');
+          if (opt === 'this') {
+              $(this).parent().toggleClass('active');
+          } else {
+              $('a.takeover-option[data-option="all"]').parent().toggleClass('active');
+          }
+
+          var isOpen = $(this).parent().hasClass('active');
+          if (opt === 'this') {
+              var target = $(this).parent().parent().parent().parent();
+
+              if (isOpen) {
+                  target.find('.takeover-body').removeClass('hidden');
+              } else {
+                  target.find('.takeover-body').addClass('hidden');
+              }
+
+          } else {
+
+              $('.takeover-items').each(function(i, v) {
+                  if (isOpen) {
+                      $(v).find('.takeover-body').removeClass('hidden');
+                  } else {
+                      $(v).find('.takeover-body').addClass('hidden');
+                  }
+              });
+          }
+
       }
+      
     };
 
 

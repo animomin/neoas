@@ -36,7 +36,8 @@
                     req.client_name, req.client_contact, comment, req.curversion,
                     req.bohum, req.hosp_contact, req.pacs, req.servername, req.serverid,
                     req.serverpw, req.dbname, req.certpw, req.openperson, req.sutak, req.exe,
-                    req.os, req.sqlversion, req.astype, req.masterDrug, req.masterSuga, req.masterMaterial
+                    req.os, req.sqlversion, req.astype, req.masterDrug, req.masterSuga, req.masterMaterial,
+                    req.manager
                 );
                 logger.info('Ready to Execute :::');
                 logger.info(query);
@@ -253,15 +254,15 @@
                 query = q;
 
                 where = "";
-                if (parseInt(params.total) === 0) {
+                // if (parseInt(params.total) === 0) {
                     where += " AND LEFT(convert(varchar(10), 접수일자, 120),7) = '" + params.month + "'";
-                }
+                // }
 
-                if (req.params.mode !== 'emr') {
+                // if (req.params.mode !== 'emr') {
                     query = util.format(query, where);
-                } else {
-                    query = util.format(query, where, where);
-                }
+                // } else {
+                //     query = util.format(query, where, where);
+                // }
                 logger.info(query);
                 return callback2();
             },
@@ -284,7 +285,7 @@
                 data.err = null;
                 data.data = records;
             }
-
+            data.query = query;
             return callback(data);
         });
     };
@@ -292,22 +293,22 @@
     exports.GetASHistory = function(req, callback) {
         var params = req.query;
         var temp = "";
-        
+
         async.waterfall([
             function(callback2) {
                 console.log(params);
-                query = querys16._RequestList;
+                query = querys16._ASHistory;
                 if (parseInt(params.mode) === 0) { // 직원용
                     where = " AND 서비스상태 IN (" + params.service_status.toString() + ')';
-                    if (parseInt(params.view_mode) === 0) { // 지사
-                        where += " AND 지사코드 = " + params.view_mode_value;
-                    } else {
+                    if (parseInt(params.view_mode) === 0) { // 내가 속한 지사 A/S
+                        where += " AND 지사코드 = '" + params.view_mode_value + "' ";
+                    } else if (parseInt(params.view_mode) === 1) { // 내가 처리한 A/S
                         temp = " AND ( 확인자ID = {ID} OR 인계자ID = {ID} OR 처리자ID = {ID} )"
                         temp = temp.replace(/{ID}/gi, params.view_mode_value);
                         where += temp;
                     }
 
-                    where += " AND (접수일자 Between '" + params.startDate + "' AND '" + params.endDate + "') ";
+                    where += " AND (CONVERT(char(10), 접수일자, 120) Between '" + params.startDate + "' AND '" + params.endDate + "') ";
 
                     if (params.keyword !== '') {
 
@@ -327,12 +328,15 @@
 
                 }
                 query = util.format(query, where, orderby);
+                console.log('ready');
                 logger.info(query);
                 return callback2();
             },
             function(callback2) {
                 if (server16.connection.connected) {
+                    console.log('go');
                     server16.RecordSet(query, function(err, records) {
+                        console.log('back');
                         return callback2(err, records);
                     });
                 }
@@ -349,7 +353,8 @@
                 data.err = null;
                 data.data = records;
             }
-
+            data.query = query;
+            console.log('finish');
             return callback(data);
         });
 

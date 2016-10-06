@@ -198,11 +198,10 @@ var neoModules = {
                 start = $.neoMNG;
                 param = menu;
                 break;
-            case MENU.MANAGE_STATISTIC:
-                alert('A/S통계 메뉴는 작업중입니다.');
-                view = 'as-manage-layout';
-                //start = $.neoMNG(menu);
-                start = function() {}
+            case MENU.MANAGE_STATISTIC:                
+                view = 'as-manage-layout_rank';
+                start = $.neoMNG;
+                param = menu;
                 break;
             default:
                 view = 'as-request-layout';

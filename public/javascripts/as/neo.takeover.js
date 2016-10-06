@@ -136,9 +136,16 @@
                 }
 
                 function _afterLoaded(opts) {
-                    opts.target_list.find('div.spiner-example').remove();
-                    neoModules.SetElementHeight();
-                    if (typeof callback === 'function') return callback();
+                  if(localStorage.getItem('takeover-option') === 'all'){
+                      opts.target_list.find('.takeover-body').each(function(i,v){
+                        $(v).toggleClass('hidden');
+                      });
+
+                  }
+
+                  opts.target_list.find('div.spiner-example').remove();
+                  neoModules.SetElementHeight();
+                  if (typeof callback === 'function') return callback();
                 }
 
             },
@@ -287,6 +294,9 @@
                     question.find('img.img-preview').bind('click', function() { _me.events.onPopupImage(this); });
 
                     $item.find('a.takeover-option').bind('click', _me.events.onTakeoverOption);
+                    if(localStorage.getItem('takeover-option') === 'all'){
+                      $item.find('a.takeover-option[data-option="all"]').parent().addClass('active');
+                    }
 
                     var $updateBadge = $item.find('span[data-name="업데이트"]');
                     $updateBadge.empty();
@@ -564,6 +574,9 @@
                             // var program = neo.emrs[asData.프로그램].name;
                             var $elem = $('.takeover-items[data-index="' + itemID + '"]');
                             if ($elem.length) {
+                                var program = $elem.parent().data('name');
+                                _me.listData.data[program].splice($elem.data('id'),1);
+                                _me.elem.list._SetTabCount(_me.elem.list.tabs[program], _me.listData.data[program]);
                                 $elem.remove();
                             }
                             // 상태가 인계접수, 완료, 취소 이면 리스트에서 찾아 지워준다.
@@ -597,8 +610,10 @@
                     $('.takeover-items').each(function(i, v) {
                         if (isOpen) {
                             $(v).find('.takeover-body').removeClass('hidden');
+                            localStorage.setItem('takeover-option',opt);
                         } else {
                             $(v).find('.takeover-body').addClass('hidden');
+                            localStorage.removeItem('takeover-option');
                         }
                     });
                 }

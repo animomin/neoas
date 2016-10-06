@@ -722,6 +722,8 @@
         $item.find('td[data-id="실행메뉴"]').text(item.실행메뉴);
         $item.find('td[data-id="세부화면"]').text(item.세부화면);
 
+        $item.find('a.takeover-option').bind('click', _me.events.onTakeoverOption);
+
         var $updateBadge = $item.find('span[data-name="업데이트"]');
             $updateBadge.empty();
         if(item.응급여부 === 1){
@@ -1440,6 +1442,38 @@
             }
           });
         }
+      },
+
+      onTakeoverOption: function(e) {
+          e.preventDefault();
+          var opt = $(this).data('option');
+          if (opt === 'this') {
+              $(this).parent().toggleClass('active');
+          } else {
+              $('a.takeover-option[data-option="all"]').parent().toggleClass('active');
+          }
+
+          var isOpen = $(this).parent().hasClass('active');
+          if (opt === 'this') {
+              var target = $(this).parent().parent().parent().parent();
+
+              if (isOpen) {
+                  target.find('.takeover-body').removeClass('hidden');
+              } else {
+                  target.find('.takeover-body').addClass('hidden');
+              }
+
+          } else {
+
+              $('.takeover-items').each(function(i, v) {
+                  if (isOpen) {
+                      $(v).find('.takeover-body').removeClass('hidden');
+                  } else {
+                      $(v).find('.takeover-body').addClass('hidden');
+                  }
+              });
+          }
+
       }
     };
 

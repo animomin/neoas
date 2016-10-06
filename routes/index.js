@@ -132,6 +132,7 @@ router.get('/apps/:mobile/:version', function(req, res, next){
 
 router.get('/manage/:mode', function(req, res,next){
   var q;
+  if(req.params.mode === 'total') q = querys16._RankTotal;
   if(req.params.mode === 'area') q = querys16._RankArea;
   if(req.params.mode === 'member') q = querys16._RankMember;
   if(req.params.mode === 'hosp') q = querys16._RankHosp;
