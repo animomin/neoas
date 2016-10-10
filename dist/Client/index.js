@@ -209,17 +209,30 @@
         set += ", 확인자ID = '" + req.확인자ID + "' ";
         set += ", 확인자지사 = '" + req.확인자지사 + "' ";
         set += ", 확인자연락처 = '" + req.확인자연락처 + "' ";
-        set += ", 확인일자 = '" + req.확인일자 + "' ";
+        if(req.확인일자.trim() === ''){
+          set += ", 확인일자 = NULL ";
+        }else{
+          set += ", 확인일자 = '" + req.확인일자.trim() + "' ";
+        }
         set += ", 인계자 = '" + req.인계자 + "' ";
         set += ", 인계자ID = '" + req.인계자ID + "' ";
         set += ", 인계자지사 = '" + req.인계자지사 + "' ";
         set += ", 인계자연락처 = '" + req.인계자연락처 + "' ";
-        set += ", 인계일자 = '" + req.인계일자 + "' ";
+        if(req.인계일자.trim() === ''){
+          set += ", 인계일자 = NULL ";
+        }else{
+          set += ", 인계일자 = '" + req.인계일자.trim() + "' ";
+        }
         set += ", 처리자 = '" + req.처리자 + "' ";
         set += ", 처리자ID = '" + req.처리자ID + "' ";
         set += ", 처리자지사 = '" + req.처리자지사 + "' ";
         set += ", 처리자연락처 = '" + req.처리자연락처 + "' ";
-        set += ", 처리일자 = '" + req.처리일자 + "' ";
+        if(req.처리일자.trim() === ''){
+          set += ", 처리일자 = NULL ";
+        }else{
+          set += ", 처리일자 = '" + req.처리일자.trim() + "' ";
+        }
+
         set += ", 응급여부 = " + req.응급여부 + " ";
         set += ", 문의내용 = '" + req.문의내용 + "' ";
         set += ", 실행메뉴 = '" + req.실행메뉴 + "' ";
@@ -339,15 +352,12 @@
 
                 }
                 query = util.format(query, where, orderby);
-                console.log('ready');
                 logger.info(query);
                 return callback2();
             },
             function(callback2) {
                 if (server16.connection.connected) {
-                    console.log('go');
                     server16.RecordSet(query, function(err, records) {
-                        console.log('back');
                         return callback2(err, records);
                     });
                 }
@@ -365,7 +375,6 @@
                 data.data = records;
             }
             data.query = query;
-            console.log('finish');
             return callback(data);
         });
 

@@ -1,12 +1,15 @@
 (function() {
-
-    if(neo.users){
-      neo.users.GetUserName = function(user_id){
-        var item = neo.users.find(function(_item){
-          return parseInt(_item.USER_ID) === parseInt(user_id);
-        });
-        return item;
+    try{
+      if(neo.users){
+        neo.users.GetUserName = function(user_id){
+          var item = neo.users.find(function(_item){
+            return parseInt(_item.USER_ID) === parseInt(user_id);
+          });
+          return item;
+        }
       }
+    }catch(e){
+      console.log(e);
     }
 
     /**
