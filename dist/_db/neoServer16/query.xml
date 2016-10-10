@@ -228,7 +228,7 @@
            ISNULL(확인자, '') AS 확인자, ISNULL(확인자ID,'') AS 확인자ID, ISNULL(확인자지사,'') AS 확인자지사, ISNULL(확인자연락처,'') AS 확인자연락처, ISNULL(CONVERT(char(19),확인일자,120),'') AS 확인일자,
            ISNULL(인계자, '') AS 인계자, ISNULL(인계자ID,'') AS 인계자ID, ISNULL(인계자지사,'') AS 인계자지사, ISNULL(인계자연락처,'') AS 인계자연락처, ISNULL(CONVERT(char(19),인계일자,120),'') AS 인계일자,
            ISNULL(처리자, '') AS 처리자, ISNULL(처리자ID,'') AS 처리자ID, ISNULL(처리자지사,'') AS 처리자지사, ISNULL(처리자연락처,'') AS 처리자연락처, ISNULL(CONVERT(char(19),처리일자,120),'') AS 처리일자,
-           CASE WHEN 서비스상태 = 4 AND ISNULL(본사AS,0) = 0  AND 인계자ID &lt;&gt; 0 AND 처리자ID &lt;&gt; 0 AND 인계자지사 &lt;&gt; 처리자지사 THEN 1 ELSE 0 END AS 수수료
+           CASE WHEN 서비스상태 = 4 AND ISNULL(본사AS,0) = 0  AND 인계자ID &lt;&gt; 0 AND 처리자ID &lt;&gt; 0 AND 인계자지사 &lt;&gt; 처리자지사  AND 지사코드 NOT IN ('0000', '0030', '0040')THEN 1 ELSE 0 END AS 수수료
     From N_Service
     Where 1 = 1
     %s
