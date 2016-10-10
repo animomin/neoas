@@ -668,7 +668,7 @@
                     if(records.err){
                       return neoNotify.Show({
                         title : 'A/S 처리내역',
-                        text : _records.err === 'NODATA' ? _NODATA : _records.err.message,
+                        text : records.err === 'NODATA' ? _NODATA : records.err.message,
                         desktop : false
                       });
                     }
