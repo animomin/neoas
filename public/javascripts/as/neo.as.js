@@ -427,6 +427,9 @@
                 break;
               case '지사코드':
                 value = neo.area[value];
+                if(parseInt(_this.data['담당자']) > 0){
+                  value += "("+neo.users.GetUserName(_this.data['담당자']).USER_NAME+")";
+                }
                 break;
               case '취소사유':
                 return $(v).html(value);

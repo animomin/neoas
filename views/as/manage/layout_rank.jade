@@ -1,108 +1,109 @@
-div.row.p-sm.m-l-sm.m-r-sm  
-  div.col-xs-12
-    div.ibox.m-b-none.small
-      div.ibox-title 
-        div.form-inline
-          div.form-group
-            h3.m-t-none 
-              i.fa.fa-bar-chart
-              |  A/S 통계                        
-          div.form-group.m-l-md
-            div.input-group.date
-              span.input-group-addon
-                i.fa.fa-calendar
-              input.form-control#rankMonth(type='text')      
-      div.ibox-content
-        div.row.no-padding.no-margins
-          div.col-lg-2.col-md-4.col-sm-4
-            div.ibox.float-e-margins
-              div.ibox-title
-                h1.no-margins.total_as(data-kind="전체") 0 건
-                h5 전체 A/S
-          div.col-lg-2.col-md-4.col-sm-4
-            div.ibox.float-e-margins
-              div.ibox-title
-                h1.no-margins.total_as(data-kind="미확인") 2 건
-                h5 미확인 A/S
-          div.col-lg-2.col-md-4.col-sm-4
-            div.ibox.float-e-margins
-              div.ibox-title
-                h1.no-margins.total_as(data-kind="미완료") 3 건
-                h5 미완료 A/S
-          div.col-lg-2.col-md-4.col-sm-4
-            div.ibox.float-e-margins
-              div.ibox-title
-                h1.no-margins.total_as(data-kind="완료") 4 건
-                h5 완료 A/S
-          div.col-lg-2.col-md-4.col-sm-4
-            div.ibox.float-e-margins
-              div.ibox-title
-                h1.no-margins.total_as(data-kind="취소") 0 건
-                h5 취소 A/S
-          div.col-lg-2.col-md-4.col-sm-4
-            div.ibox.float-e-margins
-              div.ibox-title
-                h1.no-margins.total_as(data-kind="본사") 0 건
-                h5 본사 A/S            
-div.row.p-sm.m-l-sm.m-r-sm                    
-  div.col-xs-12
-    div.row 
-      div.col-lg-4
-        div.ibox.float-e-margins
-          div.ibox-title
-            h5 지사별 A/S 처리현황
-            p.font-bold.text-right
-              span.badge.badge-primary#area_all_total 0
-          div.ibox-content
-            canvas#barChart_area_all
-      div.col-lg-8
-        div.ibox.float-e-margins
-          div.ibox-title
-            h5 지사별 A/S 인계현황             
-            p.font-bold.text-right.text-danger  
-              i.fa.fa-asterisk
-              |  본사A/S는 산정되지않음. 지사에서 A/S를 인계접수를 하였고 해당 A/S건이 처리가 완료된 경우만 산정하였음.
-          div.ibox-content
-            div.row
-              div.col-xs-6
-                canvas#barChart_area_takeover
-              div.col-xs-6
-                table.table
-                  thead
-                    tr
-                      th 지사명
-                      th.text-right (인계건수 * 3000) + (인계건수(응급) * 5000)
-                      th 수수료 합계
-                  tbody(data-kind="area_takeover")
+div.container-fluid
+  div.row
+    div.col-xs-12
+      div.ibox.m-b-none.small
+        div.ibox-title 
+          div.form-inline
+            div.form-group
+              h3.m-t-none 
+                i.fa.fa-bar-chart
+                |  A/S 통계                        
+            div.form-group.m-l-md
+              div.input-group.date
+                span.input-group-addon
+                  i.fa.fa-calendar
+                input.form-control#rankMonth(type='text')      
+        div.ibox-content
+          div.row.no-padding.no-margins
+            div.col-lg-2.col-md-4.col-sm-4
+              div.ibox.float-e-margins
+                div.ibox-title
+                  h1.no-margins.total_as(data-kind="전체") 0 건
+                  h5 전체 A/S
+            div.col-lg-2.col-md-4.col-sm-4
+              div.ibox.float-e-margins
+                div.ibox-title
+                  h1.no-margins.total_as(data-kind="미확인") 2 건
+                  h5 미확인 A/S
+            div.col-lg-2.col-md-4.col-sm-4
+              div.ibox.float-e-margins
+                div.ibox-title
+                  h1.no-margins.total_as(data-kind="미완료") 3 건
+                  h5 미완료 A/S
+            div.col-lg-2.col-md-4.col-sm-4
+              div.ibox.float-e-margins
+                div.ibox-title
+                  h1.no-margins.total_as(data-kind="완료") 4 건
+                  h5 완료 A/S
+            div.col-lg-2.col-md-4.col-sm-4
+              div.ibox.float-e-margins
+                div.ibox-title
+                  h1.no-margins.total_as(data-kind="취소") 0 건
+                  h5 취소 A/S
+            div.col-lg-2.col-md-4.col-sm-4
+              div.ibox.float-e-margins
+                div.ibox-title
+                  h1.no-margins.total_as(data-kind="본사") 0 건
+                  h5 본사 A/S            
+  div.row.p-sm.m-l-sm.m-r-sm                    
+    div.col-xs-12
+      div.row 
+        div.col-lg-4
+          div.ibox.float-e-margins
+            div.ibox-title
+              h5 지사별 A/S 처리현황
+              p.font-bold.text-right
+                span.badge.badge-primary#area_all_total 0
+            div.ibox-content
+              canvas#barChart_area_all
+        div.col-lg-8
+          div.ibox.float-e-margins
+            div.ibox-title
+              h5 지사별 A/S 인계현황             
+              p.font-bold.text-right.text-danger  
+                i.fa.fa-asterisk
+                |  본사A/S는 산정되지않음. 지사에서 A/S를 인계접수를 하였고 해당 A/S건이 처리가 완료된 경우만 산정하였음.
+            div.ibox-content
+              div.row
+                div.col-xs-6
+                  canvas#barChart_area_takeover
+                div.col-xs-6
+                  table.table
+                    thead
+                      tr
+                        th 지사명
+                        th.text-right (인계건수 * 3000) + (인계건수(응급) * 5000)
+                        th 수수료 합계
+                    tbody(data-kind="area_takeover")
+                
+      div.row
+        div.col-lg-4
+          div.ibox.float-e-margins
+            div.ibox-title
+              h5 직원별 A/S 처리현황
+              p.font-bold.text-right
+                span.badge.badge-primary#member_all_total 0
+            div.ibox-content
+              canvas#barChart_member_all
+        div.col-lg-8
+          div.ibox.float-e-margins
+            div.ibox-title
+              h5 직원별 A/S 인계건 처리현황
+              p.font-bold.text-right.text-danger  
+                i.fa.fa-asterisk
+                |  본사A/S는 산정되지않음. 본사에서 인계된 A/S 처리건을 제외하고, 인계자의 지사와 처리자의 지사가 다른 경우만 산정하였음.
+            div.ibox-content
+              div.row
+                div.col-xs-6
+                  canvas#barChart_member_takeover
+                div.col-xs-6
+                  table.table.small
+                    thead
+                      tr
+                        th 직원
+                        th.text-right (인계건수 * 3000) + (인계건수(응급) * 5000)
+                        th 수수료 합계
+                    tbody(data-kind="member_takeover")
+                
               
-    div.row
-      div.col-lg-4
-        div.ibox.float-e-margins
-          div.ibox-title
-            h5 직원별 A/S 처리현황
-            p.font-bold.text-right
-              span.badge.badge-primary#member_all_total 0
-          div.ibox-content
-            canvas#barChart_member_all
-      div.col-lg-8
-        div.ibox.float-e-margins
-          div.ibox-title
-            h5 직원별 A/S 인계건 처리현황
-            p.font-bold.text-right.text-danger  
-              i.fa.fa-asterisk
-              |  본사A/S는 산정되지않음. 본사에서 인계된 A/S 처리건을 제외하고, 인계자의 지사와 처리자의 지사가 다른 경우만 산정하였음.
-          div.ibox-content
-            div.row
-              div.col-xs-6
-                canvas#barChart_member_takeover
-              div.col-xs-6
-                table.table.small
-                  thead
-                    tr
-                      th 직원
-                      th.text-right (인계건수 * 3000) + (인계건수(응급) * 5000)
-                      th 수수료 합계
-                  tbody(data-kind="member_takeover")
-              
-            
-        
+          

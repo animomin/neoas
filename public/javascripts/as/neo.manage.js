@@ -563,20 +563,24 @@
             },
             ServiceStatus_OnClick: function(e, _this) {
                 $(e.target).toggleClass('active');
-                var status = $(e.target).data('status');
-                var selIndex = -1;
-                var isExist = _this.search_options.service_status.some(function(_v, _i) {
-                    if (_v == status) {
-                        selIndex = _i;
-                        return true;
-                    }
-                });
-                if (isExist) {
-                    _this.search_options.service_status.splice(selIndex, 1);
-                } else {
-                    _this.search_options.service_status.push(status);
-                }
-                console.log(_this.search_options.service_status);
+              //   var status = $(e.target).data('status');
+              //   var selIndex = -1;
+              // //  var service_status = _this.search_options.service_status.split(',');
+              //   var isExist = _this.search_options.service_status.some(function(_v, _i) {
+              //       if (_v == status) {
+              //           selIndex = _i;
+              //           return true;
+              //       }
+              //   });
+              //   if (isExist) {
+              //       _this.search_options.service_status.splice(selIndex, 1);
+              //       // service_status.splice(selIndex,1);
+              //   } else {
+              //       _this.search_options.service_status.push(status);
+              //       // service_status.push(status);
+              //   }
+              //   console.log(_this.search_options.service_status);
+              //   // _this.search_options.service_status = service_status.toString();
             },
             ViewMode_OnClick: function(e, _this) {
                 _this.search_options.view_mode = $(e.target).val();
@@ -612,6 +616,9 @@
                 });
             });
 
+            if(typeof _this.search_options.service_status === 'string'){
+              _this.search_options.service_status = _this.search_options.service_status.split(',');
+            }
             $elem = this.elem.$service_status;
             $elem.each(function(i, v) {
                 var selected = _this.search_options.service_status.some(function(_i) {
@@ -639,7 +646,14 @@
             } else {
                 options.view_mode_value = _this.user_id;
             }
-            options.service_status = options.service_status.toString();
+            //options.service_status = options.service_status.toString();
+            options.service_status = "";
+            _this.elem.$service_status.each(function(i,v){
+              if($(v).hasClass('active')){
+                if(options.service_status !== '') options.service_status += ',';
+                options.service_status += $(v).data('status');
+              }
+            });
 
             neoAJAX.GetAjax({
                 url: '/as/history',
@@ -651,6 +665,13 @@
                     Pace.start();
                 },
                 success: function(opt, records) {
+                    if(records.err){
+                      return neoNotify.Show({
+                        title : 'A/S 처리내역',
+                        text : _records.err === 'NODATA' ? _NODATA : _records.err.message,
+                        desktop : false
+                      });
+                    }
                     var $table = _this.elem.$table;
 
                     if (records.data && records.data.length) {
@@ -681,7 +702,29 @@
                                     }
                                 }
                             },
-                            {   'name' : '본사AS', 'title' : '본사AS',
+                            {   'name' : '본사AS', 'title' : '본사AS', "filterable": false,
+                                formatter : function(value){
+                                  switch (parseInt(value)) {
+                                    case 0:
+                                      return "<i class='fa fa-square-o'></i>"
+                                    case 1:
+                                      return "<i class='fa fa-check-square-o'></i>"
+                                    default:
+                                  }
+                                }
+                            },
+                            {   'name' : '응급여부', 'title' : '응급', "filterable": false,
+                                formatter : function(value){
+                                  switch (parseInt(value)) {
+                                    case 0:
+                                      return "<i class='fa fa-square-o'></i>"
+                                    case 1:
+                                      return "<i class='fa fa-check-square-o'></i>"
+                                    default:
+                                  }
+                                }
+                            },
+                            {   'name' : '수수료', 'title' : '수수료', "filterable": false,
                                 formatter : function(value){
                                   switch (parseInt(value)) {
                                     case 0:
@@ -709,9 +752,7 @@
                                     case 0:
                                       return '미정';
                                     default:
-                                      return neo.users.find(function(_user){
-                                        return _user.USER_ID === parseInt(value);
-                                      }).USER_NAME;
+                                      return neo.users.GetUserName(value).USER_NAME;
                                   }
                                 }
                             },
@@ -725,16 +766,82 @@
                                 'breakpoints' : 'xs'
                             },
                             { 'name': '접수자', 'title': '접수자', 'breakpoints' : 'md sm xs' },
-                            { 'name': '접수일자', 'title': '접수일', 'type': 'date', 'formatString': 'YYYY-MM-DD', 'breakpoints' : 'md sm xs' },
+                            { 'name': '접수일자', 'title': '접수일', 'type': 'date', 'formatString': 'YYYY-MM-DD', 'breakpoints' : 'md sm xs',
+                              formatter : function(value){
+                                if (value === '' || typeof value ==='undefined') return '';
+                                var temp = value.split(' ');
+                                return temp[0];
+                              }
+                            },
                             { 'name': '확인자', 'title': '확인자', 'breakpoints' : 'md sm xs' },
-                            { 'name': '확인일자', 'title': '확인일', 'type': 'date', 'formatString': 'YYYY-MM-DD', 'breakpoints' : 'md sm xs' },
+                            { 'name': '확인일자', 'title': '확인일', 'type': 'date', 'formatString': 'YYYY-MM-DD', 'breakpoints' : 'md sm xs',
+                              formatter : function(value){
+                                if (value === '' || typeof value ==='undefined') return '';
+                                var temp = value.split(' ');
+                                return temp[0];
+                              }
+                            },
                             { 'name': '인계자', 'title': '인계자', 'breakpoints' : 'md sm xs' },
-                            { 'name': '인계일자', 'title': '인계일', 'type': 'date', 'formatString': 'YYYY-MM-DD', 'breakpoints' : 'md sm xs' },
+                            { 'name': '인계일자', 'title': '인계일', 'type': 'date', 'formatString': 'YYYY-MM-DD', 'breakpoints' : 'md sm xs',
+                              formatter : function(value){
+                                if (value === '' || typeof value ==='undefined') return '';
+                                var temp = value.split(' ');
+                                return temp[0];
+                              }
+                            },
                             { 'name': '처리자', 'title': '처리자', 'breakpoints' : 'md sm xs' },
-                            { 'name': '처리일자', 'title': '처리일', 'type': 'date', 'formatString': 'YYYY-MM-DD', 'breakpoints' : 'md sm xs' },
+                            { 'name': '처리일자', 'title': '처리일', 'type': 'date', 'formatString': 'YYYY-MM-DD', 'breakpoints' : 'md sm xs',
+                              formatter : function(value){
+                                if (value === '' || typeof value ==='undefined') return '';
+                                var temp = value.split(' ');
+                                return temp[0];
+                              }
+                            },
                             { 'name' : '문의내용', 'title': '내용', 'breakpoints' : 'all'}
                         ],
                         "rows": records.data
+                    }).bind({
+                       'expand.ft.row' : function(e, ft, row) {
+
+                          var $detail = row.cells.find(function(_cell){
+                            return _cell.column.name === '문의내용';
+                          }).$detail;
+
+                          if(typeof $detail.find('td').data('checked') !== 'undefined') return;
+                          $detail.find('td').data('checked','1');
+
+                          var _index = row.cells.find(function(_cell){
+                            return _cell.column.name === '인덱스';
+                          }).value;
+
+                          neoAJAX.GetAjax({
+                            url: '/as/history',
+                            data: {
+                              index : _index ,
+                              mode : 0
+                            },
+                            dataType: 'json',
+                            async: true,
+                            method: 'GET',
+                            beforeSend : function(){
+                              $detail.find('td').html(neoAJAX.GetSpinners('fadingCircles'));
+                            },
+                            success: function(opt, _records) {
+                              if(_records.err){
+                                return neoNotify.Show({
+                                  title : 'A/S 처리내역 [문의내용 로드 실패]',
+                                  text : _records.err === 'NODATA' ? _NODATA : _records.err.message,
+                                  desktop : false
+                                });
+                              }
+                              return $detail.find('td').html(_records.data[0].문의내용);
+                            },
+                            callback : function(){
+                              $($detail.find('td')).find('.spiner-example').remove();
+                            }
+                          });
+
+                       }
                     });
                 },
                 callback: function() {

@@ -1,4 +1,14 @@
 (function() {
+
+    if(neo.users){
+      neo.users.GetUserName = function(user_id){
+        var item = neo.users.find(function(_item){
+          return parseInt(_item.USER_ID) === parseInt(user_id);
+        });
+        return item;
+      }
+    }
+
     /**
      * Save Client Browser
      */
@@ -148,7 +158,7 @@ var ASSTATUS = {
             case this.TAKEOVERCONFIRM:
                 return {"options": {"style": {'background-color' : '#dff0d8'}}, 'value' : ""};
             case this.DONE:
-                return {"options": {"style": {'background-color' : '#f7f7f7'}}, 'value' : ""};
+                return {"options": {"style": {'background-color' : '#dedddd'}}, 'value' : ""};
             case this.CANCEL:
                 return {"options": {"style": {'background-color' : '#f2dede', 'text-decoration': 'line-through'}}, 'value' : ""};
         }
@@ -198,7 +208,7 @@ var neoModules = {
                 start = $.neoMNG;
                 param = menu;
                 break;
-            case MENU.MANAGE_STATISTIC:                
+            case MENU.MANAGE_STATISTIC:
                 view = 'as-manage-layout_rank';
                 start = $.neoMNG;
                 param = menu;

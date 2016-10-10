@@ -299,31 +299,42 @@
                 console.log(params);
                 query = querys16._ASHistory;
                 if (parseInt(params.mode) === 0) { // 직원용
-                    where = " AND 서비스상태 IN (" + params.service_status.toString() + ')';
-                    if (parseInt(params.view_mode) === 0) { // 내가 속한 지사 A/S
-                        where += " AND 지사코드 = '" + params.view_mode_value + "' ";
-                    } else if (parseInt(params.view_mode) === 1) { // 내가 처리한 A/S
-                        temp = " AND ( 확인자ID = {ID} OR 인계자ID = {ID} OR 처리자ID = {ID} )"
-                        temp = temp.replace(/{ID}/gi, params.view_mode_value);
-                        where += temp;
+
+                    if (params.index){
+                      // if (params.index > 0) {
+                        query = query.replace('{문의내용}', '문의내용');
+                        where = ' AND 인덱스 = ' + params.index;
+                        orderby = ' 인덱스 ASC ';
+                      // }
+                    }else{
+                      query = query.replace('{문의내용}', '\'\' AS 문의내용');
+                      where = " AND 서비스상태 IN (" + params.service_status.toString() + ')';
+                      if (parseInt(params.view_mode) === 0) { // 내가 속한 지사 A/S
+                          where += " AND 지사코드 = '" + params.view_mode_value + "' ";
+                      } else if (parseInt(params.view_mode) === 1) { // 내가 처리한 A/S
+                          temp = " AND ( 확인자ID = {ID} OR 인계자ID = {ID} OR 처리자ID = {ID} )"
+                          temp = temp.replace(/{ID}/gi, params.view_mode_value);
+                          where += temp;
+                      }
+
+                      where += " AND (CONVERT(char(10), 접수일자, 120) Between '" + params.startDate + "' AND '" + params.endDate + "') ";
+
+                      if (params.keyword !== '') {
+
+                          where += " And ( ";
+                          where += "        기관코드 like '%" + params.keyword + "%' Or ";
+                          where += "        기관명칭 like '%" + params.keyword + "%' Or ";
+                          where += "        CONVERT(char(18), 접수일자, 21) like '%" + params.keyword + "%' Or ";
+                          where += "        접수자 like '%" + params.search + "%' Or ";
+                          where += "        확인자 like '%" + params.search + "%' Or ";
+                          where += "        처리자 like '%" + params.search + "%' Or ";
+                          where += "        문의내용 like '%" + params.search + "%' ) ";
+
+                      }
+
+                      orderby = " 접수일자 DESC ";
+
                     }
-
-                    where += " AND (CONVERT(char(10), 접수일자, 120) Between '" + params.startDate + "' AND '" + params.endDate + "') ";
-
-                    if (params.keyword !== '') {
-
-                        where += " And ( ";
-                        where += "        기관코드 like '%" + params.keyword + "%' Or ";
-                        where += "        기관명칭 like '%" + params.keyword + "%' Or ";
-                        where += "        CONVERT(char(18), 접수일자, 21) like '%" + params.keyword + "%' Or ";
-                        where += "        접수자 like '%" + params.search + "%' Or ";
-                        where += "        확인자 like '%" + params.search + "%' Or ";
-                        where += "        처리자 like '%" + params.search + "%' Or ";
-                        where += "        문의내용 like '%" + params.search + "%' ) ";
-
-                    }
-
-                    orderby = " 접수일자 DESC ";
                 } else { //병원용
 
                 }

@@ -1,43 +1,44 @@
-div.row.p-sm.m-l-sm.m-r-sm  
-  div.col-xs-12
-    div.ibox.m-b-none.small
-      div.ibox-title 
-        h3.m-t-none 
-          i.fa.fa-history
-          |  A/S 처리내역  
-      div.ibox-content
-        div.row.no-padding
-          div.form-inline
-            div.form-group.m-r-xs
-              div.input-daterange.input-group
-                  input.input-sm.form-control.accept-date(type='text', data-name='start')
-                  span.input-group-addon ~
-                  input.input-sm.form-control.accept-date(type='text', data-name='end')          
-            div.form-group.m-r-xs                         
-              div.btn-group
-                  button.btn.btn-default.service_status(type='button', data-status='0') 접수
-                  button.btn.btn-default.service_status(type='button', data-status='1') 확인
-                  button.btn.btn-default.service_status(type='button', data-status='2') 인계
-                  button.btn.btn-default.service_status(type='button', data-status='3') 인계확인
-                  button.btn.btn-default.service_status(type='button', data-status='4') 완료
-                  button.btn.btn-default.service_status(type='button', data-status='5') 취소          
-            div.form-group.m-r-xs                         
-              div.radio.radio-info.radio-inline
-                input.view_mode(type='radio',name='list-kind',id='my',value='1')
-                label(for='my') 내가 처리한 A/S                      
-              div.radio.radio-info.radio-inline
-                input.view_mode(type='radio',name='list-kind',id='area',value='0')
-                label(for='area') 지사 A/S        
-              div.radio.radio-info.radio-inline
-                input.view_mode(type='radio',name='list-kind',id='all',value='2')
-                label(for='all') 전체 A/S       
-            div.form-group
-              input.form-control.keyword#keyword(type='text',placeholder='검색어를 입력해주세요.')                   
-            button.btn.btn-primary#btnSearch 검색                   
-               
- 
-                  
-  div.col-xs-12.m-t-none
-    div.ibox
-      div.ibox-content.small  
-        table.table.table-responsive#data-table(data-paging="true",data-paging-size='15',data-sorting='true',data-toggle-column="last")        
+div.container-fluid
+  div.row
+    div.col-xs-12
+      div.ibox.m-b-none.small
+        div.ibox-title 
+          h3.m-t-none 
+            i.fa.fa-history
+            |  A/S 처리내역  
+        div.ibox-content
+          div.row.no-padding
+            div.form-inline
+              div.form-group.m-r-xs
+                div.input-daterange.input-group
+                    input.input-sm.form-control.accept-date(type='text', data-name='start')
+                    span.input-group-addon ~
+                    input.input-sm.form-control.accept-date(type='text', data-name='end')          
+              div.form-group.m-r-xs                         
+                div.btn-group
+                    button.btn.btn-default.service_status(type='button', data-status='0') 접수
+                    button.btn.btn-default.service_status(type='button', data-status='1') 확인
+                    button.btn.btn-default.service_status(type='button', data-status='2') 인계
+                    button.btn.btn-default.service_status(type='button', data-status='3') 인계확인
+                    button.btn.btn-default.service_status(type='button', data-status='4') 완료
+                    button.btn.btn-default.service_status(type='button', data-status='5') 취소          
+              div.form-group.m-r-xs                         
+                div.radio.radio-info.radio-inline
+                  input.view_mode(type='radio',name='list-kind',id='my',value='1')
+                  label(for='my') 내가 처리한 A/S                      
+                div.radio.radio-info.radio-inline
+                  input.view_mode(type='radio',name='list-kind',id='area',value='0')
+                  label(for='area') 지사 A/S        
+                div.radio.radio-info.radio-inline
+                  input.view_mode(type='radio',name='list-kind',id='all',value='2')
+                  label(for='all') 전체 A/S       
+              div.form-group
+                input.form-control.keyword#keyword(type='text',placeholder='검색어를 입력해주세요.')                   
+              button.btn.btn-primary#btnSearch 검색                   
+                 
+   
+                    
+    div.col-xs-12.m-t-none
+      div.ibox
+        div.ibox-content.small  
+          table.table.table-responsive#data-table(data-paging="true",data-paging-size='15',data-sorting='true',data-toggle-column="last",data-paging-count-format="{CP} of {TP} / {TR}",data-filtering="true",data-filter-placeholder="결과내 재검색", data-filter-ignore-case="false")        
