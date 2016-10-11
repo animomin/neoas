@@ -39,7 +39,138 @@
             }
         }
     };
-
+    var tableColumn =  [
+        { 'name': '인덱스', 'title': 'ID', 'style': { 'width': 50, 'maxWidth': 50 },  'breakpoints' : 'xs' },
+        { 'name': '기관코드', 'title': '기관번호' },
+        { 'name': '기관명칭', 'title': '기관명칭',
+          formatter : function(value){
+            if(value.length > 10){
+              return '<a data-toggle="tooltips" title="' + value + '">' + value.substring(0,10) + '...</a>';
+            }else{
+              return value;
+            }
+          }
+        },
+        {
+            'name': '프로그램',
+            'title': 'EMR',
+            formatter: function(value) {
+                if (value === "" || typeof value === "undefined") value = 0;
+                switch (parseInt(value)) {
+                    case 1:
+                        return "<span class='badge badge-eplus'>Eplus</span>";
+                    case 8:
+                        return "<span class='badge badge-medi'>메디</span>";
+                    case 20:
+                        return "<span class='badge badge-sense'>센스</span>";
+                }
+            }
+        },
+        {   'name' : '본사AS', 'title' : '본사AS', "filterable": false,
+            formatter : function(value){
+              switch (parseInt(value)) {
+                case 0:
+                  return "<i class='fa fa-square-o'></i>"
+                case 1:
+                  return "<i class='fa fa-check-square-o'></i>"
+                default:
+              }
+            }
+        },
+        {   'name' : '응급여부', 'title' : '응급', "filterable": false,
+            formatter : function(value){
+              switch (parseInt(value)) {
+                case 0:
+                  return "<i class='fa fa-square-o'></i>"
+                case 1:
+                  return "<i class='fa fa-check-square-o'></i>"
+                default:
+              }
+            }
+        },
+        {   'name' : '수수료', 'title' : '수수료', "filterable": false,
+            formatter : function(value){
+              switch (parseInt(value)) {
+                case 0:
+                  return "<i class='fa fa-square-o'></i>"
+                case 1:
+                  return "<i class='fa fa-check-square-o'></i>"
+                default:
+              }
+            }
+        },
+        {
+            'name': '지사코드',
+            'title': '담당지사',
+            formatter: function(value) {
+                if (value === '' || typeof value === 'undefined') value = '0000';
+                return neo.area[value];
+            },
+            'breakpoints' : 'xs'
+        },
+        {
+            'name' : '담당자',
+            'title' : '담당자',
+            formatter : function(value){
+              switch (parseInt(value)) {
+                case 0:
+                  return '미정';
+                default:
+                  return neo.users.GetUserName(value).USER_NAME;
+              }
+            }
+        },
+        {
+            'name': '서비스상태',
+            'title': '상태',
+            formatter: function(value) {
+                value = parseInt(value);
+                return ASSTATUS.ServiceName(value);
+            },
+            'breakpoints' : 'xs'
+        },
+        { 'name': '접수자', 'title': '접수자', 'breakpoints' : 'md sm xs',
+          formatter : function(value){
+            if(value.length > 3){
+              return '<a data-toggle="tooltips" title="' + value + '">' + value.substring(0,3) + '...</a>';
+            }else{
+              return value;
+            }
+          }
+        },
+        { 'name': '접수일자', 'title': '접수일', 'type': 'date', 'formatString': 'YYYY-MM-DD', 'breakpoints' : 'md sm xs',
+          formatter : function(value){
+            if (value === '' || typeof value ==='undefined') return '';
+            var temp = value.split(' ');
+            return temp[0];
+          }
+        },
+        { 'name': '확인자', 'title': '확인자', 'breakpoints' : 'md sm xs' },
+        { 'name': '확인일자', 'title': '확인일', 'type': 'date', 'formatString': 'YYYY-MM-DD', 'breakpoints' : 'md sm xs',
+          formatter : function(value){
+            if (value === '' || typeof value ==='undefined') return '';
+            var temp = value.split(' ');
+            return temp[0];
+          }
+        },
+        { 'name': '인계자', 'title': '인계자', 'breakpoints' : 'md sm xs' },
+        { 'name': '인계일자', 'title': '인계일', 'type': 'date', 'formatString': 'YYYY-MM-DD', 'breakpoints' : 'md sm xs',
+          formatter : function(value){
+            if (value === '' || typeof value ==='undefined') return '';
+            var temp = value.split(' ');
+            return temp[0];
+          }
+        },
+        { 'name': '처리자', 'title': '처리자', 'breakpoints' : 'md sm xs' },
+        { 'name': '처리일자', 'title': '처리일', 'type': 'date', 'formatString': 'YYYY-MM-DD', 'breakpoints' : 'md sm xs',
+          formatter : function(value){
+            if (value === '' || typeof value ==='undefined') return '';
+            var temp = value.split(' ');
+            return temp[0];
+          }
+        },
+        { 'name' : '문의내용', 'title': '내용', 'breakpoints' : 'all'}
+    ];
     var NeoManage = function(menu) {
         var _menu = menu;
         var _me = this;
@@ -510,6 +641,7 @@
         elem.$view_mode = $('input.view_mode');
         elem.$keyword = $('input#keyword');
         elem.$search = $('button#btnSearch');
+        elem.$print = $('button#btnPrint');
         elem.$table = $('table#data-table');
 
 
@@ -519,18 +651,22 @@
         var viewClick = function(e) { me.events.ViewMode_OnClick(e, me); };
         var searchClick = function(e) { me.events.btnSearch_OnClick(e, me); };
         var keywordKeyUp = function(e) { me.events.Keyword_OnKeyUp(e, me); };
+        var printClick = function(e){me.events.print_OnClick(e.target, me);};
 
         elem.$date.bind('change', dateChange);
         elem.$service_status.bind('click', statusClick);
         elem.$view_mode.bind('click', viewClick);
         elem.$search.bind('click', searchClick);
+        elem.$print.bind('click', printClick);
         elem.$keyword.bind('keyup', keywordKeyUp);
+
 
         this.init();
     }
     AsHistory.prototype = {
         user_id: null,
         user_area: null,
+        history : null,
         search_options: {
             //startDate : (new Date()).GetToday('YYYY-MM-DD'),
             startDate : (function(){
@@ -550,7 +686,8 @@
             $keyword: null,
             $search: null,
             $table: null,
-            $dataTable: null
+            $dataTable: null,
+            $print : null
         },
         events: {
             Date_OnChange : function(e, _this){
@@ -596,6 +733,11 @@
             },
             btnSearch_OnClick: function(e, _this) {
                 _this.Load();
+            },
+            print_OnClick : function(target, _this){
+                console.log(_this.history);
+                window.historyData = _this.history;
+                window.open('print?mode=1', 'popUpWindow');
             }
         },
         init: function() {
@@ -663,6 +805,7 @@
                 method: 'GET',
                 beforeSend: function() {
                     Pace.start();
+                    _this.history = {};
                 },
                 success: function(opt, records) {
                     if(records.err){
@@ -676,129 +819,22 @@
 
                     if (records.data && records.data.length) {
                         records.data.forEach(function(_item, _index) {
+
+                            //_item.접수자 = _item.접수자.length > 3 ? _item.접수자.substring(0,3) + '...' : _item.접수자;
+
                             var temp = ASSTATUS.ServiceBackGround(_item.서비스상태);
                             temp.value = _item;
                             records.data[_index] = JSON.parse(JSON.stringify(temp));
                         });
                     }
 
+                    _this.history = {
+                      columns : tableColumn,
+                      rows : records.data
+                    };
+
                     $table.footable({
-                        "columns": [
-                            { 'name': '인덱스', 'title': 'ID', 'style': { 'width': 50, 'maxWidth': 50 },  'breakpoints' : 'xs' },
-                            { 'name': '기관코드', 'title': '기관번호' },
-                            { 'name': '기관명칭', 'title': '기관명칭' },
-                            {
-                                'name': '프로그램',
-                                'title': '프로그램',
-                                formatter: function(value) {
-                                    if (value === "" || typeof value === "undefined") value = 0;
-                                    switch (parseInt(value)) {
-                                        case 1:
-                                            return "<span class='badge badge-eplus'>Eplus</span>";
-                                        case 8:
-                                            return "<span class='badge badge-medi'>Medi</span>";
-                                        case 20:
-                                            return "<span class='badge badge-sense'>Sense</span>";
-                                    }
-                                }
-                            },
-                            {   'name' : '본사AS', 'title' : '본사AS', "filterable": false,
-                                formatter : function(value){
-                                  switch (parseInt(value)) {
-                                    case 0:
-                                      return "<i class='fa fa-square-o'></i>"
-                                    case 1:
-                                      return "<i class='fa fa-check-square-o'></i>"
-                                    default:
-                                  }
-                                }
-                            },
-                            {   'name' : '응급여부', 'title' : '응급', "filterable": false,
-                                formatter : function(value){
-                                  switch (parseInt(value)) {
-                                    case 0:
-                                      return "<i class='fa fa-square-o'></i>"
-                                    case 1:
-                                      return "<i class='fa fa-check-square-o'></i>"
-                                    default:
-                                  }
-                                }
-                            },
-                            {   'name' : '수수료', 'title' : '수수료', "filterable": false,
-                                formatter : function(value){
-                                  switch (parseInt(value)) {
-                                    case 0:
-                                      return "<i class='fa fa-square-o'></i>"
-                                    case 1:
-                                      return "<i class='fa fa-check-square-o'></i>"
-                                    default:
-                                  }
-                                }
-                            },
-                            {
-                                'name': '지사코드',
-                                'title': '담당지사',
-                                formatter: function(value) {
-                                    if (value === '' || typeof value === 'undefined') value = '0000';
-                                    return neo.area[value];
-                                },
-                                'breakpoints' : 'xs'
-                            },
-                            {
-                                'name' : '담당자',
-                                'title' : '담당자',
-                                formatter : function(value){
-                                  switch (parseInt(value)) {
-                                    case 0:
-                                      return '미정';
-                                    default:
-                                      return neo.users.GetUserName(value).USER_NAME;
-                                  }
-                                }
-                            },
-                            {
-                                'name': '서비스상태',
-                                'title': '상태',
-                                formatter: function(value) {
-                                    value = parseInt(value);
-                                    return ASSTATUS.ServiceName(value);
-                                },
-                                'breakpoints' : 'xs'
-                            },
-                            { 'name': '접수자', 'title': '접수자', 'breakpoints' : 'md sm xs' },
-                            { 'name': '접수일자', 'title': '접수일', 'type': 'date', 'formatString': 'YYYY-MM-DD', 'breakpoints' : 'md sm xs',
-                              formatter : function(value){
-                                if (value === '' || typeof value ==='undefined') return '';
-                                var temp = value.split(' ');
-                                return temp[0];
-                              }
-                            },
-                            { 'name': '확인자', 'title': '확인자', 'breakpoints' : 'md sm xs' },
-                            { 'name': '확인일자', 'title': '확인일', 'type': 'date', 'formatString': 'YYYY-MM-DD', 'breakpoints' : 'md sm xs',
-                              formatter : function(value){
-                                if (value === '' || typeof value ==='undefined') return '';
-                                var temp = value.split(' ');
-                                return temp[0];
-                              }
-                            },
-                            { 'name': '인계자', 'title': '인계자', 'breakpoints' : 'md sm xs' },
-                            { 'name': '인계일자', 'title': '인계일', 'type': 'date', 'formatString': 'YYYY-MM-DD', 'breakpoints' : 'md sm xs',
-                              formatter : function(value){
-                                if (value === '' || typeof value ==='undefined') return '';
-                                var temp = value.split(' ');
-                                return temp[0];
-                              }
-                            },
-                            { 'name': '처리자', 'title': '처리자', 'breakpoints' : 'md sm xs' },
-                            { 'name': '처리일자', 'title': '처리일', 'type': 'date', 'formatString': 'YYYY-MM-DD', 'breakpoints' : 'md sm xs',
-                              formatter : function(value){
-                                if (value === '' || typeof value ==='undefined') return '';
-                                var temp = value.split(' ');
-                                return temp[0];
-                              }
-                            },
-                            { 'name' : '문의내용', 'title': '내용', 'breakpoints' : 'all'}
-                        ],
+                        "columns": tableColumn,
                         "rows": records.data
                     }).bind({
                        'expand.ft.row' : function(e, ft, row) {

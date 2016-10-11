@@ -142,5 +142,9 @@ router.get('/manage/:mode', function(req, res,next){
   });
 });
 
+router.get('/print', function(req, res, next){
+  res.render('print.jade');
+});
+
 
 module.exports = router;

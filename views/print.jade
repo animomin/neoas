@@ -1,0 +1,70 @@
+extends layout_member
+block styles 
+  link(rel='stylesheet', href='/plugins/footable-bootstrap/css/footable.bootstrap.min.css')
+  link(rel='stylesheet', href='/plugins/sweetalert2/dist/sweetalert2.min.css')    
+block content
+  
+  table.table.table-responsive.small#data-table(data-paging="false",data-sorting='false',data-show-toggle='false')        
+  
+block scripts
+  script(src='/plugins/footable-bootstrap/js/footable.js')
+  script(src='/plugins/sweetalert2/dist/sweetalert2.min.js')    
+  script(src='/plugins/sweetalert2/dist/es6-promise.min.js')
+  script.
+    $(document).ready(function(){
+      console.log('loaded');
+      $('body').attr('class', 'white-bg');
+      var $pTable = $('table#data-table');
+      var columns = window.opener.historyData.columns;
+      var rows = window.opener.historyData.rows;
+      
+      $pTable.footable({
+        'columns' : columns,
+        'rows' : rows
+      }).bind({
+        'init.ft.table' : function(e){
+          console.log('init');
+        },
+        'draw.ft.table' : function(e){
+          //alert('');
+          swal({
+            title: 'A/S 처리내역 출력',
+            html: '여백을 <span class="font-bold">취소</span> 혹은 <span class="font-bold">맞춤</span>으로 설정하시면 <br>여백을 조정할 수 있습니다.<br>' +
+                  ' <small> ( 맞춤 여백 권장값 : 좌/우 = 1.5 | 상/하 = 10) <br> 모니터 해상도에 따라 차이가 있을 수 있습니다. </small><br><br>' +
+                  ' <span class="font-bold">출력하기</span>를 클릭하면 설정화면이 나타납니다.',
+            type: 'info',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '출력하기'
+          }).then(function() {
+            window.print();
+          });
+        }
+      });
+    });
+    (function(){
+      
+      if(window.matchMedia){
+        var mediaQueryList = window.matchMedia('print');
+        mediaQueryList.addListener(function(mql){
+          if(mql.matches){
+            console.log('before print2');
+          }else{
+            console.log('after print2');
+            window.close();
+          }
+        })
+      }else{
+        window.onbeforeprint = function(){
+          console.log('before print');
+        }  
+        window.onafterprint = function(){
+          console.log('after print');
+          window.close();
+        }
+      }
+    })();
+    
+
+    
