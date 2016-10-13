@@ -169,7 +169,9 @@
             return temp[0];
           }
         },
+        { 'name' : '출력', 'title' : '', 'breakpoints' : 'all'},
         { 'name' : '문의내용', 'title': '내용', 'breakpoints' : 'all'}
+
     ];
     var NeoManage = function(menu) {
         var _menu = menu;
@@ -637,6 +639,7 @@
 
         var elem = this.elem;
         elem.$date = $('input.accept-date');
+        elem.$quickDate = $('button.accept-quickDate');
         elem.$service_status = $('button.service_status');
         elem.$view_mode = $('input.view_mode');
         elem.$keyword = $('input#keyword');
@@ -647,6 +650,7 @@
 
         var me = this;
         var dateChange = function(e) { me.events.Date_OnChange(e, me); };
+        var quickDateClick = function(e) {me.events.QuickDate_OnClick(e.target, me);};
         var statusClick = function(e) { me.events.ServiceStatus_OnClick(e, me); };
         var viewClick = function(e) { me.events.ViewMode_OnClick(e, me); };
         var searchClick = function(e) { me.events.btnSearch_OnClick(e, me); };
@@ -654,6 +658,7 @@
         var printClick = function(e){me.events.print_OnClick(e.target, me);};
 
         elem.$date.bind('change', dateChange);
+        elem.$quickDate.bind('click', quickDateClick);
         elem.$service_status.bind('click', statusClick);
         elem.$view_mode.bind('click', viewClick);
         elem.$search.bind('click', searchClick);
@@ -681,6 +686,7 @@
         },
         elem: {
             $date : null,
+            $quickDate : null,
             $service_status: null,
             $view_mode: null,
             $keyword: null,
@@ -698,26 +704,23 @@
                     _this.search_options.endDate = selDate;
                 }
             },
+            QuickDate_OnClick : function(target, _this){
+              var day = $(target).data('name');
+              if(day==='yesterday'){
+                _this.search_options.startDate = (function(){
+                    var todate = new Date((new Date()).GetToday('YYYY-MM-DD'));
+                    todate.setDate(todate.getDate()-1);
+                    return todate.GetDate_CustomFormat('YYYY-MM-DD');
+                })();
+                _this.search_options.endDate = _this.search_options.startDate;
+              }else{
+                _this.search_options.startDate =(new Date()).GetToday('YYYY-MM-DD');
+                _this.search_options.endDate = _this.search_options.startDate;
+              }
+              _this.Load();
+            },
             ServiceStatus_OnClick: function(e, _this) {
                 $(e.target).toggleClass('active');
-              //   var status = $(e.target).data('status');
-              //   var selIndex = -1;
-              // //  var service_status = _this.search_options.service_status.split(',');
-              //   var isExist = _this.search_options.service_status.some(function(_v, _i) {
-              //       if (_v == status) {
-              //           selIndex = _i;
-              //           return true;
-              //       }
-              //   });
-              //   if (isExist) {
-              //       _this.search_options.service_status.splice(selIndex, 1);
-              //       // service_status.splice(selIndex,1);
-              //   } else {
-              //       _this.search_options.service_status.push(status);
-              //       // service_status.push(status);
-              //   }
-              //   console.log(_this.search_options.service_status);
-              //   // _this.search_options.service_status = service_status.toString();
             },
             ViewMode_OnClick: function(e, _this) {
                 _this.search_options.view_mode = $(e.target).val();
@@ -737,7 +740,7 @@
             print_OnClick : function(target, _this){
                 console.log(_this.history);
                 window.historyData = _this.history;
-                window.open('print?mode=1', 'popUpWindow');
+                window.open('print', 'popUpWindow');
             }
         },
         init: function() {
@@ -824,11 +827,14 @@
 
                             var temp = ASSTATUS.ServiceBackGround(_item.서비스상태);
                             temp.value = _item;
+                            temp.value["출력"] = '<button class="btn-default btn-sm histroy-print" data-index="'+_index+'"><i class="fa fa-print"></i> 출력</button>';
                             records.data[_index] = JSON.parse(JSON.stringify(temp));
                         });
                     }
 
                     _this.history = {
+                      mode : 1,
+                      options : opt.data,
                       columns : tableColumn,
                       rows : records.data
                     };
@@ -837,7 +843,39 @@
                         "columns": tableColumn,
                         "rows": records.data
                     }).bind({
-                       'expand.ft.row' : function(e, ft, row) {
+                      'init.ft.table' : function(e){
+                      },
+                      'draw.ft.table' : function(e){
+                        var eachTotal = [0,0,0,0,0,0];
+                        var total = 0;
+                        records.data.forEach(function(_item){
+                          eachTotal[_item.value.서비스상태] += 1;
+                          total += 1;
+                        });
+                        $('#historyTotal>h4').remove();
+                        $('#historyTotal').append(
+                            '<h4>전체A/S: ' + total + ' | ' +
+                            '접수: ' + eachTotal[ASSTATUS.ACCEPT] + ' | ' +
+                            '확인: ' + eachTotal[ASSTATUS.CONFIRM] + ' | ' +
+                            '인계: ' + eachTotal[ASSTATUS.TAKEOVER] + ' | ' +
+                            '인계확인: ' + eachTotal[ASSTATUS.TAKEOVERCONFIRM] + ' | ' +
+                            '완료: ' + eachTotal[ASSTATUS.DONE] + ' | ' +
+                            '취소: ' + eachTotal[ASSTATUS.CANCEL] + '</h4> '
+                        );
+                        _this.history.total = $('#historyTotal').text();
+                        $('.histroy-print').on('click', function(){
+                          var selItem = _this.history.rows[$(this).data('index')];
+                              selItem.options["expanded"] = true;
+                          var historyItem = {
+                            mode : 2,
+                            columns : tableColumn,
+                            rows : [selItem]
+                          };
+                          window.historyData = historyItem
+                          window.open('print', 'popUpWindow');
+                        });
+                      },
+                      'expand.ft.row' : function(e, ft, row) {
 
                           var $detail = row.cells.find(function(_cell){
                             return _cell.column.name === '문의내용';
@@ -870,7 +908,14 @@
                                   desktop : false
                                 });
                               }
-                              return $detail.find('td').html(_records.data[0].문의내용);
+                              $detail.find('td').html(_records.data[0].문의내용);
+                              _this.history.rows.some(function(_cell){
+                                console.log(_cell);
+                                if(parseInt(_cell.value.인덱스) === parseInt(_index)){
+                                  _cell.value.문의내용 = _records.data[0].문의내용;
+                                  return true;
+                                }
+                              })
                             },
                             callback : function(){
                               $($detail.find('td')).find('.spiner-example').remove();

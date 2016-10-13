@@ -1,0 +1,25 @@
+extends ../layout_client2
+
+block content  
+
+  div.sidebar-container
+    ul.nav.nav-tabs.navs-3
+      li.active
+        a.as-tab(href='#accept', data-toggle='tab') A/S 접수        
+      li
+        a.as-tab(href='#history',data-toggle='tab') A/S 접수내역        
+      li
+        a.as-tab(href='#notice',data-toggle='tab') 공지사항      
+    div.tab-content
+      div#accept.tab-pane.fade.in.active
+        include ./client_accept.jade
+      div#history.tab-pane.fade 접수내역
+        //include ./client_history.jade
+      div#notice.tab-pane.fade 공지사항
+        //include ./client_notice.jade
+  
+block scripts
+  
+  script.
+    var nc = new $.neoClient();
+    //tinymce.init({ selector:'textarea#comment' });

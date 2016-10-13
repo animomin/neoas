@@ -1,0 +1,50 @@
+div.container-fluid.light-gray-bg
+  h3 A/S 예약접수
+  form(role='form',id='accept')
+    p 불편사항을 자세히 적어주시면 빠르게 도움을 드릴 수 있습니다.
+    p 아래의 접수자 정보를 확인하시고 예약하기 버튼을 눌러주세요.
+    div.form-group
+      div.input-group
+        span.input-group-addon 접수자
+        input.form-control.input(type='text',id='client_name',name='client_name')
+    div.form-group
+      //label 연락처
+      //- input.form-control(type='text',id='client_contact',name='client_contact',placeholder="연락처 ('-'은 생략하고 입력해주세요.)")
+      div.input-group
+        span.input-group-addon 연락처
+        input.form-control.input.input-block.block(type='text',id='client_contact',name='client_contact')
+        span.input-group-addon(style='border-left:0;border-right:0;') 내선번호
+        input.form-control.input.input-block.block(type='text',id='client_contact2',name='client_contact2')
+    div.form-group       
+      textarea(id='comment', name='comment')        
+  
+    button.btn.btn-success.block.full-width.m-b(type='submit') 예약하기     
+            
+    input(type='hidden', id='hospnum', name='hospnum')
+    input(type='hidden', id='hospname', name='hospname')
+    input(type='hidden', id='area', name='area')
+    input(type='hidden', id='program', name='program')
+    input(type='hidden', id='exe', name='exe')
+    input(type='hidden', id='pcinfo', name='pcinfo')  
+    input(type='hidden', id='curversion', name='curversion')      
+    input(type='hidden', id='bohum', name='bohum')
+    input(type='hidden', id='hosp_contact', name='hosp_contact')
+    input(type='hidden', id='pacs', name='pacs')
+    input(type='hidden', id='servername', name='servername')
+    input(type='hidden', id='serverid', name='serverid')
+    input(type='hidden', id='serverpw', name='serverpw')
+    input(type='hidden', id='dbname', name='dbname')
+    input(type='hidden', id='certpw', name='certpw')
+    input(type='hidden', id='openperson', name='openperson')
+    input(type='hidden', id='sutak', name='sutak')             
+    input(type='hidden', id='os', name='os')             
+    input(type='hidden', id='sqlversion', name='sqlversion')       
+    input(type='hidden', id='astype', name='astype', value=0)    
+    input(type='hidden', id='masterSuga', name='masterSuga')       
+    input(type='hidden', id='masterDrug', name='masterDrug')       
+    input(type='hidden', id='masterMaterial', name='masterMaterial') 
+    input(type='hidden', id='manager', name='manager') 
+    
+  form(id='uploadImage',action='/clients/upload',method='post',enctype='multipart/form-data')    
+    input(type='file', id='capture' name='capture')
+    input(type='submit', value='upload')

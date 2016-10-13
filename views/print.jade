@@ -3,7 +3,9 @@ block styles
   link(rel='stylesheet', href='/plugins/footable-bootstrap/css/footable.bootstrap.min.css')
   link(rel='stylesheet', href='/plugins/sweetalert2/dist/sweetalert2.min.css')    
 block content
-  
+  div.container-fluid    
+    div.media-body
+        
   table.table.table-responsive.small#data-table(data-paging="false",data-sorting='false',data-show-toggle='false')        
   
 block scripts
@@ -15,8 +17,23 @@ block scripts
       console.log('loaded');
       $('body').attr('class', 'white-bg');
       var $pTable = $('table#data-table');
-      var columns = window.opener.historyData.columns;
-      var rows = window.opener.historyData.rows;
+      var params = $.extend(true, {},window.opener.historyData);
+      var columns = params.columns;
+      var rows = params.rows;
+      var options = params.options;
+      
+      if(parseInt(params.mode)===1){
+        if(typeof options.startDate === 'function') options.startDate = options.startDate();      
+        $('.media-body').append(
+          $('<h3>').text('조회기간 : ' + options.startDate + " ~ " + options.endDate + '  ' + params.total)
+        );
+      }
+      
+      columns.forEach(function(_col){
+        if(_col.name.match(/본사AS|수수료|출력/gi)){
+          _col.visible = false;
+        }
+      })
       
       $pTable.footable({
         'columns' : columns,

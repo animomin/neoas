@@ -14,6 +14,10 @@ div.container-fluid
                     input.input-sm.form-control.accept-date(type='text', data-name='start')
                     span.input-group-addon ~
                     input.input-sm.form-control.accept-date(type='text', data-name='end')          
+              div.form-group.m-r-xs
+                div.btn-group
+                    button.btn.btn-default.accept-quickDate(type'button', data-name='yesterday') 어제
+                    button.btn.btn-default.accept-quickDate(type'button', data-name='today') 오늘
               div.form-group.m-r-xs                         
                 div.btn-group
                     button.btn.btn-default.service_status(type='button', data-status='0') 접수
@@ -38,8 +42,19 @@ div.container-fluid
               button.btn.btn-default#btnPrint
                 i.fa.fa-print
                 |  출력
+               
                 
     div.col-xs-12.m-t-none
-      div.ibox
+      div.ibox        
         div.ibox-content.small  
-          table.table.table-responsive#data-table(data-paging="true",data-paging-size='15',data-sorting='true',data-toggle-column="last",data-paging-count-format="{CP} of {TP} / {TR}",data-filtering="true",data-filter-placeholder="결과내 재검색", data-filter-ignore-case="false")        
+          div#historyTotal.text-center
+          table.table.table-responsive#data-table(
+            data-paging="true",
+            data-paging-size='15',
+            data-sorting='true',
+            data-toggle-column="last",
+            data-paging-count-format="{CP} of {TP} / {TR}",
+            data-filtering="true",
+            data-filter-placeholder="결과내 재검색",
+            data-filter-ignore-case="false"
+          )        

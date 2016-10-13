@@ -4556,6 +4556,10 @@ table.table-mail tr td {
     background-color: #f3f3f4;
 }
 
+.light-gray-bg {
+    background-color: #f9f9f9;
+}
+
 .white-bg {
     background-color: #ffffff;
 }
