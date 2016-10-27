@@ -29,6 +29,7 @@
       toolbar : [
           ['mybutton', ['capture']],
           ['mybutton2', ['emergency', 'takeover', 'done']],
+          ['mybutton3', ['saveContext']],
           ['style', ['bold', 'italic', 'underline', 'clear']],
           ['fontsize', ['fontsize']],
           ['color', ['color']],
@@ -112,6 +113,21 @@
         //   });
         //   return button.render();
         // },
+        saveContext : function(context){
+          var ui = $.summernote.ui;
+          var button = ui.button({
+            contents : '<i class="fa fa-floppy-o"></i> 수정',
+            tooltip : '내용만 저장',
+            buttonID : 'save',
+            customClass : 'btn-success as-status-btn',
+            customAttr : {
+              attrName : 'data-type',
+              attrValue : '-1'
+            },
+            click : function(){}
+          });
+          return button.render();
+        },
         popupImage : function(context){
           var ui = $.summernote.ui;
           var button = ui.button({
@@ -499,6 +515,7 @@
 
         });
       },
+
       /**
        * AS 상태변경
        * 1. 확인 : 서비스상태 업데이트 -> 클라이언트 상태변경 메세지 전송, 상태바 리로드(왼쪽 리스트 새로 뿌리기) (data.서비스상태 값변경)
@@ -510,10 +527,13 @@
         var tab = _me.elem.list.$workingTab;
         var cData = JSON.parse(JSON.stringify(_this.data));
         /* 선택된 AS건의 데이터 갱신 */
-        cData.서비스상태 = parseInt(cData.서비스상태) !== ASSTATUS.TAKEOVERCONFIRM ? status : cData.서비스상태;
         cData.문의내용 = _me.elem.GetComment();
         cData.실행메뉴 = _me.elem.$lyMenu.selectpicker('val');
         cData.세부화면 = _me.elem.$lyDetail.selectpicker('val');
+        // status 가 0보다 작으면 서비스상태 변경없이 내용변경만 저장한다.
+        if(parseInt(status)>=0){
+          cData.서비스상태 = parseInt(cData.서비스상태) !== ASSTATUS.TAKEOVERCONFIRM ? status : cData.서비스상태;
+        }
         switch (status) {
           case ASSTATUS.CONFIRM:
             cData.확인자 = neo.user.USER_NAME;
@@ -553,14 +573,18 @@
             // cData.문의내용 = _me.elem.$edit_q.summernote('code');
 
             break;
+          default:
+            break;
         }
 
         /* 변경된 사항 업데이트 */
         neoAJAX.as.UpdateAS(_this.$elem, cData, function(result){
           /* 결과가 성공이면 */
           if(result.err){
+            var msg = parseInt(status) >= 0 ? 'AS요청건의 상태를 변경하는데 실패하였습니다.' : 'AS요청건 내용을 수정하는데 실패하였습니다.';
+                msg += ' \n (ERROR : '+ result.Message+')';
             return neoNotify.Show({
-              text : 'AS요청건의 상태를 변경하는데 실패하였습니다. \n (ERROR : '+ result.Message+')',
+              text : msg,
               type : 'error',
               desktop : true
             });
@@ -585,9 +609,10 @@
           //   _me.elem.RefreshElem(_this.$elem, _this.data);
           //   _me.elem.RefreshTabCount();
           // });
-          tab.tab('show');
-          _me.options.workTab = tab.data('name');
-
+          if(parseInt(status) >= 0){
+            tab.tab('show');
+            _me.options.workTab = tab.data('name');
+          }
           _me.listData.Load(null, function(){
             $.neoSocket.emitClients();
 
@@ -1204,8 +1229,11 @@
             msg = "해당 AS요청건을 완료처리합니다";
             break;
           default:
+            msg = '해당 AS요청건의 내용을 수정합니다.';
         }
-        msg += "<br><small class='font-bold text-danger'> 서비스상태를 변경하면 접수자의 컴퓨터에도 알림이 나탑니다. </small> <br> 계속하시겠습니까?";
+        if(type >= 0){
+          msg += "<br><small class='font-bold text-danger'> 서비스상태를 변경하면 접수자의 컴퓨터에도 알림이 나탑니다. </small> <br> 계속하시겠습니까?";
+        }
         swal({
           title: 'AS 상태 변경',
           //text: msg,
@@ -1226,7 +1254,6 @@
         });
 
       },
-
       /**
        * 응급여부 체크
        */

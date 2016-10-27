@@ -6,14 +6,34 @@ router.get('/', function(req, res, next) {
   // res.send('respond with a resource');
   var ip =  req.headers["X-Forwarded-For"] || req.headers["x-forwarded-for"] || req.client.remoteAddress;
   console.log(ip);
-  //if(ip.indexOf('211.238.39.148') >= 0 || ip.indexOf('::1') >= 0 ){
-    // res.render('client', params.GetASClientParams(req));
-    // res.render('client/accept');
-  //}else{
+  if(ip.indexOf('211.238.39.148') >= 0 || ip.indexOf('::1') >= 0 ){
+     //res.render('client', params.GetASClientParams(req));
+     res.render('client/accept');
+    // res.render('client/client_index');
+  }else{
    res.render('client/main', params.GetASClientParams(req));
-  //}
+  }
 
 });
+
+router.get('/index', function(req, res, next){
+  var ip =  req.headers["X-Forwarded-For"] || req.headers["x-forwarded-for"] || req.client.remoteAddress;
+  console.log(ip);
+  console.log(req.query.ver);
+  if(ip.indexOf('211.238.39.148') >= 0 || ip.indexOf('::1') >= 0 ){
+    //res.render('client/accept');
+    // res.render('client/accept');
+    if(isNaN(req.query.ver) || parseInt(req.query.ver) >= 10){
+        res.render('client/accept');
+    }else{
+        res.render('client/accept_old');
+    }
+  }else{
+   //res.render('client/main', params.GetASClientParams(req));
+  }
+});
+
+
 
 router.get('/new', function(req, res, next) {
   // res.send('respond with a resource');
@@ -42,9 +62,9 @@ router.post('/require', function(req, res, next){
       fs.writeFile(path, data, function(err){
         if(err) logger.error('(AS Require) IMAGE UPLOAD FAILED :: ', err);
         if(!err){
-          fields.comment = '<p><img src="uploads/' + img.originalFilename +
+          fields.comment = '<p><img class="img-preview" src="uploads/' + img.originalFilename +
                             '" data-filename="'+img.originalFilename +
-                            '" style="width: 25%;"></p>' + fields.comment;
+                            '" style="width: 100%;"></p>' + fields.comment;
         }
         client.Accept(fields, function(err, data){
           if(err) logger.error('AS Require insert FAILED :: ', err);
@@ -104,6 +124,13 @@ router.put('/updateas', function(req, res, next){
   client.UpdateAs(req.body, function(result){
     res.send(result);
   });
+});
+
+/**
+ * PUT AS Context
+ */
+router.put('/context', function(req, res, next){
+  console.log(req.body);
 });
 
 /**

@@ -21,6 +21,7 @@
     _me.editor = {
       toolbar : [
           ['mybutton', ['capture', 'done']],
+          ['mybutton2', ['saveContext']],
           ['style', ['bold', 'italic', 'underline', 'clear']],
           ['fontsize', ['fontsize']],
           ['color', ['color']],
@@ -62,6 +63,21 @@
             customAttr : {
               attrName : 'data-type',
               attrValue : '4'
+            },
+            click : function(){}
+          });
+          return button.render();
+        },
+        saveContext : function(context){
+          var ui = $.summernote.ui;
+          var button = ui.button({
+            contents : '<i class="fa fa-floppy-o"></i> 수정',
+            tooltip : '내용만 저장',
+            buttonID : 'save',
+            customClass : 'btn-success as-status-btn',
+            customAttr : {
+              attrName : 'data-type',
+              attrValue : '-1'
             },
             click : function(){}
           });
@@ -350,6 +366,7 @@
 
           if(_this.data.서비스상태 === ASSTATUS.DONE){
             _me.elem.$asStatus.addClass('disabled');
+            $(_me.elem.$asStatus[_me.elem.$asStatus.length-1]).removeClass('disabled');
           }else{
             _me.elem.$asStatus.removeClass('disabled');
           }
@@ -454,8 +471,10 @@
         var _this = _me.selItem;
         var cData = JSON.parse(JSON.stringify(_this.data));
         /* 선택된 AS건의 데이터 갱신 */
-        cData.서비스상태 = status;
         cData.문의내용 = _me.elem.GetComment();
+        if(parseInt(status) >=0 ){
+          cData.서비스상태 = status;
+        }
         switch (status) {
           case ASSTATUS.CONFIRM:
             cData.확인자 = neo.user.USER_NAME;
@@ -494,14 +513,18 @@
             cData.처리일자 = (new Date()).GetToday('YYYY-MM-DD HH:MM:SS');
             // cData.문의내용 = _me.elem.$edit.summernote('code');
             break;
+          default:
+            break;
         }
 
         /* 변경된 사항 업데이트 */
         neoAJAX.as.UpdateAS(_this.$elem, cData, function(result){
           /* 결과가 성공이면 */
           if(result.err){
+            var msg = parseInt(status) >= 0 ? 'AS요청건의 상태를 변경하는데 실패하였습니다.' : 'AS요청건 내용을 수정하는데 실패하였습니다.';
+                msg += ' \n (ERROR : '+ result.Message+')';
             return neoNotify.Show({
-              text : 'AS요청건의 상태를 변경하는데 실패하였습니다. \n (ERROR : '+ result.Message+')',
+              text : msg,
               type : 'error',
               desktop : true
             });
@@ -1034,8 +1057,11 @@
             msg = "해당 AS요청건을 완료처리합니다";
             break;
           default:
+            msg = '해당 AS요청건의 내용을 수정합니다.';
         }
-        msg += "<br><small class='font-bold text-danger'> 서비스상태를 변경하면 접수자의 컴퓨터에도 알림이 나탑니다. </small> <br> 계속하시겠습니까?";
+        if(type >= 0){
+          msg += "<br><small class='font-bold text-danger'> 서비스상태를 변경하면 접수자의 컴퓨터에도 알림이 나탑니다. </small> <br> 계속하시겠습니까?";
+        }
         swal({
           title: 'AS 상태 변경',
           //text: msg,

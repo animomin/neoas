@@ -1,0 +1,42 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    meta(name='viewport',content='width=device-width, initial-scale=1.0')
+    meta(http-equiv='X-UA-Compatible',content='IE=edge')
+    title= title
+    <!--[if lt IE 9]><script type='text/javascript' src="<a href="http://html5shiv.googlecode.com/svn/trunk/html5.js" target="_blank">http://html5shiv.googlecode.com/svn/trunk/html5.js</a>"></script><![endif]-->
+    <!--[if lt IE 9]><script type='text/javascript' src="<a href="http://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.js" target="_blank">http://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.js</a>"></script><![endif]-->    
+    link(rel='stylesheet', href='/plugins/bootstrap/css/bootstrap.min.css')    
+    link(rel='stylesheet', href='/plugins/font-awesome/css/font-awesome.min.css')    
+    link(rel='stylesheet', href='/plugins/design/css/animation.css')
+             
+  body
+    block content
+      ul.nav.nav-tabs
+        li.active
+          a(href='#') A/S 접수
+        li
+          a(href='#') A/S 접수내역
+        li
+          a(href='#') 공지사항      
+
+      
+      div.tab-content
+        div#accept.tab-pane.fade.in.active
+          include ./client_accept.jade
+        div#history.tab-pane.fade 접수내역
+          //include ./client_history.jade
+        div#notice.tab-pane.fade 공지사항
+          //include ./client_notice.jade
+    <!--[if lt IE 9]><script src='http://code.jquery.com/jquery-1.10.2.min.js'></script><![endif]-->
+    <!--[if gte IE 9]><script src='/javascripts/jquery/jquery.min.js'></script><![endif]-->
+    <!--[if !IE]><!-->
+    script(src='/javascripts/jquery/jquery.min.js')
+    <!--<![endif]-->
+    script(src='/javascripts/jquery.form.min.js')
+    
+    script(src='/plugins/bootstrap/js/bootstrap.min.js')
+    
+    block scripts   
+    
