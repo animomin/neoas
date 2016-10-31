@@ -174,7 +174,7 @@
 
     io.on('connection', function(socket){
       console.log('NEW CONNECTION ', socket.handshake.address);
-
+      console.log(io);
       /**
        * JOIN EVENT
        */

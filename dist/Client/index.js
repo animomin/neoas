@@ -331,8 +331,8 @@
                           where += temp;
                       }
 
-                      //where += " AND (CONVERT(char(10), 접수일자, 120) Between '" + params.startDate + "' AND '" + params.endDate + "') ";
-                      where += " AND (접수일자 >= '" + params.startDate + "' AND 접수일자 <= '" + params.endDate + "') ";
+                      where += " AND (CONVERT(char(10), 접수일자, 120) Between '" + params.startDate + "' AND '" + params.endDate + "') ";
+                      //where += " AND (접수일자 >= '" + params.startDate + "' AND 접수일자 <= '" + params.endDate + "') ";
 
                       if (params.keyword !== '') {
 
