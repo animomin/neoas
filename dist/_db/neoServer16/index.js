@@ -5,12 +5,6 @@ var mssql = require('mssql'),
     dbString = JSON.parse(fs.readFileSync(path.join(__dirname, '../../../../', 'lib/server.json'), 'UTF-8')),
     connection = new mssql.Connection(dbString.server16);
 
-if(dbString.server16.server === '211.238.39.148'){
-  global.debugMode = true;
-}else{
-  global.debugMode = false;
-}
-
 var xml = fs.readFileSync(path.join(__dirname, 'query.xml'),'utf-8');
     digester.digest(xml, function(err, result){
       global.querys16 = result.query;

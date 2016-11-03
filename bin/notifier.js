@@ -7,8 +7,12 @@ var headers = {
 var uuid = '4e5540984d63a374';
 var secret_key = 'M4scl7JziW';
 
+var testPush = {
+  uuid : 'C3DD8E20-C90E-4E6F-8851-B737D8ED1E8A',
+  secret_key  : 'vqfxwd34Yb'
+};
+
 exports.sendPush = function(type, area, summary, callback){
-  if(global.debugMode) return callback();
   var body = '';
   var _summary = '';
   switch (type) {
@@ -47,15 +51,19 @@ exports.sendPush = function(type, area, summary, callback){
   if(area === '0036') area = '0025';
   if(area === '0037') area = '0033';
 
+  if(global.debugMode){
+    body = '지사코드 : ' + area + '\n' + body;
+  }
+
   // Configure the request
   var options = {
       url: 'http://push.doday.net/api/push',
       method: 'POST',
       headers: headers,
       form: {
-        'uuid' : uuid,
-        'secret_key' : secret_key,
-        'code' : 'neosoftbank' + area,
+        'uuid' : global.debugMode ? testPush.uuid : uuid,
+        'secret_key' : global.debugMode ? testPush.secret_key : secret_key,
+        'code' : global.debugMode ? 'neotest0000' : 'neosoftbank' + area,
         'body' : body
       }
   };

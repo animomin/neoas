@@ -94,3 +94,4 @@ function onListening() {
 }
 
 require('./socket');
+global.debugMode = process.env.NODE_ENV === 'development';
