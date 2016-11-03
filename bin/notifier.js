@@ -12,7 +12,7 @@ exports.sendPush = function(type, area, summary, callback){
   var _summary = '';
   switch (type) {
     case 'JOIN':
-      body = '새로운 A/S 요청이 접수되었습니다.\n' + summary + '\nhttp://211.238.39.148:4183';
+      body = '새로운 A/S 요청이 접수되었습니다.\n' + summary + '\nhttp://115.68.114.16:4183';
       break;
     case 'STATUS':
 
@@ -35,7 +35,7 @@ exports.sendPush = function(type, area, summary, callback){
 
       }
 
-      body += _summary + '\nhttp://211.238.39.148:4183';
+      body += _summary + '\nhttp://115.68.114.16:4183';
       break;
     default:
   }
