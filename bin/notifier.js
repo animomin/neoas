@@ -8,6 +8,7 @@ var uuid = '4e5540984d63a374';
 var secret_key = 'M4scl7JziW';
 
 exports.sendPush = function(type, area, summary, callback){
+  if(global.debugMode) return callback();
   var body = '';
   var _summary = '';
   switch (type) {

@@ -39,7 +39,7 @@ var NeoClient = {
 
       _this.socket.emit(SOCKETEVENT.CLIENT.JOIN, {id : _this.room, area : _this.area, data: _this.summary});
       _this.serviceStatus = ConstServiceStatus.RECEIPT;
-      _this._ServiceTimeout();
+      //_this._ServiceTimeout();
     });
 
 
@@ -161,6 +161,22 @@ var NeoClient = {
 
     _this.timer = setTimeout(function(){
       var _this = NeoClient;
+      neoAJAX.GetAjax({
+        url: 'clients/autostatus',
+        data: {
+          index : _this.room
+        },
+        dataType: 'json',
+        async: true,
+        method: 'PUT',
+        beforeSend : function(){},
+        success : function(opt, _records){
+
+        },
+        callback : function(){
+
+        }
+      })
       var sendData = {
         item : _this.room,
         status : ConstServiceStatus.TAKEOVER,
