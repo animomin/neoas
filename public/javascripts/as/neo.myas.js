@@ -531,17 +531,18 @@
           }
           _me.listData.data[_me.options.workTab][_this.id] = _this.data = cData;
           /* 소캣으로 클라이언트(상태변경), 다른 직원들에게 메시지 전송 (인계) */
-          $.neoSocket.emitChangeStatus({id : _this.data.인덱스, status : _this.data.서비스상태, item : {
-            확인일자 : _this.data.확인일자,
-            확인자 : _this.data.확인자,
-            확인자연락처 : _this.data.확인자연락처,
-            인계일자 : _this.data.인계일자,
-            인계자 : _this.data. 인계자,
-            인계자연락처 : _this.data.인계자연락처,
-            처리일자 : _this.data.처리일자,
-            처리자  : _this.data.처리자,
-            처리자연락처 : _this.data.처리자연락처
-          } });
+          $.neoSocket.emitChangeStatus({id : _this.data.인덱스, status : _this.data.서비스상태, item :_this.data });
+          // $.neoSocket.emitChangeStatus({id : _this.data.인덱스, status : _this.data.서비스상태, item : {
+          //   확인일자 : _this.data.확인일자,
+          //   확인자 : _this.data.확인자,
+          //   확인자연락처 : _this.data.확인자연락처,
+          //   인계일자 : _this.data.인계일자,
+          //   인계자 : _this.data. 인계자,
+          //   인계자연락처 : _this.data.인계자연락처,
+          //   처리일자 : _this.data.처리일자,
+          //   처리자  : _this.data.처리자,
+          //   처리자연락처 : _this.data.처리자연락처
+          // } });
 
           /* listData에서 해당데이터를 이동시킨다 */
           // _me.listData.MoveData(_this.data, function(){
@@ -800,14 +801,49 @@
         Tmplt = '<span id="template"><h3>1. 문의내용 ( 병원용 )</h3><span id="question"><p><br></p></span><h3>2. 확인내용 ( 담당자용 )</h3><p><br></p><h3>3. 처리내용 </h3><p><br></p></p></span>';
         TmpltTable ='<table id="personInfo" class="table table-bordered small"><tbody><tr><td>접수자 정보<br></td><td>확인자 정보<br></td><td>인계자 정보<br></td><td>처리자 정보<br></td></tr><tr><td><span id="iaccept"></span><br></td><td><span id="iconfirm"></span><br></td><td><span id="itakeover"></span><br></td><td><span id="idone"></span><br></td></tr></tbody></table>';
 
-        if(item){
+        if(!item){
+          return target.summernote('code', Tmplt + TmpltTable);
+        }
 
-          var question = item.문의내용.trim();
-          if(question.indexOf('<span id="template">') >= 0){
-            target.summernote('code', question + TmpltTable);
+        if(item.문의내용.trim() !== ""){return _drawComment(item.문의내용.trim());}
+
+        neoAJAX.GetAjax({
+          url: '/as/history',
+          data: {
+            index : item.인덱스 ,
+            mode : 0
+          },
+          dataType: 'json',
+          async: true,
+          method: 'GET',
+          beforeSend : function(){},
+          success : function(opt, _records){
+            if(_records.err){
+              target.summernote('code', Tmplt + TmpltTable);
+              return neoNotify.Show({
+                title : '나의 A/S [문의내용 로드 실패]',
+                text : _records.err === 'NODATA' ? _NODATA : _records.err.message,
+                desktop : false
+              });
+            }
+            _drawComment(_records.data[0].문의내용.trim());
+          },
+          callback : function(){
+            if(typeof callback === 'function'){
+              return callback();
+            }else{
+              return;
+            }
+          }
+        });
+        function _drawComment(comment){
+          var comment = comment.trim();
+          _me.selItem.data.문의내용 = comment;
+          if(comment.indexOf('<span id="template">') >= 0){
+            target.summernote('code', comment + TmpltTable);
           }else{
             target.summernote('code', Tmplt + TmpltTable);
-            $('span#question').html(item.문의내용.trim());
+            $('span#question').html(comment);
           }
 
           // $('span#confirm').html(item.확인내용.trim());
@@ -845,21 +881,6 @@
             '처리자 연락처 : ' + item.처리자연락처.trim() + '<br>' +
             '처리일자 : ' + (item.처리자ID === 0 ?  "" : item.처리일자.trim())
           );
-
-
-          //item.문의내용 = $('span#question').html();
-
-        }else{
-          target.summernote('code', Tmplt + TmpltTable);
-          // target.summernote('insertNode', $(TmpltTable));
-        }
-
-
-
-        if(typeof callback === 'function'){
-          return callback();
-        }else{
-          return;
         }
       },
       GetComment : function(){

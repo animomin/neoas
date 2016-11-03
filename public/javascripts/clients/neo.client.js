@@ -10,6 +10,8 @@ var NeoClient = {
   status : false,
   room : null,
   area : null,
+  data : null,
+  summary : null,
   timer : null,
   receiveData : null,
   serviceStatus : null,
@@ -24,7 +26,18 @@ var NeoClient = {
       console.log('Socket is connected!');
       _this.status = true;
       // _this.socket.emit('join', {type : 'CLIENT', id : _this.room, area: _this.area});
-      _this.socket.emit(SOCKETEVENT.CLIENT.JOIN, {id : _this.room, area : _this.area});
+      _this.summary = _this.room + ' ';
+      if(_this.data.astype[0] == 1){
+        _this.summary += "[장애] ";
+      }else if(_this.data.astype[0] == 2){
+        _this.summary += "[사용법] ";
+      }else{
+        _this.summary += "[선택없음] ";
+      }
+      _this.summary += _this.data.hospname[0];
+
+
+      _this.socket.emit(SOCKETEVENT.CLIENT.JOIN, {id : _this.room, area : _this.area, data: _this.summary});
       _this.serviceStatus = ConstServiceStatus.RECEIPT;
       _this._ServiceTimeout();
     });

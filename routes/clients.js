@@ -7,8 +7,8 @@ router.get('/', function(req, res, next) {
   var ip =  req.headers["X-Forwarded-For"] || req.headers["x-forwarded-for"] || req.client.remoteAddress;
   console.log(ip);
   if(ip.indexOf('211.238.39.148') >= 0 || ip.indexOf('::1') >= 0 ){
-     //res.render('client', params.GetASClientParams(req));
-     res.render('client/accept');
+     res.render('client', params.GetASClientParams(req));
+     //res.render('client/accept');
     // res.render('client/client_index');
   }else{
    res.render('client/main', params.GetASClientParams(req));
@@ -69,7 +69,7 @@ router.post('/require', function(req, res, next){
         client.Accept(fields, function(err, data){
           if(err) logger.error('AS Require insert FAILED :: ', err);
           if(!err){
-            res.render('client/room', {bodyClass : "", index : data[0].index, area : fields.area});
+            res.render('client/room', {bodyClass : "", index : data[0].index, area : fields.area, data : fields});
           }
         });
       });

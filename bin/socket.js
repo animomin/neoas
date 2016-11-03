@@ -23,7 +23,7 @@
     };
 
     var io = global.io;
-
+    var noti = require('./notifier');
     var extend = util._extend;
 
     var socketManager = {
@@ -174,7 +174,6 @@
 
     io.on('connection', function(socket){
       console.log('NEW CONNECTION ', socket.handshake.address);
-      console.log(io);
       /**
        * JOIN EVENT
        */
@@ -187,6 +186,11 @@
       socket.on(SOCKETEVENT.CLIENT.JOIN, function(data){
         sckClients.add(data, socket, function(item){
           socket.broadcast.emit(SOCKETEVENT.MEMBER.CLIENTS, {TYPE:'JOIN', CLIENTS : sckClients.slot, NEW : item});
+          console.log("==========================================");
+          console.log(data);
+          noti.sendPush('JOIN',item.area, data.data, function(){
+            console.log('COOL!');
+          });
         });
       });
 
@@ -317,16 +321,20 @@
        */
       socket.on(SOCKETEVENT.STATUS, function(data){
         console.log(SOCKETEVENT.STATUS);
+        console.log(data);
         sckClients.find(data.id, function(item){
           if(item[0]) io.to(item[0].socket).emit(SOCKETEVENT.STATUS, {TYPE : 'STATUS', STATUS : data.status, item : data.item});
         });
-        console.log('MEMBER SEARCH');
         sckMember.slot.forEach(function(item){
-          console.log(item);
           if(item.socket != socket.id){
             io.to(item.socket).emit(SOCKETEVENT.STATUS, {TYPE : 'STATUS', STATUS : data.status, item : data});
           }
         });
+        if(data.status === global.ASSTATUS.DONE){
+          noti.sendPush('STATUS', data.item['지사코드'], data.item, function(){
+            console.log('COOL!');
+          });
+        }
 
       });
 

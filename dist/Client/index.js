@@ -59,6 +59,7 @@
         where = " AND 인덱스 = " + req.query.id;
         orderby = " 인덱스 ASC ";
         query = util.format(query, where, orderby);
+        query = query.replace('{문의내용}', '문의내용');
         if (server16.connection.connected) {
             server16.RecordSet(query, function(err, records) {
                 if (err) {
@@ -85,16 +86,18 @@
             function(callback2) {
                 query = querys16._RequestList;
                 if (params.type === 'TAKEOVER') {
+                    query = query.replace('{문의내용}','문의내용');
                     where = ' AND 서비스상태 = ' + ASSTATUS.TAKEOVER;
                     where += ' AND ISNULL(처리자ID,0) = 0 ';
                     where += ' AND 프로그램 = ' + params.emr;
                     orderby = ' 응급여부 DESC, CONVERT(char(10),접수일자,120) DESC ';
                 } else if (params.type === 'MYAS') {
+                    query = query.replace('{문의내용}',"'' AS 문의내용");
                     where = ' AND 서비스상태 IN (' + params.status + ') ';
                     where += ' AND ISNULL(처리자ID,0) = ' + params.user;
                     orderby = ' 응급여부 DESC, CONVERT(char(10),접수일자,120) DESC ';
                 } else if (params.type === 'HISTORY') {
-
+                    query = query.replace('{문의내용}',"'' AS 문의내용");
                     where = " And ( ";
                     where += "        접수자 like '%" + params.search + "%' Or ";
                     where += "        확인자 like '%" + params.search + "%' Or ";
@@ -113,6 +116,7 @@
                     orderby = " 접수일자 DESC, 서비스상태";
 
                 } else {
+                    query = query.replace('{문의내용}',"'' AS 문의내용");
                     switch (params.status) {
                         case ASSTATUS.ACCEPT:
                             where = " AND ( CONVERT(char(10), 접수일자, 120) = '" + params.date + "' OR 서비스상태 = " + ASSTATUS.ACCEPT + ") ";
