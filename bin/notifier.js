@@ -17,7 +17,7 @@ exports.sendPush = function(type, area, summary, callback){
   var _summary = '';
   switch (type) {
     case 'JOIN':
-
+      if(typeof summary === 'undefined') return callback();
       body = '새로운 A/S 요청이 접수되었습니다.\n' + summary + '\nhttp://115.68.114.16:4183';
       break;
     case 'STATUS':
@@ -64,7 +64,7 @@ exports.sendPush = function(type, area, summary, callback){
       form: {
         'uuid' : global.debugMode ? testPush.uuid : uuid,
         'secret_key' : global.debugMode ? testPush.secret_key : secret_key,
-        'code' : global.debugMode ? 'neotest0000' : typeof summary === 'undefined' ? 'neotest0000' : 'neosoftbank' + area,
+        'code' : global.debugMode ? 'neotest0000' : 'neosoftbank' + area,
         'body' : body
       }
   };

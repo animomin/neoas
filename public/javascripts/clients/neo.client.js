@@ -24,7 +24,7 @@ var NeoClient = {
     _this.socket = io.connect();
     _this.socket.on('connect', function(){
       console.log('Socket is connected!');
-      _this.status = true;
+      //_this.status = true;
       // _this.socket.emit('join', {type : 'CLIENT', id : _this.room, area: _this.area});
       _this.summary = _this.room + ' ';
       if(_this.data.astype[0] == 1){
@@ -37,12 +37,14 @@ var NeoClient = {
       _this.summary += _this.data.hospname[0];
 
 
-      _this.socket.emit(SOCKETEVENT.CLIENT.JOIN, {id : _this.room, area : _this.area, data: _this.summary});
+      _this.socket.emit(SOCKETEVENT.CLIENT.JOIN, {id : _this.room, area : _this.area, data: _this.summary, status : _this.status});
       _this.serviceStatus = ConstServiceStatus.RECEIPT;
       //_this._ServiceTimeout();
     });
 
-
+    _this.socket.on(SOCKETEVENT.CLIENT.JOIN,function(data){
+      _this.status = true;
+    });
     _this.socket.on(SOCKETEVENT.CLIENT.LIVEAS, function(data){
       _this.receiveData = data;
       $('#as_command').html(data.params);
@@ -82,6 +84,10 @@ var NeoClient = {
         $('.as-cancel').addClass('hidden');
         $('.as-done').removeClass('hidden');
         //$('title').html('LIVEASEND');
+        setTimeout(function(){
+          NeoClient._DisConnect(true);
+          location.href = '/clients';
+        },60000);
         return;
       }
 

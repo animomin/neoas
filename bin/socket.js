@@ -186,11 +186,11 @@
       socket.on(SOCKETEVENT.CLIENT.JOIN, function(data){
         sckClients.add(data, socket, function(item){
           socket.broadcast.emit(SOCKETEVENT.MEMBER.CLIENTS, {TYPE:'JOIN', CLIENTS : sckClients.slot, NEW : item});
-          console.log("==========================================");
-          console.log(data);
-          noti.sendPush('JOIN',item.area, data.data, function(){
-            console.log('COOL!');
-          });
+          if(!data.status){
+            noti.sendPush('JOIN',item.area, data.data, function(){
+              socket.emit(SOCKETEVENT.CLIENT.JOIN, {TYPE: 'JOIN'});
+            });
+          }
         });
       });
 
