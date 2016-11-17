@@ -252,8 +252,8 @@
     SUM(CASE WHEN 서비스상태 &gt;= 1 AND 서비스상태 &lt;= 3 THEN 1 ELSE 0 END) AS 미완료,
     SUM(CASE WHEN 서비스상태 = 4 THEN 1 ELSE 0 END) AS 완료,
     SUM(CASE WHEN 서비스상태 = 5 THEN 1 ELSE 0 END) AS 취소,
-    SUM(CASE WHEN 서비스상태 = 4 AND 응급여부 = 0 AND 인계자지사 = 지사코드 AND ISNULL(본사AS,0) = 0 THEN 1 ELSE 0 END) AS 인계,
-    SUM(CASE WHEN 서비스상태 = 4 AND 응급여부 = 1 AND 인계자지사 = 지사코드 AND ISNULL(본사AS,0) = 0 THEN 1 ELSE 0 END) AS 응급
+    SUM(CASE WHEN 서비스상태 = 4 AND 응급여부 = 0 AND 인계자지사 = 지사코드 AND 인계자지사 &lt;&gt; 처리자지사 AND ISNULL(인계자ID,0) &lt;&gt; 0 AND ISNULL(본사AS,0) = 0 THEN 1 ELSE 0 END) AS 인계,
+    SUM(CASE WHEN 서비스상태 = 4 AND 응급여부 = 1 AND 인계자지사 = 지사코드 AND 인계자지사 &lt;&gt; 처리자지사 AND ISNULL(인계자ID,0) &lt;&gt; 0 AND ISNULL(본사AS,0) = 0 THEN 1 ELSE 0 END) AS 응급
     FROM NeoAs..N_Service
     WHERE 1=1
     %s

@@ -645,6 +645,7 @@
         elem.$keyword = $('input#keyword');
         elem.$search = $('button#btnSearch');
         elem.$print = $('button#btnPrint');
+        elem.$excel = $('button#btnExcel');
         elem.$table = $('table#data-table');
 
 
@@ -656,6 +657,7 @@
         var searchClick = function(e) { me.events.btnSearch_OnClick(e, me); };
         var keywordKeyUp = function(e) { me.events.Keyword_OnKeyUp(e, me); };
         var printClick = function(e){me.events.print_OnClick(e.target, me);};
+        var excelClick = function(e){me.events.excel_OnClick(e.target, me);};
 
         elem.$date.bind('change', dateChange);
         elem.$quickDate.bind('click', quickDateClick);
@@ -663,6 +665,7 @@
         elem.$view_mode.bind('click', viewClick);
         elem.$search.bind('click', searchClick);
         elem.$print.bind('click', printClick);
+        elem.$excel.bind('click', excelClick);
         elem.$keyword.bind('keyup', keywordKeyUp);
 
 
@@ -741,6 +744,13 @@
                 console.log(_this.history);
                 window.historyData = _this.history;
                 window.open('print', 'popUpWindow');
+            },
+            excel_OnClick : function(target, _this){
+                console.log(_this.history);
+                window.historyData = _this.history;
+                window.neo = neo;
+                window.ASSTATUS = ASSTATUS;
+                window.open('excel', 'popUpWindow');
             }
         },
         init: function() {

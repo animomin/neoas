@@ -145,6 +145,9 @@ router.get('/manage/:mode', function(req, res,next){
 router.get('/print', function(req, res, next){
   res.render('print.jade');
 });
+router.get('/excel', function(req, res,next){
+  res.render('excel.jade');
+})
 
 
 module.exports = router;
