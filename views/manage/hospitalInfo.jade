@@ -1,0 +1,27 @@
+div.row.border-bottom.white-bg.dashboard-header
+  div.col-sm-12
+    h4 
+      i.fa.fa-hospital-o
+      |  병원정보 
+    div.panel-body#hospital-info
+      
+
+    h4 
+      i.fa.fa-sticky-note-o
+      |  특이사항
+      button.btn.btn-primary.btn-xs.btn-outline(data-toggle="modal",data-target="#hospital-uniq-dialog")
+        i.fa.fa-edit      
+    table.table.table-bordered.small.hospital-info
+      tbody
+        tr
+          th.tb-header 고객유형
+          td(data-id='병원유형')
+        tr
+          th.tb-header 전산담당
+          td(data-id='전산담당')
+        tr
+          th.tb-header 결제담당
+          td(data-id='결제담당')                       
+        tr
+          th.tb-header 메모              
+          td(data-id='메모')    

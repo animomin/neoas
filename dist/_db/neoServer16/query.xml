@@ -88,6 +88,33 @@
          End
       End
 
+      IF NOT EXISTS(Select Name From SYS.TABLES WHERE name = 'N_병원일지')
+        BEGIN
+          CREATE TABLE N_병원일지(
+            인덱스 int not null identity(1,1) primary key,
+            USER_ID int not null,
+            기관코드 varchar(8) not null,
+            기관명칭 nvarchar(100) not null,
+            프로그램 nvarchar(15) null,
+            일지구분 tinyint not null,
+            내용 ntext null,
+            작성자 int not null,
+            작성일자 datetime not null,
+            삭제 bit default 0
+          )
+        END
+      
+      IF NOT EXISTS(Select Name From SYS.TABLES WHERE name = 'N_병원특이사항')
+        BEGIN
+          CREATE TABLE N_병원특이사항(
+            USER_ID int not null primary key,
+            병원유형 tinyint null,
+            전산담당 nvarchar(200) null,
+            결제담당 nvarchar(200) null,            
+            메모 ntext null
+          )
+        END
+
       SELECT '200' AS STATUS, '데이터베이스 업데이트 완료' AS Message
     END TRY
     BEGIN CATCH
@@ -303,4 +330,59 @@
     GROUP BY 프로그램,CASE WHEN ISNULL(실행파일,'') = '' THEN '기타' ELSE 실행파일 END
     ORDER BY 프로그램, 발생건수 DESC
   </_RankEmr>
+  <_HospitalManageHistory>
+    Select 인덱스, USER_ID, 기관코드, 기관명칭, 프로그램, 작성자, CONVERT(char(19),작성일자 ,120) AS 작성일자, '' AS 내용
+    From NeoAs..N_병원일지
+    Where 일지구분 = 0
+    {{일지조건}}
+    Order By 작성일자 DESC;
+    Select 인덱스, USER_ID, 기관코드, 기관명칭, 프로그램, 작성자, CONVERT(char(19),작성일자 ,120) AS 작성일자, '' AS 내용 
+    From NeoAs..N_병원일지
+    Where 일지구분 = 1
+    {{일지조건}}
+    Order By 작성일자 DESC;
+    Select 인덱스, 기관코드, 기관명칭, 프로그램, 접수자, CONVERT(char(19),접수일자 ,120) AS 접수일자 , 처리자, 서비스상태, '' AS 내용
+    From NeoAs..N_Service
+    Where 1 = 1
+    {{AS조건}}
+    Order By 접수일자 DESC
+  </_HospitalManageHistory>
+  <_HospitalManageHistory_SAVE>
+    Begin Try
+      Insert Into NeoAS..N_병원일지(USER_ID, 기관코드, 기관명칭, 프로그램, 일지구분, 내용, 작성자, 작성일자)
+      Values(%s, '%s', '%s', '%s', %s, '%s', %s, GETDATE())
+      Select 0 As Status, 'SUCCESS' as Message 
+    End Try
+    Begin CATCH
+      SELECT ERROR_NUMBER() AS Status, ERROR_MESSAGE() AS Message;
+    END CATCH    
+  </_HospitalManageHistory_SAVE>
+  <_HospitalManageInfo>
+    SELECT 병원유형, 전산담당, 결제담당, 메모 FROM NeoAS..N_병원특이사항
+    WHERE USER_ID = %s
+  </_HospitalManageInfo>
+  <_HospitalManageInfo_SAVE>
+    BEGIN Try
+      IF EXISTS ( SELECT USER_ID FROM N_병원특이사항 WHERE USER_ID = %s)
+        BEGIN
+          DELETE FROM N_병원특이사항 WHERE USER_ID = %s
+        End
+      
+      INSERT INTO NeoAS..N_병원특이사항(USER_ID,병원유형, 전산담당, 결제담당, 메모)
+      VALUES (%s)
+      Select 0 As Status, 'SUCCESS' as Message 
+    End Try
+    Begin CATCH
+      SELECT ERROR_NUMBER() AS Status, ERROR_MESSAGE() AS Message;
+    END CATCH  
+
+  </_HospitalManageInfo_SAVE>  
+  <_HospitalManageHistoryDetail>
+    SELECT 내용 FROM NEOAS..N_병원일지 
+    WHERE 인덱스 = {{KEY}}
+  </_HospitalManageHistoryDetail>
+  <_HospitalManageHistoryDetail_AS>
+    SELECT 문의내용 AS 내용 FROM NEOAS..N_Service
+    WHERE 인덱스 = {{KEY}}
+  </_HospitalManageHistoryDetail_AS>
 </query>

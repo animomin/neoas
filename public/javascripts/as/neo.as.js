@@ -179,7 +179,7 @@
             target_list : _me.elem.list.$accept,
             target_tab : _me.elem.list.$acceptTab,
             beforeSend : _beforeSend,
-            url : 'clients/list',
+            url : '/clients/list',
             data : {
               date : _me.options.workDate,
               // status : _me.options.workState,
@@ -206,7 +206,7 @@
           target_list : _me.elem.list.$working,
           target_tab : _me.elem.list.$workingTab,
           beforeSend : _beforeSend,
-          url : 'clients/list',
+          url : '/clients/list',
           data : {
             status : _me.elem.list.$workingTab.data('type'),
             search : this.search || '',
@@ -231,7 +231,7 @@
            target_list : _me.elem.list.$cancel,
            target_tab : _me.elem.list.$cancelTab,
            beforeSend : _beforeSend,
-           url : 'clients/list',
+           url : '/clients/list',
            data : {
              status : _me.elem.list.$cancelTab.data('type'),
              search : this.search || '',
@@ -689,7 +689,7 @@
         var options = {
           target_list : _this.$list,
           beforeSend : _beforeSend,
-          url : 'clients/list',
+          url : '/clients/list',
           data : {
             type : 'HISTORY',
             search : _this.search

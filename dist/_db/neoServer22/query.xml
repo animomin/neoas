@@ -23,4 +23,61 @@
     ON U.user_id = i.info_user_id
     Where U.user_med_id = '%s'
   </_HospInfo>
+  <_HospitalList>
+    Select %s
+    From NC_H_USER AS H
+    INNER JOIN NC_H_INFO AS I
+    ON H.USER_ID = I.info_user_id
+    LEFT JOIN NC_N_CODE AS C
+    ON H.user_program = C.데이터1
+    AND C.코드구분 = '프로그램'
+    Where 1 = 1
+    AND H.USER_CLOSED = 0
+    %s
+    Order By %s
+  </_HospitalList>
+  <_HospitalInfo>
+    Select h.user_id, h.user_med_id as 기관코드, h.user_med_name as 기관명칭, isnull(cc.코드이름,'미정') AS 진료과목, isnull(c.코드이름,'미정') as 프로그램,
+			isnull(u.user_name,'미정') as 담당자, i.info_president as 대표자, isnull(i.info_tel,'-') as 전화번호, isnull(i.info_fax,'-') as 팩스번호, isnull(i.info_hp,'-') as 핸드폰번호,
+			isnull(i.info_post,'') AS 우편번호, isnull(i.info_juso,'') as 주소, isnull(i.info_email,'') as 이메일, i.INFO_AREA as 지사코드
+    from nc_h_user as h
+  	inner join nc_h_info as i
+  	on h.user_id = i.info_user_id
+  	left join nc_n_user as u
+  	on h.user_담당자 = u.user_id
+  	left join NC_N_CODE as c
+  	on h.user_program = c.데이터1
+  	and c.코드구분 = '프로그램'
+  	left join NC_N_CODE as cc
+  	on h.user_gwa = cc.데이터1
+  	and cc.코드구분 = '과별코드'
+    Where H.USER_ID = %s;
+
+    SELECT C.코드이름 + ' ('+ C.데이터3 + ')' AS 부가서비스 
+    FROM 
+      (
+        SELECT A.코드이름, A.데이터1, A.데이터3, CONVERT(INT,B.데이터1) AS 분류코드  
+        FROM (SELECT * FROM NC_N_CODE WHERE 코드구분 = '부가서비스' ) AS A 
+        LEFT JOIN ( SELECT * FROM NC_N_CODE WHERE 코드구분 = '부가서비스분류' ) AS B  
+        ON A.데이터2 = B.데이터1 
+      ) AS C  
+    LEFT JOIN  (SELECT * FROM NC_H_부가서비스 WHERE 거래처ID =  %s) AS D  
+    ON D.서비스ID = CONVERT(INT,C.데이터1)
+    WHERE GETDATE() BETWEEN D.시작일자 AND D.종료일자
+    ORDER BY C.분류코드
+  </_HospitalInfo>
+  <HospitalExtraService>
+    SELECT C.코드이름 + ' ('+ C.데이터3 + ')' AS 부가서비스 
+    FROM 
+      (
+        SELECT A.코드이름, A.데이터1, A.데이터3, CONVERT(INT,B.데이터1) AS 분류코드  
+        FROM (SELECT * FROM NC_N_CODE WHERE 코드구분 = '부가서비스' ) AS A 
+        LEFT JOIN ( SELECT * FROM NC_N_CODE WHERE 코드구분 = '부가서비스분류' ) AS B  
+        ON A.데이터2 = B.데이터1 
+      ) AS C  
+    LEFT JOIN  (SELECT * FROM NC_H_부가서비스 WHERE 거래처ID =  %s) AS D  
+    ON D.서비스ID = CONVERT(INT,C.데이터1)
+    WHERE GETDATE()
+    ORDER BY C.분류코드 
+  </HospitalExtraService>
 </query>

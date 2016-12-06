@@ -37,7 +37,7 @@
                     target_list: _me.elem.list.lists[neo.emrs[20].name],
                     target_tab: _me.elem.list.tabs[neo.emrs[20].name],
                     beforeSend: _beforeSend,
-                    url: 'clients/list',
+                    url: '/clients/list',
                     data: {
                         type: 'TAKEOVER',
                         status: ASSTATUS.TAKEOVER,
@@ -61,7 +61,7 @@
                     target_list: _me.elem.list.lists[neo.emrs[8].name],
                     target_tab: _me.elem.list.tabs[neo.emrs[8].name],
                     beforeSend: _beforeSend,
-                    url: 'clients/list',
+                    url: '/clients/list',
                     data: {
                         type: 'TAKEOVER',
                         status: ASSTATUS.TAKEOVER,
@@ -85,7 +85,7 @@
                     target_list: _me.elem.list.lists[neo.emrs[1].name],
                     target_tab: _me.elem.list.tabs[neo.emrs[1].name],
                     beforeSend: _beforeSend,
-                    url: 'clients/list',
+                    url: '/clients/list',
                     data: {
                         type: 'TAKEOVER',
                         status: ASSTATUS.TAKEOVER,

@@ -174,7 +174,7 @@
 
     ];
     var NeoManage = function(menu) {
-        var _menu = menu;
+        var _menu = parseInt(menu);
         var _me = this;
 
         var manage = null;
@@ -256,7 +256,7 @@
         Load : function(opt){
           var _this = this;
           neoAJAX.GetAjax({
-            url : '/manage/total',
+            url : '/rank/total',
             data : {
               month : opt.month
             },
@@ -297,7 +297,7 @@
           var _this = this;
 
           neoAJAX.GetAjax({
-            url : '/manage/area',
+            url : '/rank/area',
             data : {
               month : opt.month
             },
@@ -473,7 +473,7 @@
         Load : function(opt){
           var _this = this;
           neoAJAX.GetAjax({
-            url : '/manage/member',
+            url : '/rank/member',
             data : {
               month : opt.month
             },
@@ -811,7 +811,7 @@
             });
 
             neoAJAX.GetAjax({
-                url: '/as/history',
+                url: 'history',
                 data: options,
                 dataType: 'json',
                 async: true,
@@ -899,7 +899,7 @@
                           }).value;
 
                           neoAJAX.GetAjax({
-                            url: '/as/history',
+                            url: 'history',
                             data: {
                               index : _index ,
                               mode : 0

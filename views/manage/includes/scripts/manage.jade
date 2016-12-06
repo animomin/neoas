@@ -1,0 +1,94 @@
+script(src='/plugins/bootstrap-select/dist/js/bootstrap-select.min.js')
+script(src='/plugins/bootstrap-select/dist/js/i18n/defaults-ko_KR.min.js')
+script(src='/plugins/datepicker/js/bootstrap-datepicker.js')
+script(src='/plugins/datepicker/js/bootstrap-datepicker.kr.js')
+script(src='/plugins/footable-bootstrap/js/footable.js')
+script(src='/plugins/pnotify-master/dist/pnotify.custom.min.js')
+//- script(src='/plugins/pnotify-master/dist/pnotify.desktop.js')
+
+script(src='/plugins/summernote/dist/summernote.js')
+script(src='/plugins/summernote/dist/lang/summernote-ko-KR.min.js')
+script(src='/plugins/sweetalert2/dist/sweetalert2.min.js')    
+script(src='/plugins/sweetalert2/dist/es6-promise.min.js')
+script(src='/plugins/split.js/split.js')   
+
+script(src='/javascripts/neo.modules.js')
+script(src='/javascripts/neo.notify.js')
+script(src='/javascripts/manage/neo.manage.js')
+
+script.  
+  var mobile;
+  $(document).ready(function(){
+    mobile = isMobile.any();
+    
+    
+    
+    $('[data-toggle="tooltip"]').tooltip(); 
+    
+    $('#page-wrapper').addClass('no-padding');
+    //- mobile = true;
+    /**
+     * Set Layout 
+     */
+    var menu = neo.menu;
+    neoModules.SetLayout(menu, $('#workspace'), function(){
+      Split(['#left','#right'], {
+        gutterSize : 3,
+        cursor: 'col-resize',
+        sizes : [20,80]
+      });
+      //- Split(['#right-col1', '#right-col2'], {
+      //-   gutterSize : 3,
+      //-   direction : 'vertical',
+      //-   sizes: [30,70],
+      //-   cursor : 'row-resize'
+      //- });
+      neoModules.SetElementHeight();     
+      var Manage = function(){
+        this.storage = new manage.Storage();
+        this.model = new manage.Model(this.storage);
+        this.template = new manage.Template();
+        this.view = new manage.View(this.template);
+        this.controller = new manage.Controller(this.model, this.view);
+      }
+      
+      $.Manage = new Manage();
+    });       
+    
+    $(window).bind("load resize scroll", function () {
+        //- if (!$("body").hasClass('body-small')) {
+            neoModules.SetElementHeight();
+        //- }
+        if(menu === MENU.MANAGE_STATUS || menu === MENU.MANAGE_STATISTIC){
+        //-   var height = $(window).height() - 110;
+        //-   $('#workspace').height(height);
+          var workspace = $('#workspace');
+              workspace.css('overflow','overlay');
+        }
+        
+    });
+    Pace.options = {
+      ajax: false
+    };
+    Pace.on('hide', function(){
+        $('#workspace').removeClass('hidden');
+        //- tour.start();
+        
+    });  
+
+     
+
+  });
+  
+  window.onload = function(){
+    var Manage = function(){
+        this.storage = new manage.Storage();
+        this.model = new manage.Model(this.storage);
+        this.template = new manage.Template();
+        this.view = new manage.View(this.template);
+        this.controller = new manage.Controller(this.model, this.view);
+      }
+      
+      $.Manage = new Manage();
+  }
+  

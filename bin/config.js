@@ -79,7 +79,7 @@
           STATUS : true,
           title : 'NeoSoftBank AS',
           body : "gray-bg fixed-nav",
-          menu : req.query.menu || page.MENU.REQUEST,
+          menu : req.params.menu || page.MENU.REQUEST,
           user : req.session.user
         };
 

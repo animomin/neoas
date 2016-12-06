@@ -33,7 +33,7 @@ script.
     /**
      * Set Layout 
      */
-    var menu = parseInt(sessionStorage.getItem('menu')) || neo.menu;
+    var menu = neo.menu;
     neoModules.SetLayout(menu, $('#workspace'));      
     $($('a.navbar-as[data-as="'+menu+'"]').parent()).addClass('active').siblings().removeClass('active');
     

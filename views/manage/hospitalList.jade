@@ -1,0 +1,21 @@
+div.panel-heading.no-padding
+  div.form-group.m-b-xs.m-t-xs.m-l-xs.m-r-xs    
+    div.input-group        
+      span.input-group-btn
+        button.btn.btn-sm.btn-default#area-all 전체        
+      span.input-group-addon.hidden
+        i.fa.fa-search
+
+      input.input.input-sm.form-control#search(
+        type='text',
+        placeholder='요양기관검색')                
+    
+div.sidebar-container
+  div.scroll-container(data-name='hospital-list')      
+    table.table.table-hover.table-condensed.table-bordered.table-responsive
+      thead
+        tr
+          th N
+          th Name /Code          
+          th Act.
+      tbody#hospital-list    

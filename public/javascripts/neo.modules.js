@@ -79,6 +79,12 @@
         }
 
         switch (format) {
+            case "YYYY":
+                return yyyy;
+            case "MM":
+                return MM;
+            case "DD":
+                return dd;
             case "YYYY년 MM월":
                 return yyyy + '년 ' + MM + "월";
             case "YYYY-MM":
@@ -176,7 +182,8 @@ var MENU = {
     TAKEOVER: 502,
     MYAS: 503,
     MANAGE_STATUS: 504,
-    MANAGE_STATISTIC: 505
+    MANAGE_STATISTIC: 505,
+    MANAGE : 601
 };
 
 var SETTINGS = {
@@ -187,12 +194,13 @@ var SETTINGS = {
  * Modules collections
  */
 var neoModules = {
-    SetLayout: function(menu, container) {
+    SetLayout: function(menu, container, callback) {
         var view = '',
             start;
         var m = mobile ? "_m" : "";
         var param = null;
-        switch (menu) {
+        callback = callback || function(){};
+        switch (parseInt(menu)) {
             case MENU.REQUEST:
                 view = 'as-request-layout';
                 start = $.neoAS;
@@ -215,6 +223,10 @@ var neoModules = {
                 view = 'as-manage-layout_rank';
                 start = $.neoMNG;
                 param = menu;
+                break;
+            case MENU.MANAGE:
+                view = 'manage-layout';
+                start = callback;
                 break;
             default:
                 view = 'as-request-layout';
@@ -301,7 +313,7 @@ var neoAJAX = {
         UpdateAS: function(elem, data, callback) {
             var result;
             $.ajax({
-                url: 'clients/updateas',
+                url: '/clients/updateas',
                 data: data,
                 dataType: 'json',
                 async: true,

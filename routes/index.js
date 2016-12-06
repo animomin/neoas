@@ -5,7 +5,7 @@ router.get('/', function(req, res, next) {
   if(!req.session.login){
     return res.redirect(page.users.login);
   }
-  res.redirect(page.as.index);
+  res.redirect(page.as.index + '/501');
 });
 
 router.get('/template/:template', function(req, res, next){
@@ -130,7 +130,7 @@ router.get('/apps/:mobile/:version', function(req, res, next){
   res.download(file);
 });
 
-router.get('/manage/:mode', function(req, res,next){
+router.get('/rank/:mode', function(req, res,next){
   var q;
   if(req.params.mode === 'total') q = querys16._RankTotal;
   if(req.params.mode === 'area') q = querys16._RankArea;

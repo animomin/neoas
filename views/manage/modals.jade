@@ -1,0 +1,48 @@
+div.modal.inmodal.fade#hospital-uniq-dialog(tabindex='-1', role='dialog', aria-hidden='true')
+  div.modal-dialog
+    div.modal-content      
+      div.modal-body
+        button.close(type='button',data-dismiss='modal')
+          span(aria-hidden='true') &times;
+          span.sr-only Close
+        h2 
+          i.fa.fa-sticky-note-o
+          |  특이사항
+        div.hr-line-dashed
+        h3#uniq-title
+        div#uniq-body        
+          div.form-group             
+            div.radio.radio-primary.radio-inline
+              input#uniq-type-0(type='radio', name='uniq-type', value='0')
+              label(for='uniq-type-0').font-bold.text-success 우수
+            div.radio.radio-inline
+              input#uniq-type-1(type='radio', name='uniq-type', value='1')
+              label(for='uniq-type-1') 보통
+            div.radio.radio-danger.radio-inline
+              input#uniq-type-2(type='radio', name='uniq-type', value='2')
+              label(for='uniq-type-2').font-bold.text-danger 주의
+          div.form-group
+            label.control-label 전산담당 :
+            //- select.form-control.neo-members#uniq-computation(data-title='전산담당')
+            input.input.form-control#uniq-computation(type='text')
+          div.form-group
+            label.control-label 결제담당 :
+            //- select.form-control.neo-members#uniq-payer(data-title='결제담당')
+            input.input.form-control#uniq-payer(type='text')
+          //- div.form-group
+          //-   label.control-label 부가서비스 :
+          //-   select.form-control#uniq-extra-service(multiple)
+          //-     option 전자인증
+          //-     option CRM
+          //-     option DB보안
+          //-     option 카드단말기
+          //-     option 자동심사체크
+          //-     option 드러그인포
+          //-     option 워킹챠트 
+          //-     option 홈페이지
+          div.form-group
+            label.control-label 메모 :
+            textarea.form-control#uniq-memo(rows=10,placeholder="Ex.\u000A원장은 전반적 만족.\u000A원무과 직원은 우호적.\u000A123번(link) 보류중, 확인하여 피드백 줄 것. ")
+      div.modal-footer
+        button.btn.btn-white(type='button', data-dismiss='modal') 닫기
+        button.btn.btn-primary(type='button' data-name='hospUniqSave') 저장

@@ -1,0 +1,35 @@
+div.row.white-bg.dashboard-header
+      div.form-inline.pull-right
+        div.form-group.m-r-xs
+          div.input-daterange.input-group
+            input.input-sm.form-control(type='text',data-name='start')
+            span.input-group-addon ~
+            input.input-sm.form-control(type='text',data-name='end')
+            span.input-group-btn
+              button.btn.btn-sm.btn-primary#history-search 검색
+          div.form-group.m-r-xs
+            div.btn-group
+              button.btn.btn-sm.btn-outline.btn-primary.history-quickDate(data-name='y') 어제
+              button.btn.btn-sm.btn-outline.btn-primary.history-quickDate(data-name='t') 오늘
+              
+      div.col-sm-12
+        div.tabs-container
+          ul.nav.nav-tabs
+            li.active 
+              a.history-tabs(href='#tab-1', data-toggle='tab') 방문              
+            li
+              a.history-tabs(href='#tab-2', data-toggle='tab') 전화
+            li
+              a.history-tabs(href='#tab-3', data-toggle='tab') 웹A/S
+          div.tab-content
+            div#tab-1.history-pane.tab-pane.active.fade.in
+              div.history-table-wrapper
+                table.history-table.table#history-table-visit(data-paging="true", data-sorting="true", data-filtering="true")
+            div#tab-2.history-pane.tab-pane.fade
+              div.history-table-wrapper
+                table.history-table.table#history-table-tel(data-paging="true", data-sorting="true", data-filtering="true")
+            div#tab-3.history-pane.tab-pane.fade
+              div.history-table-wrapper
+                table.history-table.table#history-table-web(data-paging="true", data-sorting="true", data-filtering="true")
+
+              

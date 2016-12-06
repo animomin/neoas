@@ -1,0 +1,41 @@
+extends ../layout_member
+block styles
+  include ./includes/styles/manage.jade  
+block content
+  div#wrapper
+    div.gray-bg#page-wrapper
+      //header include
+      include ../includes/templates/header.jade
+      
+      div#workspace 
+    //  
+      div.wrapper.wrapper-content.animated.fadeInRight
+        div.row
+          div.col-sm-4
+            div.ibox
+              div.ibox-content
+                div.input-group
+                  span.input-group-btn
+                    button.btn.btn-primary(type='button') 전체
+                  input.input.form-control(type='text', placeholder='요양기관 검색')       
+                div.clients-list
+                  div.full-height-scroll
+                    div.table-responsive
+                      table.table.table-striped.table-hover
+                        thead
+                          tr
+                            th N
+                            th Name /Code
+                            th EMR
+                        tbody#hospital-list
+                          tr
+                            td 1
+                            td 장수요양병원 / 34281402
+                            td 메디챠트
+                            
+          div.col-sm-8
+  include ./modals.jade
+
+block scripts
+  include ./includes/scripts/manage.jade  
+  

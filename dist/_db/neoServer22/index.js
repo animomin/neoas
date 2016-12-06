@@ -27,6 +27,7 @@ function disConnect(){
 
 exports.RecordSet = function(query, callback){
     var rs = new mssql.Request(connection);
+    rs.multiple = query.split(';').length > 1;
   	rs.query(query,function(err, recordset){
   		callback(err, recordset);
   	});

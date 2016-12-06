@@ -1,0 +1,17 @@
+div#left.split.split-horizontal.split-noscroll.white-bg 
+  include ./hospitalList.jade  
+div#right.split.split-horizontal.white-bg
+  div.page.animated.fadeInRight(data-page="history-main")
+    div.row
+      div.col-lg-8
+        include ./hospitalHistory.jade
+      div.col-lg-4
+        include ./hospitalInfo.jade             
+  div.page.hidden.animated.fadeInRight(data-page="history-write")
+    include ./hospitalHistoryWrite.jade        
+//-
+  div.page.animated.fadeInRight(data-page="history-main")
+    include ./hospitalInfo.jade             
+    include ./hospitalHistory.jade
+  div.page.hidden.animated.fadeInRight(data-page="history-write")
+    include ./hospitalHistoryWrite.jade

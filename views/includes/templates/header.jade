@@ -23,18 +23,21 @@ div.row.border-bottom
           //-   a.navbar-as(href='/manage', data-as='504') AS관리
           
           li(class=menu==501 ? 'active' : '')
-            a.navbar-as(href='/as', data-as='501') AS요청
+            a.navbar-as(href='/as/501', data-as='501') AS요청
           li(class=menu==502 ? 'active' : '')
-            a.navbar-as(href='/takeover', data-as='502') AS현황         
+            a.navbar-as(href='/as/502', data-as='502') AS현황         
           li(class=menu==503 ? 'active' :'')
-            a.navbar-as(href='/myas', data-as='503') 나의AS    
+            a.navbar-as(href='/as/503', data-as='503') 나의AS    
           li(class=menu==504 ? 'active' : '')
-                a.navbar-as(href='/manage', data-as='504') AS처리내역
+            a.navbar-as(href='/as/504', data-as='504') AS처리내역
           li(class=menu==505 ? 'active' : '')
-            a.navbar-as(href='/manage', data-as='505') AS통계              
+            a.navbar-as(href='/as/505', data-as='505') AS통계
+          - if(user.USER_ID === 89)    
+            li(class=menu==601 ? 'active' : '')
+              a.navbar-mngr(href='/manage', data-as='601') 거래처관리
+        ul.nav.navbar-nav.navbar-right 
           li
             a(href='/download/webpage?fdr=help&fle=neoas.pdf') 도움말
-        ul.nav.navbar-nav.navbar-right 
           li
             a#sign-out(href='/users/logout',onClick='localStorage.clear();')
               i.fa.fa-sign-out

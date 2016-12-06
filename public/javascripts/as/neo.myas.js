@@ -130,7 +130,7 @@
           target_list : _me.elem.list.lists.WORKING,
           target_tab : _me.elem.list.tabs.WORKING,
           beforeSend : _beforeSend,
-          url : 'clients/list',
+          url : '/clients/list',
           data : {
             // date : _me.options.workDate,
             type: 'MYAS',
@@ -154,7 +154,7 @@
           target_list : _me.elem.list.lists.DONE,
           target_tab : _me.elem.list.tabs.DONE,
           beforeSend : _beforeSend,
-          url : 'clients/list',
+          url : '/clients/list',
           data : {
             // date : _me.options.workDate,
             type: 'MYAS',
@@ -292,7 +292,7 @@
         var _this = _me.listData;
         var newItem;
         var options = {
-          url : 'clients/item',
+          url : '/clients/item',
           data : {id : newOne.id},
           dataType : 'json',
           async : true,
@@ -924,7 +924,7 @@
         var options = {
           target_list : _this.$list,
           beforeSend : _beforeSend,
-          url : 'clients/list',
+          url : '/clients/list',
           data : {
             type : 'HISTORY',
             search : _this.search
