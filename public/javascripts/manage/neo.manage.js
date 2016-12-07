@@ -723,7 +723,7 @@
       if(result.err){
 
       }else{
-        
+        result.data[0].내용 = result.data[0].내용.replace(/src="uploads/,'src="/uploads');
         item.target.find('td').empty().html(result.data[0].내용);
         // if($('.footable-details.history-table.table').hasClass('hidden')){
         //   $('.footable-details.history-table.table').removeClass('hidden');

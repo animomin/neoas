@@ -838,6 +838,7 @@
         });
         function _drawComment(comment){
           var comment = comment.trim();
+          comment = comment.replace(/src="uploads/,'src="/uploads');
           _me.selItem.data.문의내용 = comment;
           if(comment.indexOf('<span id="template">') >= 0){
             target.summernote('code', comment + TmpltTable);

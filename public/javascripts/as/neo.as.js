@@ -1117,6 +1117,8 @@
         });
         function _drawComment(comment){
           var comment = comment.trim();
+          comment = comment.replace(/src="uploads/,'src="/uploads');
+
           _me.selItem.data.문의내용 = comment;
           if(comment.indexOf('<span id="template">') >= 0){
             target.summernote('code', comment + TmpltTable);
@@ -1733,7 +1735,7 @@
                 // // $('#'+target).summernote('insertNode', img);
                 // _me.elem.$edit_q.summernote('insertNode', img);
                 var img = $('<img />').addClass('img-preview').attr({
-                            'src' : 'uploads/'+sendData.oParams.picName,
+                            'src' : '/uploads/'+sendData.oParams.picName,
                             'style' : 'width:25%;'
                           });
                 if(target_elem.is(_me.selItem.$elem)){

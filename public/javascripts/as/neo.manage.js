@@ -918,6 +918,8 @@
                                   desktop : false
                                 });
                               }
+
+                              _records.data[0].문의내용 = _records.data[0].문의내용.replace(/src="uploads/,'src="/uploads');
                               $detail.find('td').html(_records.data[0].문의내용);
                               _this.history.rows.some(function(_cell){
                                 console.log(_cell);
