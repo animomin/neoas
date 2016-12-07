@@ -16,18 +16,18 @@ div.row.white-bg.dashboard-header
         div.tabs-container
           ul.nav.nav-tabs
             li.active 
-              a.history-tabs(href='#tab-1', data-toggle='tab') 방문              
+              a.history-tabs(href='#tab-1', data-toggle='tab', data-name='방문') 방문              
             li
-              a.history-tabs(href='#tab-2', data-toggle='tab') 전화
+              a.history-tabs(href='#tab-2', data-toggle='tab', data-name='전화') 전화
             li
-              a.history-tabs(href='#tab-3', data-toggle='tab') 웹A/S
+              a.history-tabs(href='#tab-3', data-toggle='tab', data-name='웹A/S') 웹A/S
           div.tab-content
             div#tab-1.history-pane.tab-pane.active.fade.in
               div.history-table-wrapper
-                table.history-table.table#history-table-visit(data-paging="true", data-sorting="true", data-filtering="true")
+                table.history-table.table#history-table-visit(data-paging="true", data-sorting="true", data-filtering="true", data-editing="true", data-editing-always-show="true")
             div#tab-2.history-pane.tab-pane.fade
               div.history-table-wrapper
-                table.history-table.table#history-table-tel(data-paging="true", data-sorting="true", data-filtering="true")
+                table.history-table.table#history-table-tel(data-paging="true", data-sorting="true", data-filtering="true", data-editing="true", data-editing-always-show="true")
             div#tab-3.history-pane.tab-pane.fade
               div.history-table-wrapper
                 table.history-table.table#history-table-web(data-paging="true", data-sorting="true", data-filtering="true")

@@ -56,6 +56,7 @@
     this.historyTableColumns.push([
       { 'title' : '', 'style': { 'width': 50, 'maxWidth': 50 },  'breakpoints' : 'xs' },
       { 'name' : '인덱스', 'visible' : false},
+      { 'name' : 'USER_ID', 'visible' : false},
       { 'name' : '기관코드', 'title' : '기관기호' },
       { 'name' : '기관명칭', 'title' : '기관명칭' },
       { 'name' : '프로그램', 'title' : '프로그램' },
@@ -153,7 +154,7 @@
     this.$historySearch = $('button#history-search');
     this.$historyQuickDate = $('button.history-quickDate');
     this.$historyTabs = $('a.history-tabs');
-    this.$historyDate = $('div.input-daterange input');
+    this.$historyDate = $('div.input-daterange input');    
     this.$historyTable = $('table.history-table')    
     
     this.$historyWrite = $('div#history-body');
@@ -290,12 +291,20 @@
       var temp = self.$historyWrite;
       temp.unbind('click').bind('click', function(event){
         var target = event.target;
-        if(target.tagName.toLowerCase() === 'button'){
+        if(target.tagName.toLowerCase() === 'button' && $(target).data('type') === 'save'){
           self._getHistoryWriteData(function(data){
             if(data){
               handler(data);
             }
           });
+        }else if(target.tagName.toLowerCase() === 'button' && $(target).data('type') === 'close'){
+          self.$page.each(function(i,v){
+            if($(v).data('page') === 'history-main'){
+              $(v).removeClass('hidden');        
+            }else{
+              $(v).addClass('hidden')
+            }
+        });
         }
       });
 
@@ -366,6 +375,9 @@
           day.setDate(day.getDate()-1);
         }
         day = day.GetDate_CustomFormat('YYYY-MM-DD');
+        self.$historyDate.each(function(i,v){
+          $(v).val(day);
+        });
         handler({
           id : $(this).data('id'),
           start : day,
@@ -375,7 +387,7 @@
     }else if(event === 'historyDetail'){
       console.log('View.bind.historyDetail execute');
       self.$historyTable.each(function(i ,v){
-        $(v).bind('expand.ft.row', function(event, ft, row){
+        $(v).unbind('expand.ft.row').bind('expand.ft.row', function(event, ft, row){          
           var selItem = {
             as : i === 2 ? true : false,
             key : null
@@ -400,6 +412,85 @@
           handler(selItem);
 
         });
+      });
+    }else if(event === 'historyEdit'){
+      console.log('View.bind.historyEdit execute');
+      self.$historyTable.each(function(i,v){
+        if(i < 2){
+          $(v).unbind('edit.ft.editing').bind('edit.ft.editing', function(e, ft, row){           
+
+            var writer = row.cells.find(function(_cell){
+              return _cell.column.name === '작성자'
+            });
+
+
+            if(parseInt(writer.value) !== parseInt(neo.user.USER_ID)){
+              swal(
+                '수정할 수 없습니다.',
+                '글을 작성한 사람만 수정이 가능합니다.',
+                'error'
+              );
+            }else{
+              handler({
+                as : i === 2 ? true : false,
+                
+                type : i,
+                key : row.cells.find(function(_cell){
+                  return _cell.column.name === '인덱스';
+                }).value,
+                'USER_ID' : row.cells.find(function(_cell){
+                  return _cell.column.name === 'USER_ID';
+                }).value,
+                '기관명칭' : row.cells.find(function(_cell){
+                  return _cell.column.name === '기관명칭';
+                }).value,
+                '기관코드' : row.cells.find(function(_cell){
+                  return _cell.column.name === '기관코드';
+                }).value
+              });     
+            }       
+          });
+        }
+      });
+    }else if(event === 'historyRemove'){
+      console.log('View.bind.historyRemove execute');
+      self.$historyTable.each(function(i,v){
+        if(i < 2){
+          $(v).unbind('delete.ft.editing').bind('delete.ft.editing', function(e, ft, row){
+            var writer = row.cells.find(function(_cell){
+              return _cell.column.name === '작성자'
+            });
+
+
+            if(parseInt(writer.value) !== parseInt(neo.user.USER_ID)){
+              swal(
+                '삭제할 수 없습니다.',
+                '글을 작성한 사람만 삭제가 가능합니다.',
+                'error'
+              );
+            }else{
+              swal({
+                title: '정말로 삭제하시겠습니까?',
+                text: "선택하신 일지를 삭제합니다.",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                cancelButtonText: '아니오',
+                confirmButtonText: '네, 삭제할께요!'
+              }).then(function () {
+                handler({                  
+                  key : row.cells.find(function(_cell){
+                    return _cell.column.name === '인덱스';
+                  }).value,
+                  'USER_ID' : row.cells.find(function(_cell){
+                    return _cell.column.name === 'USER_ID';
+                  }).value
+                });
+              });
+            }
+          });          
+        }
       });
     }
     
@@ -434,6 +525,9 @@
           //   // we only load the column definitions as the row data is loaded through the button clicks
           //   "columns": self.template.getTableColumns(i)
           // });    
+
+          var $tab = $(self.$historyTabs.eq(i));
+          $tab.html($tab.data('name') + ' <span class="badge">'+data[i].length+'</span>');
           $(_table).parent().addClass('hidden');  
           $(_table).empty().footable({
             "columns" : self.template.getTableColumns(i),
@@ -442,6 +536,7 @@
             "draw.ft.table" : function(){
               // $(_table).removeClass('hidden');
               $(_table).parent().removeClass('hidden');
+              $($(_table).find('tfoot')).find('.footable-add').remove();
             }
            
           });
@@ -454,6 +549,9 @@
 
   View.prototype._addHospItem = function(data){
     this.$hospitalList.append(this.template.insertHospItem(data));   
+    this.$hospitalUniq.removeData('id');
+    this.$historySearch.removeData('id');
+    this.$historyQuickDate.removeData('id');
   };
 
   View.prototype._loadHospInfo = function(data){
@@ -538,11 +636,15 @@
       if($(v).data('page') === 'history-write'){
         $(v).removeClass('hidden');
 
-        $(':input:radio[name="history-type"]').prop('checked',false)
+        $(':input:radio[name="history-type"]').prop('checked',false);
         self.$historyEditor.summernote('code', '');
+
+        $(':input:radio[name="history-type"]:eq('+data.type+')').prop('checked',true);
+        self.$historyEditor.summernote('code', data.내용);
 
         $(v).find('h3#history-title').text(data.기관명칭 + ' / ' + data.기관코드);
         self.$historyWrite.data('id', data.USER_ID);
+        self.$historyWrite.data('key', data.key);
       }else{
         $(v).addClass('hidden')
       }
@@ -553,10 +655,11 @@
   View.prototype._getHistoryWriteData = function(callback){
     var data = {};
     data.USER_ID = this.$historyWrite.data('id');
+    data.key = this.$historyWrite.data('key');
     data.type = $(":input:radio[name=history-type]:checked").val();
     data.writer = neo.user.USER_ID;
     data.contents = this.$historyEditor.summernote('code');
-   
+    data['지사코드'] = neo.user.user_area
     if(!data.type){      
       neoNotify.Show({
         text : '일지유형을 선택해주세요.',
@@ -605,7 +708,10 @@
 
     this.view.bind('areaAll', function(checked){
       self.model.hospAreaAll = checked;
-      self.showHospList();
+      self.clearData(function(){
+        self.showHospList();
+        self.showHospHistoryList();
+      });      
     });
 
     this.view.bind('hospSearch', function(search){
@@ -642,12 +748,24 @@
     });
 
     this.view.bind('historyDetail', function(item){
-      self.showHistoryDefailt(item);
+      self.showHistoryDetail(item);
+    });
+
+    this.view.bind('historyEdit', function(item){
+      self.showHistoryEditPage(item);
+    });
+
+    this.view.bind('historyRemove', function(item){
+      self.removeHistory(item);
     });
 
     this.showHospList();
     this.showHospHistoryList();
   }
+
+  Controller.prototype.clearData = function(callback){
+    this.model.clearData(callback);
+  };
 
   Controller.prototype.showHospList = function(){
     var self = this;
@@ -678,10 +796,10 @@
       item = {
         id : null,
         start : self.view.$historyDate.filter('[data-name="start"]').val(),
-        end : self.view.$historyDate.filter('[data-name="end"]').val()
+        end : self.view.$historyDate.filter('[data-name="end"]').val()        
       };      
     }
-
+    
     this.model.readHospHistoryList(item, function(result){
       if(result.err){
 
@@ -698,6 +816,11 @@
 
       }else{
         self.showHospInfo(data.USER_ID);     
+        self.showHospHistoryList({
+          id : data.USER_ID,
+          start : self.view.$historyDate.filter('[data-name="start"]').val(),
+          end : self.view.$historyDate.filter('[data-name="end"]').val(),
+        });
       }
     });
   };
@@ -717,7 +840,7 @@
     })
   };
 
-  Controller.prototype.showHistoryDefailt = function(item){
+  Controller.prototype.showHistoryDetail = function(item){
     var self = this;
     this.model.getHistoryDetail(item, function(result){
       if(result.err){
@@ -730,6 +853,34 @@
         // }
       }
     })
+  };
+
+  Controller.prototype.showHistoryEditPage = function(item){
+    var self = this;
+    this.model.getHistoryDetail(item, function(result){
+      if(result.err){
+
+      }else{        
+        item['내용'] = result.data[0].내용;
+        self.view.render('showHistroyWrite', item);
+      }
+    });
+  };
+
+  Controller.prototype.removeHistory = function(item){
+    var self = this;
+    this.model.removeHistory(item, function(result){
+      if(result.err){
+
+      }else{      
+        self.showHospInfo(item.USER_ID);     
+        self.showHospHistoryList({
+          id : item.USER_ID,
+          start : self.view.$historyDate.filter('[data-name="start"]').val(),
+          end : self.view.$historyDate.filter('[data-name="end"]').val(),
+        });
+      }
+    });
   }
   
   /**
@@ -742,13 +893,18 @@
     this.hospSearch = '';
   }
 
+  Model.prototype.clearData = function(callback){
+    this.storage.removeData('hospitalInfo');
+    callback();
+  };
+
   Model.prototype.findItem =function(key, index, callback){
     this.storage.findItem(key, index, callback);
-  }
+  };
 
   Model.prototype.findItemByID = function(key, id){
     return this.storage.findItemByID(key, id);
-  }
+  };
 
   Model.prototype.readHosp = function(_callback){
     var self = this;
@@ -797,12 +953,15 @@
     });
   };
 
+  
   Model.prototype.saveHistory = function(_data, _callback){
 
     var hosp = this.storage.getData('hospitalInfo');
     _data["기관코드"] = hosp["기관코드"];
     _data["기관명칭"] = hosp["기관명칭"];
     _data["프로그램"] = hosp["프로그램"];
+    _data["지사코드"] = hosp["지사코드"];
+    
     $.ajax({
       url : '/manage/history',
       data : _data,
@@ -819,6 +978,25 @@
       },
       complete : function(){}
     })
+  };
+
+  Model.prototype.removeHistory = function(_data, _callback){
+    $.ajax({
+      url : '/manage/history',
+      data : _data,
+      dataType : 'json',
+      method : 'PUT',
+      async : true,
+      beforeSend : function(){},
+      success : function(result){
+        _callback(result);
+      },
+      error : function(a,b,c){
+        console.log('ERROR!!!');
+        console.log(a,b,c);
+      },
+      complete : function(){}
+    });
   };
 
   Model.prototype.saveHospitalUniqInfo = function(_data, _callback){
@@ -845,12 +1023,15 @@
       var hosp = this.storage.getData('hospitalInfo');
       _item["기관코드"] = hosp["기관코드"];
     }
+    // _item["지사코드"] = neo.user.user_area;
+    
+    _item['지사코드'] = this.hospAreaAll ? '' : neo.user.user_area;
     $.ajax({
       url : '/manage/history',
       data : _item,
       dataType : 'json',
       method : 'GET',
-      async : true,
+      async : false,
       beforeSend : function(){},
       success : function(result){       
         _callback(result)
@@ -898,6 +1079,10 @@
     //this.hospList = [];    
     this.selIndex = -1;
   } 
+
+  Storage.prototype.removeData = function(key){
+    this[key] = null;
+  }  
 
   Storage.prototype.setData = function(key, value){
     this[key] = value;

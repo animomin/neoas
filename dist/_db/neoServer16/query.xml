@@ -2,7 +2,7 @@
 <query>
   <_DataBaseUpdate>
     BEGIN TRY
-
+     
       IF NOT EXISTS(Select Name From SYSCOLUMNS WHERE NAME = '담당자' AND ID = OBJECT_ID('N_Service'))
       BEGIN
         ALTER TABLE NeoAs..N_Service ADD 담당자 int NOT NULL default 0
@@ -97,6 +97,7 @@
             기관명칭 nvarchar(100) not null,
             프로그램 nvarchar(15) null,
             일지구분 tinyint not null,
+            지사코드 varchar(4) null,
             내용 ntext null,
             작성자 int not null,
             작성일자 datetime not null,
@@ -334,14 +335,16 @@
     Select 인덱스, USER_ID, 기관코드, 기관명칭, 프로그램, 작성자, CONVERT(char(19),작성일자 ,120) AS 작성일자, '' AS 내용
     From NeoAs..N_병원일지
     Where 일지구분 = 0
+    AND 삭제 = 0
     {{일지조건}}
     Order By 작성일자 DESC;
     Select 인덱스, USER_ID, 기관코드, 기관명칭, 프로그램, 작성자, CONVERT(char(19),작성일자 ,120) AS 작성일자, '' AS 내용 
     From NeoAs..N_병원일지
     Where 일지구분 = 1
+    AND 삭제 = 0
     {{일지조건}}
     Order By 작성일자 DESC;
-    Select 인덱스, 기관코드, 기관명칭, 프로그램, 접수자, CONVERT(char(19),접수일자 ,120) AS 접수일자 , 처리자, 서비스상태, '' AS 내용
+    Select 인덱스, 기관코드, 기관명칭, 프로그램, 접수자, CONVERT(char(10),접수일자 ,120) AS 접수일자 , 처리자, 서비스상태, '' AS 내용
     From NeoAs..N_Service
     Where 1 = 1
     {{AS조건}}
@@ -349,14 +352,38 @@
   </_HospitalManageHistory>
   <_HospitalManageHistory_SAVE>
     Begin Try
-      Insert Into NeoAS..N_병원일지(USER_ID, 기관코드, 기관명칭, 프로그램, 일지구분, 내용, 작성자, 작성일자)
-      Values(%s, '%s', '%s', '%s', %s, '%s', %s, GETDATE())
+      Insert Into NeoAS..N_병원일지(USER_ID, 기관코드, 기관명칭, 프로그램, 지사코드, 일지구분, 내용, 작성자, 작성일자)
+      Values(%s, '%s', '%s', '%s', '%s', %s, '%s', %s, GETDATE())
       Select 0 As Status, 'SUCCESS' as Message 
     End Try
     Begin CATCH
       SELECT ERROR_NUMBER() AS Status, ERROR_MESSAGE() AS Message;
     END CATCH    
   </_HospitalManageHistory_SAVE>
+  <_HospitalManageHistory_UPDATE>
+    Begin Try
+      Update NeoAS..N_병원일지
+      SET 내용 = '%s',
+          일지구분 = %s,
+          작성일자 = GETDATE()
+      Where 인덱스 = %s
+      Select 0 As Status, 'SUCCESS' as Message 
+    End Try
+    Begin CATCH
+      SELECT ERROR_NUMBER() AS Status, ERROR_MESSAGE() AS Message;
+    END CATCH   
+  </_HospitalManageHistory_UPDATE>
+  <_HospitalManageHistory_DELETE>
+    Begin Try
+      Update NeoAS..N_병원일지
+      SET 삭제 = 1
+      Where 인덱스 = %s
+      Select 0 As Status, 'SUCCESS' as Message 
+    End Try
+    Begin CATCH
+      SELECT ERROR_NUMBER() AS Status, ERROR_MESSAGE() AS Message;
+    END CATCH   
+  </_HospitalManageHistory_DELETE>
   <_HospitalManageInfo>
     SELECT 병원유형, 전산담당, 결제담당, 메모 FROM NeoAS..N_병원특이사항
     WHERE USER_ID = %s

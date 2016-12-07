@@ -45,6 +45,12 @@ router.post('/history', function(req, res, next){
   });
 });
 
+router.put('/history', function(req, res, next){
+  member.RemoveHospitalHistory(req, function(result){
+    res.send(result);
+  });
+});
+
 router.get('/history/contents', function(req, res, next){
   member.GetHospitalHistoryDetail(req, function(result){
     res.send(result);

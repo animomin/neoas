@@ -57,7 +57,7 @@
       async.waterfall([
         function(callback){
           var select = 'H.USER_ID, H.user_med_id AS 기관코드, H.user_med_name AS 기관명칭, ';
-          select += "ISNULL(C.코드이름,'미정') AS 프로그램, ISNULL(I.info_president, '') AS 대표자, C.데이터1 "
+          select += "ISNULL(C.코드이름,'미정') AS 프로그램, ISNULL(I.info_president, '') AS 대표자, C.데이터1, I.INFO_AREA AS 지사코드 ";
 
           var where = "";
           if(params.area !== '') where += " AND I.INFO_AREA = '" + params.area + "'";
@@ -105,10 +105,8 @@
         },
         function(callback){
           if (server22.connection.connected) {
-              server22.RecordSet(query, function(err, records) {        
-                  
-                  console.log(records[1][0]);
-                  console.log(records[1].length);          
+              server22.RecordSet(query, function(err, records) {
+                  console.log(records[0]);
                   if(records[1].length > 0){
                     var extra = '';
                     for(var i = 0; i < records[1].length; i++){
@@ -162,16 +160,25 @@
 
     exports.SaveHospitalHistory = function(req, _callback){
       var params = req.body;
-      query = querys16._HospitalManageHistory_SAVE;
+      
       async.waterfall([
         function(callback){
-
-          query = util.format(query, 
-                              params.USER_ID,
-                              params["기관코드"],
-                              params["기관명칭"],
-                              params["프로그램"], 
-                              params.type, params.contents, params.writer);
+          if(!params.key){
+            query = querys16._HospitalManageHistory_SAVE;
+            query = util.format(query, 
+                                params.USER_ID,
+                                params["기관코드"],
+                                params["기관명칭"],
+                                params["프로그램"], 
+                                params["지사코드"],
+                                params.type, params.contents, params.writer);
+          }else{
+            query = querys16._HospitalManageHistory_UPDATE;
+            query = util.format(query, 
+                                params.contents,
+                                params.type,
+                                params.key);                                
+          }
           console.log(query);
           callback(null);
         },
@@ -196,7 +203,41 @@
         }
         _callback(data);
       });
-    }
+    };
+
+    exports.RemoveHospitalHistory = function(req, _callback){
+      var params = req.body;
+      async.waterfall([
+        function(callback){
+          
+            query = querys16._HospitalManageHistory_DELETE;
+            query = util.format(query, params.key);                                
+         
+          console.log(query);
+          callback(null);
+        },
+        function(callback){
+          if (server16.connection.connected) {
+              server16.execute(query, function(err, records) {
+                  return callback(err, records);
+              });
+          }
+        }
+      ], function(err, records){
+        if (err) {
+            logger.error(err);
+            data.err = err;
+            data.data = null;
+        } else if (!records || records.length <= 0) {
+            data.err = 'NODATA';
+            data.data = null;
+        } else {
+            data.err = null;
+            data.data = records;
+        }
+        _callback(data);
+      });
+    };
 
     exports.SaveHospitalInfo = function(req, _callback){
       var params = req.body;
@@ -251,8 +292,12 @@
             where1 = " AND USER_ID = " + params.id;
             where2 = " AND 기관코드 = '" + params["기관코드"] + "' ";            
           }
-          where1 += " AND 작성일자 Between '" + params.start + "' AND '" + params.end + "' ";
-          where2 += " AND 접수일자 Between '" + params.start + "' AND '" + params.end + "' ";
+          where1 += " AND CONVERT(char(10),작성일자 ,120) Between '" + params.start + "' AND '" + params.end + "' ";
+          where2 += " AND CONVERT(char(10),접수일자 ,120) Between '" + params.start + "' AND '" + params.end + "' ";
+          if(params["지사코드"] !== ''){
+            where1 += " AND 지사코드 ='" + params["지사코드"] + "' ";
+            where2 += " AND 지사코드 ='" + params["지사코드"] + "' ";
+          }
           query = query.replace(/{{일지조건}}/gim, where1);
           query = query.replace(/{{AS조건}}/gim, where2);
 
