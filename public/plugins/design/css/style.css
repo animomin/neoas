@@ -3,7 +3,9 @@
 .hidden {
     display: none;
 }
-
+.content-preview img{
+    width: 100% !important;
+}
 h1,
 h2,
 h3,
@@ -707,6 +709,9 @@ body.canvas-menu.mini-navbar nav.navbar-static-side {
         display: block;
         float: none;
     }
+    .breakpoints-sm {
+        display : none !important;
+    }
 }
 
 .menu-visible-lg,
@@ -724,6 +729,9 @@ body.canvas-menu.mini-navbar nav.navbar-static-side {
     .menu-visible-md {
         display: block !important;
     }
+
+    
+    
 }
 
 @media (max-width: 767px) {
@@ -3064,6 +3072,14 @@ a.forum-item-title:hover {
     }
     .forum-desc {
         float: none !important;
+    }
+    .breakpoints-md {
+        display: none !important;
+    }
+}
+@media (max-width: 480px){
+    .breakpoints-xs {
+        display: none !important;
     }
 }
 

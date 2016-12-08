@@ -17,15 +17,29 @@
 
     this.defaultHistoryListItem = '' +
     '<tr>' +
-    '  <td></td>' +
-    '  <td>{{기관코드}}</td>' +
-    '  <td>{{기관명칭}}</td>' +
-    '  <td>{{프로그램}}</td>' +
-    '  <td>{{접수자}}</td>' +
-    '  <td>{{접수일자}}</td>' +
-    '  <td>{{처리자}}</td>' +
-    '  <td>{{서비스상태}}</td>' +
-    '  <td>{{내용}}</td>' +
+    '  <td class="hidden" data-name="인덱스">{{인덱스}}</td>' +
+    '  <td class="hidden" data-name="USER_ID">{{USER_ID}}</td>' +    
+    '  <td class="breakpoints-xs" data-name="기관코드">{{기관코드}}</td>' +
+    '  <td data-name="기관명칭">{{기관명칭}}</td>' +
+    '  <td class="breakpoints-xs breakpoints-sm">{{프로그램}}</td>' +
+    '  <td class="breakpoints-xs breakpoints-sm" data-name="작성자" data-value="{{작성자}}">{{작성자이름}}</td>' +
+    '  <td >{{작성일자}}</td>' +
+    ' <td>' +
+    //'   <button class="btn btn-default btn-xs history-write" data-index="{{INDEX}}" data-toggle="modal" data-target="#history-write-dialog"><i class="fa fa-pencil"></i></button></td>' +
+    '   <button class="btn btn-default btn-xs fa fa-pencil" data-type="edit"></button>' +
+    '   <button class="btn btn-default btn-xs fa fa-trash" data-type="remove"></button></td>' +
+    '</tr>';
+
+    this.defaultASListItem = '' +
+    '<tr>' +
+    '  <td data-name="인덱스">{{인덱스}}</td>' +
+    '  <td class="breakpoints-xs" data-name="기관코드">{{기관코드}}</td>' +
+    '  <td data-name="기관명칭">{{기관명칭}}</td>' +
+    '  <td class="breakpoints-xs breakpoints-sm">{{프로그램}}</td>' +
+    '  <td class="breakpoints-xs breakpoints-sm breakpoints-md">{{접수자}}</td>' +
+    '  <td class="breakpoints-xs breakpoints-sm breakpoints-md">{{접수일자}}</td>' +
+    '  <td class="breakpoints-xs breakpoints-sm breakpoints-md">{{처리자}}</td>' +
+    '  <td>{{서비스상태}}</td>' +    
     '</tr>';
 
     this.defaultHospitalInfo = '' +
@@ -52,53 +66,7 @@
 
     this.defaultExtraService = '<li><a href="#">{{부가서비스}}</a></li>';
 
-    this.historyTableColumns = [];
-    this.historyTableColumns.push([
-      { 'title' : '', 'style': { 'width': 50, 'maxWidth': 50 },  'breakpoints' : 'xs' },
-      { 'name' : '인덱스', 'visible' : false},
-      { 'name' : 'USER_ID', 'visible' : false},
-      { 'name' : '기관코드', 'title' : '기관기호' },
-      { 'name' : '기관명칭', 'title' : '기관명칭' },
-      { 'name' : '프로그램', 'title' : '프로그램' },
-      { 'name' : '작성자', 'title' : '작성자',
-        formatter : function(value){
-          console.log(value);
-          return neo.users.GetUserName(value).USER_NAME || '';
-        } 
-      },
-      { 'name' : '작성일자', 'title' : '작성일'},
-      { 'name' : '내용', 'title' : '내용', 'breakpoints' : 'all'}
-    ]);
-    this.historyTableColumns.push([
-      { 'title' : '', 'style': { 'width': 50, 'maxWidth': 50 },  'breakpoints' : 'xs' },
-      { 'name' : '인덱스', 'visible' : false},
-      { 'name' : '기관코드', 'title' : '기관기호' },
-      { 'name' : '기관명칭', 'title' : '기관명칭' },
-      { 'name' : '프로그램', 'title' : '프로그램',
-        formatter: function(value) {
-            if (value === "" || typeof value === "undefined") value = 0;
-            switch (parseInt(value)) {
-                case 1:
-                    return 'Eplus';
-                case 8:
-                    return 'MediChart';
-                case 20:
-                    return 'SENSE'
-            }
-        } 
-      },
-      { 'name' : '접수자', 'title' : '접수자' },
-      { 'name' : '접수일자', 'title' : '접수일자' },
-      { 'name' : '처리자', 'title' : '처리자'},
-      { 'name' : '서비스상태', 'title' : '상태',
-        formatter: function(value) {
-                value = parseInt(value);
-                return ASSTATUS.ServiceName(value);
-        }
-      },
-      { 'name' : '내용',  'title' : '내용', 'breakpoints' : 'all' }      
-    ]);
-  
+   
     // 
 
 
@@ -121,6 +89,68 @@
       view = view + template;
     }
     return view;
+  };
+
+  Template.prototype.insertHistoryItem = function(data){
+    var view = '';
+    for(var i = 0; i < data.length; i++){
+      var template = this.defaultHistoryListItem;
+      template = template.replace('{{인덱스}}', data[i].인덱스);
+      template = template.replace('{{USER_ID}}', data[i].USER_ID);
+      template = template.replace('{{기관코드}}', data[i].기관코드);
+      template = template.replace('{{기관명칭}}', data[i].기관명칭);
+      template = template.replace('{{프로그램}}', data[i].프로그램);
+      template = template.replace('{{작성자}}', data[i].작성자);
+      template = template.replace('{{작성자이름}}', neo.users.GetUserName(data[i].작성자).USER_NAME);
+      template = template.replace('{{작성일자}}', data[i].작성일자);      
+
+      view = view + template;
+    }
+    return view;
+  }
+
+  Template.prototype.insertASItem = function(data, page){
+    var view = '';
+    // for(var i = 0; i < data.length; i++){
+    var start = (page - 1) * 20;
+    var end = page * 20;
+        end = data.length < end ? data.length : end; 
+    for(var i = start ; i < end; i++){
+      var template = this.defaultASListItem;
+      template = template.replace('{{인덱스}}', data[i].인덱스);      
+      template = template.replace('{{기관코드}}', data[i].기관코드);
+      template = template.replace('{{기관명칭}}', data[i].기관명칭);
+      template = template.replace('{{프로그램}}', (function(){
+          var value = data[i].프로그램;
+          if (value === "" || typeof value === "undefined") value = 0;
+          switch (parseInt(value)) {
+              case 1:
+                  return 'Eplus';
+              case 8:
+                  return 'MediChart';
+              case 20:
+                  return 'SENSE'
+          }
+      }));
+      template = template.replace('{{접수자}}', data[i].접수자);
+      template = template.replace('{{접수일자}}', data[i].접수일자);
+      template = template.replace('{{처리자}}', data[i].처리자);
+      template = template.replace('{{서비스상태}}', ASSTATUS.ServiceName(parseInt(data[i].서비스상태)));      
+
+      view = view + template;
+    }
+    return view;
+  };
+
+  Template.prototype.insertASItemPagination = function(data){
+    var view = '';
+    var pages = Math.ceil(data.length / 20);
+    
+    view += '<li class="disabled" data-type="prev" data-pages="'+pages+'" data-curpage="1"><a href="#"> 이전 </a></li>';
+    view += '<li class="' + (pages > 1 ? '' : 'disabled') + '" data-type="next" data-pages="'+pages+'" data-curpage="1"><a href="#"> 다음 </a></li>';    
+
+    return view;
+
   };
 
   Template.prototype.getTableColumns = function(i){
@@ -195,6 +225,10 @@
           ['picture', ['picture']]],
       lang : 'ko-KR',
       height : 400,
+      placeholder : '<p>Ex.</p>' +
+                    '<p>정기방문 or 요청방문</p><br><br>' +
+                    '<h4> 특이사항 </h4>' +
+                    '<p>별다른 특이사항 없으며, 원장님과 직원들에게 고시변경건 재안내 해줌.</p>',
       buttons : {}
     });
 
@@ -387,111 +421,116 @@
     }else if(event === 'historyDetail'){
       console.log('View.bind.historyDetail execute');
       self.$historyTable.each(function(i ,v){
-        $(v).unbind('expand.ft.row').bind('expand.ft.row', function(event, ft, row){          
-          var selItem = {
-            as : i === 2 ? true : false,
-            key : null
-          };
-          var $contents = row.cells.find(function(_cell){
-            return _cell.column.name === '내용';
-          }).$detail;
-
-          if($contents.find('td').data('load')){
-            return;
-          }else{
-            $contents.find('td').data('load', 'on');
-          }
-
-          selItem.target = $contents;
-         
-
-          selItem.key = row.cells.find(function(_cell){            
-            return _cell.column.name === '인덱스';
-          }).value;
+        $(v).unbind('click').bind('click', function(_event){
           
-          handler(selItem);
-
-        });
-      });
-    }else if(event === 'historyEdit'){
-      console.log('View.bind.historyEdit execute');
-      self.$historyTable.each(function(i,v){
-        if(i < 2){
-          $(v).unbind('edit.ft.editing').bind('edit.ft.editing', function(e, ft, row){           
-
-            var writer = row.cells.find(function(_cell){
-              return _cell.column.name === '작성자'
-            });
-
-
-            if(parseInt(writer.value) !== parseInt(neo.user.USER_ID)){
-              swal(
-                '수정할 수 없습니다.',
-                '글을 작성한 사람만 수정이 가능합니다.',
-                'error'
-              );
+          var target = _event.target;
+          var parent = $(target).parent();
+          if(target.tagName.toLowerCase() === 'td'){
+            if(parent.hasClass('has-child')){
+              var child = $(parent).data('target');
+              child = $('#' + child);              
+              child.toggleClass('in');
             }else{
-              handler({
+              var selItem = {
+                event : event,
                 as : i === 2 ? true : false,
-                
-                type : i,
-                key : row.cells.find(function(_cell){
-                  return _cell.column.name === '인덱스';
-                }).value,
-                'USER_ID' : row.cells.find(function(_cell){
-                  return _cell.column.name === 'USER_ID';
-                }).value,
-                '기관명칭' : row.cells.find(function(_cell){
-                  return _cell.column.name === '기관명칭';
-                }).value,
-                '기관코드' : row.cells.find(function(_cell){
-                  return _cell.column.name === '기관코드';
-                }).value
-              });     
-            }       
-          });
-        }
-      });
-    }else if(event === 'historyRemove'){
-      console.log('View.bind.historyRemove execute');
-      self.$historyTable.each(function(i,v){
-        if(i < 2){
-          $(v).unbind('delete.ft.editing').bind('delete.ft.editing', function(e, ft, row){
-            var writer = row.cells.find(function(_cell){
-              return _cell.column.name === '작성자'
-            });
-
-
-            if(parseInt(writer.value) !== parseInt(neo.user.USER_ID)){
-              swal(
-                '삭제할 수 없습니다.',
-                '글을 작성한 사람만 삭제가 가능합니다.',
-                'error'
-              );
-            }else{
-              swal({
-                title: '정말로 삭제하시겠습니까?',
-                text: "선택하신 일지를 삭제합니다.",
-                type: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                cancelButtonText: '아니오',
-                confirmButtonText: '네, 삭제할께요!'
-              }).then(function () {
-                handler({                  
-                  key : row.cells.find(function(_cell){
-                    return _cell.column.name === '인덱스';
-                  }).value,
-                  'USER_ID' : row.cells.find(function(_cell){
-                    return _cell.column.name === 'USER_ID';
-                  }).value
-                });
-              });
+                key : (function(){
+                  return parent.find('td[data-name="인덱스"]').text();
+                })(),
+                target : parent,
+                type : i
+              };
+              if(selItem.key){
+                handler(selItem);
+              }     
+            }            
+          } else if(target.tagName.toLowerCase() === 'button'){
+            if(i < 2){
+              parent = parent.parent();
+              var writer = (function(){
+                    return parent.find('td[data-name="작성자"]').data('value');
+                  })();
+              
+              if($(target).data('type') === 'edit'){
+                if(parseInt(writer) !== parseInt(neo.user.USER_ID)){
+                  swal(
+                    '수정할 수 없습니다.',
+                    '글을 작성한 사람만 수정이 가능합니다.',
+                    'error'
+                  );
+                }else{
+                  handler({
+                    event : 'historyEdit',
+                    as : i === 2 ? true : false,                  
+                    type : i,
+                    key : (function(){
+                      return parent.find('td[data-name="인덱스"]').text();
+                    })(),
+                    'USER_ID' : (function(){
+                      return parent.find('td[data-name="USER_ID"]').text();
+                    })(),
+                    '기관명칭' : (function(){
+                      return parent.find('td[data-name="기관명칭"]').text();
+                    })(),
+                    '기관코드' : (function(){
+                      return parent.find('td[data-name="기관코드"]').text();
+                    })(),
+                  });     
+                }       
+              }else{
+                if(parseInt(writer) !== parseInt(neo.user.USER_ID)){
+                  swal(
+                    '삭제할 수 없습니다.',
+                    '글을 작성한 사람만 삭제가 가능합니다.',
+                    'error'
+                  );
+                }else{
+                  swal({
+                    title: '정말로 삭제하시겠습니까?',
+                    text: "선택하신 일지를 삭제합니다.",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    cancelButtonText: '아니오',
+                    confirmButtonText: '네, 삭제할께요!'
+                  }).then(function () {
+                    handler({      
+                      event : 'historyRemove',            
+                      key : (function(){
+                        return parent.find('td[data-name="인덱스"]').text();
+                      })(),
+                      'USER_ID' : (function(){
+                        return parent.find('td[data-name="USER_ID"]').text();
+                      })()
+                    });
+                  });
+                }
+              }              
             }
-          });          
-        }
-      });
+          } else if(target.tagName.toLowerCase().match(/li|a/)){   
+            var pager = null;        
+            if(target.tagName.toLowerCase() === 'li') {
+              if($(target).hasClass('disabled')) return;             
+              pager = $(target); 
+            } else {
+              if($($(target).parent()).hasClass('disabled')) return;
+              pager = $(target).parent();              
+            } 
+
+            
+            handler({
+              event : 'historyASPage',
+              as : true,
+              pageType : $(pager).data('type'),
+              pages : $(pager).data('pages'),
+              curpage : $(pager).data('curpage'),
+              pager : pager
+            });
+          }
+        });        
+      });   
+    
     }
     
   };
@@ -521,27 +560,41 @@
         console.log('View.render.showHospHistoryList execute');
         
         self.$historyTable.each(function(i,_table){
-          // FooTable.init('#' + $(_item).attr('id'), {
-          //   // we only load the column definitions as the row data is loaded through the button clicks
-          //   "columns": self.template.getTableColumns(i)
-          // });    
-
+       
           var $tab = $(self.$historyTabs.eq(i));
           $tab.html($tab.data('name') + ' <span class="badge">'+data[i].length+'</span>');
-          $(_table).parent().addClass('hidden');  
-          $(_table).empty().footable({
-            "columns" : self.template.getTableColumns(i),
-            "rows" : data[i]
-          }).bind({
-            "draw.ft.table" : function(){
-              // $(_table).removeClass('hidden');
-              $(_table).parent().removeClass('hidden');
-              $($(_table).find('tfoot')).find('.footable-add').remove();
-            }
-           
-          });
+          // $(_table).parent().addClass('hidden');  
+          if(i < 2){
+            $(_table).find('tbody').empty().append(self.template.insertHistoryItem(data[i]));
+          }else{
+            $(_table).find('ul.pager').empty().append(self.template.insertASItemPagination(data[i]));
+            $(_table).find('tbody').empty().append(self.template.insertASItem(data[i], 1));
+          }
+          
         });
 
+      },
+      showHistoryASPage : function(){
+        console.log('View.render.showHistoryASPage execute');
+        var _table = self.$historyTable.eq(2);    
+        
+        if(data.pageType === 'next'){
+          data.page = parseInt(data.curpage) + 1;
+          if(parseInt(data.page) === parseInt(data.pages)){
+            data.pager.addClass('disabled');
+          }
+        }else{
+          data.page = parseInt(data.curpage) - 1;
+          if(parseInt(data.page) === 1){
+            data.pager.addClass('disabled');
+          }
+        }
+
+        data.pager.data('curpage', data.page);
+        data.pager.siblings().data('curpage', data.page);
+        data.pager.siblings().removeClass('disabled');
+
+        $(_table).find('tbody').empty().append(self.template.insertASItem(data.data, data.page));
       }
     };
     viewCommands[viewCmd]();
@@ -748,13 +801,18 @@
     });
 
     this.view.bind('historyDetail', function(item){
-      self.showHistoryDetail(item);
+      if(item.event === 'historyDetail'){
+        self.showHistoryDetail(item);
+      }else if(item.event === 'historyEdit'){
+        self.showHistoryEditPage(item);
+      }else if(item.event === 'historyRemove'){
+        self.removeHistory(item);
+      }else if(item.event === 'historyASPage'){
+        self.historyASPaging(item);
+      }
     });
 
-    this.view.bind('historyEdit', function(item){
-      self.showHistoryEditPage(item);
-    });
-
+   
     this.view.bind('historyRemove', function(item){
       self.removeHistory(item);
     });
@@ -847,10 +905,16 @@
 
       }else{
         result.data[0].내용 = result.data[0].내용.replace(/src="uploads/,'src="/uploads');
-        item.target.find('td').empty().html(result.data[0].내용);
-        // if($('.footable-details.history-table.table').hasClass('hidden')){
-        //   $('.footable-details.history-table.table').removeClass('hidden');
-        // }
+        
+        
+        var parent = item.target;
+        parent.data('target', 'history-' + parent.index() + '-' + item.type);
+        parent.addClass('has-child');
+        parent.after(
+          '<tr class="collapse in animated fadeInRight" id="'+'history-' + parent.index()+ '-' + item.type + '"> ' + 
+          '  <td colspan="' + (item.type == 2 ? 7 : 6) + '" class="content-preview">' + result.data[0].내용 + '</td>' +
+          '</tr>');       
+
       }
     })
   };
@@ -881,7 +945,12 @@
         });
       }
     });
-  }
+  };
+
+  Controller.prototype.historyASPaging = function(item){
+    item.data = this.model.storage.getData('historyList')[2];
+    this.view.render('showHistoryASPage', item);
+  };
   
   /**
    * Model Module
@@ -1019,6 +1088,7 @@
   };
 
   Model.prototype.readHospHistoryList = function(_item, _callback){
+    var self = this;
     if(_item.id){
       var hosp = this.storage.getData('hospitalInfo');
       _item["기관코드"] = hosp["기관코드"];
@@ -1032,7 +1102,11 @@
       dataType : 'json',
       method : 'GET',
       async : false,
-      beforeSend : function(){},
+      beforeSend : function(){
+        if(self.storage){        
+          self.storage.removeData('historyList');
+        }
+      },
       success : function(result){       
         _callback(result)
       },
@@ -1040,8 +1114,10 @@
         console.log('ERROR!!!');
         console.log(a,b,c);
       },
-      complete : function(result){
-
+      complete : function(result){        
+        if(self.storage){     
+          self.storage.setData('historyList', result.responseJSON.data);
+        }
       }
     })
   };
@@ -1055,7 +1131,7 @@
       },
       dataType : 'json',
       method : 'GET',
-      async : true,
+      async : false,
       beforeSend : function(){},
       success : function(result){
         _callback(result);

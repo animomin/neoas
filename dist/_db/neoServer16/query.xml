@@ -344,7 +344,7 @@
     AND 삭제 = 0
     {{일지조건}}
     Order By 작성일자 DESC;
-    Select 인덱스, 기관코드, 기관명칭, 프로그램, 접수자, CONVERT(char(10),접수일자 ,120) AS 접수일자 , 처리자, 서비스상태, '' AS 내용
+    Select 인덱스, 기관코드, 기관명칭, 프로그램, 접수자, CONVERT(char(10),접수일자 ,120) AS 접수일자 , ISNULL(처리자, '') AS 처리자, 서비스상태, '' AS 내용
     From NeoAs..N_Service
     Where 1 = 1
     {{AS조건}}
