@@ -2,6 +2,11 @@
 <query>
   <_DataBaseUpdate>
     BEGIN TRY
+
+      IF NOT EXISTS(Select Name From SYSCOLUMNS Where NAME = '처리일자' AND ID = OBJECT_ID('N_병원일지'))
+      BEGIN
+        ALTER TABLE NeoAS..N_병원일지 ADD 처리일자 datetime NULL        
+      END
      
       IF NOT EXISTS(Select Name From SYSCOLUMNS WHERE NAME = '담당자' AND ID = OBJECT_ID('N_Service'))
       BEGIN
@@ -332,13 +337,15 @@
     ORDER BY 프로그램, 발생건수 DESC
   </_RankEmr>
   <_HospitalManageHistory>
-    Select 인덱스, USER_ID, 기관코드, 기관명칭, 프로그램, 작성자, CONVERT(char(19),작성일자 ,120) AS 작성일자, '' AS 내용
+    Select 인덱스, USER_ID, 기관코드, 기관명칭, 프로그램, 작성자, 
+          CONVERT(char(10),작성일자 ,120) AS 작성일자, '' AS 내용, CONVERT(char(10), 처리일자, 120) AS 처리일자
     From NeoAs..N_병원일지
     Where 일지구분 = 0
     AND 삭제 = 0
     {{일지조건}}
     Order By 작성일자 DESC;
-    Select 인덱스, USER_ID, 기관코드, 기관명칭, 프로그램, 작성자, CONVERT(char(19),작성일자 ,120) AS 작성일자, '' AS 내용 
+    Select 인덱스, USER_ID, 기관코드, 기관명칭, 프로그램, 작성자, 
+            CONVERT(char(10),작성일자 ,120) AS 작성일자, '' AS 내용, CONVERT(char(10), 처리일자, 120) AS 처리일자 
     From NeoAs..N_병원일지
     Where 일지구분 = 1
     AND 삭제 = 0
@@ -352,8 +359,8 @@
   </_HospitalManageHistory>
   <_HospitalManageHistory_SAVE>
     Begin Try
-      Insert Into NeoAS..N_병원일지(USER_ID, 기관코드, 기관명칭, 프로그램, 지사코드, 일지구분, 내용, 작성자, 작성일자)
-      Values(%s, '%s', '%s', '%s', '%s', %s, '%s', %s, GETDATE())
+      Insert Into NeoAS..N_병원일지(USER_ID, 기관코드, 기관명칭, 프로그램, 지사코드, 일지구분, 내용, 작성자, 작성일자, 처리일자)
+      Values(%s, '%s', '%s', '%s', '%s', %s, '%s', %s, GETDATE(), '%s')
       Select 0 As Status, 'SUCCESS' as Message 
     End Try
     Begin CATCH
@@ -365,6 +372,7 @@
       Update NeoAS..N_병원일지
       SET 내용 = '%s',
           일지구분 = %s,
+          처리일자 = '%s',
           작성일자 = GETDATE()
       Where 인덱스 = %s
       Select 0 As Status, 'SUCCESS' as Message 

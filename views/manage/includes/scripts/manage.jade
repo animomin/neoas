@@ -20,7 +20,7 @@ script.
   var mobile;
   $(document).ready(function(){
     mobile = isMobile.any();
-    
+    //- mobile = true;
     
     
     $('[data-toggle="tooltip"]').tooltip(); 
@@ -32,11 +32,13 @@ script.
      */
     var menu = neo.menu;
     neoModules.SetLayout(menu, $('#workspace'), function(){
-      Split(['#left','#right'], {
-        gutterSize : 3,
-        cursor: 'col-resize',
-        sizes : [20,80]
-      });
+      if(!mobile){
+        Split(['#left','#right'], {
+          gutterSize : 3,
+          cursor: 'col-resize',
+          sizes : [20,80]
+        });
+      }
       //- Split(['#right-col1', '#right-col2'], {
       //-   gutterSize : 3,
       //-   direction : 'vertical',

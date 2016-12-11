@@ -160,7 +160,7 @@
 
     exports.SaveHospitalHistory = function(req, _callback){
       var params = req.body;
-      
+      console.log(params);
       async.waterfall([
         function(callback){
           if(!params.key){
@@ -171,11 +171,12 @@
                                 params["기관명칭"],
                                 params["프로그램"], 
                                 params["지사코드"],
-                                params.type, params.contents, params.writer);
+                                params.type, params.contents, params.writer, params.workdate);
           }else{
             query = querys16._HospitalManageHistory_UPDATE;
             query = util.format(query, 
                                 params.contents,
+                                params.workdate,
                                 params.type,
                                 params.key);                                
           }

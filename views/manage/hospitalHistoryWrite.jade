@@ -6,7 +6,10 @@ div.row.border-bottom.white-bg.dashboard-header
         div.hr-line-dashed
         h3#history-title
         div#history-body(data-id="-1")
-          div.form-group             
+          div.form-group
+            div.input-daterange.form-inline.m-b-xs
+              label.control-label 처리일자
+              input.input.input-sm.form-control#history-date(type='text', name='history-date', data-name='work')
             div.radio.radio-info.radio-inline
               input#history-kind-visit(type='radio', name='history-type', value='0')
               label(for='history-kind-visit') 방문

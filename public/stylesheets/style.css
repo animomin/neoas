@@ -78,3 +78,13 @@
 .table-hover tr{
   cursor : pointer;
 }
+
+.unstyled-pre{
+  padding: 0px;
+  margin: 0px;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+  background-color: inherit;
+  border: none;
+}

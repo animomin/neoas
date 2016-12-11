@@ -15,15 +15,15 @@ div.row.white-bg.dashboard-header
           
   div.col-lg-12
     div.tabs-container
-      ul.nav.nav-tabs
-        li
+      ul.nav.nav-tabs.navs-3
+        li.active 
           a.history-tabs(href='#tab-1', data-toggle='tab', data-name='방문') 방문              
         li
           a.history-tabs(href='#tab-2', data-toggle='tab', data-name='전화') 전화
-        li.active 
+        li
           a.history-tabs(href='#tab-3', data-toggle='tab', data-name='웹A/S') 웹A/S
       div.tab-content
-        div#tab-1.history-pane.tab-pane.fade
+        div#tab-1.history-pane.tab-pane.active.fade.in
           div.history-table-wrapper.wrapper.wrapper-content
             //- table.history-table.table#history-table-visit(data-paging="false", data-sorting="true", data-filtering="true", data-editing="true", data-editing-always-show="true")
             
@@ -35,8 +35,9 @@ div.row.white-bg.dashboard-header
                   th.breakpoints-xs 기관기호
                   th 기관명칭
                   th.breakpoints-xs.breakpoints-sm 프로그램
-                  th.breakpoints-xs.breakpoints-sm 작성자
-                  th 작성일자
+                  th 처리일자
+                  th 작성자
+                  th.breakpoints-xs.breakpoints-sm  작성일자
                   th ACT.
               tbody
         div#tab-2.history-pane.tab-pane.fade
@@ -51,11 +52,12 @@ div.row.white-bg.dashboard-header
                   th.breakpoints-xs 기관기호
                   th 기관명칭
                   th.breakpoints-xs.breakpoints-sm 프로그램
-                  th.breakpoints-xs.breakpoints-sm 작성자
-                  th 작성일자
+                  th 처리일자
+                  th 작성자
+                  th.breakpoints-xs.breakpoints-sm 작성일자
                   th ACT.
               tbody
-        div#tab-3.history-pane.tab-pane.active.fade.in
+        div#tab-3.history-pane.tab-pane.fade
           div.history-table-wrapper.wrapper.wrapper-content
             //- table.history-table.table#history-table-web(data-paging="false", data-sorting="true", data-filtering="true")
             table.history-table.table.small.table-hover#history-table-web

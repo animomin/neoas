@@ -6,6 +6,29 @@
    */
   function Template(){
     console.log('template');
+    this.defaultVisitPlaceHolder = '' +
+    '<div>Ex. 양식에 맞춰 작성하세요!</div>' +
+    '<div><br></div>' +
+    '<div>정기방문 or 요청방문 or 영업방문 등</div>' +
+    '<div><br></div>' +
+    '<div>1. 특이사항</div>' +
+    '<div><br></div>' +
+    '<div>2. 부서별 오류 / 요청사항&nbsp;</div>' +
+    '<div><br></div>' +
+    '<div>3. AS 접수내역 및 개발진행 사항</div>' +
+    '<div><br></div>';
+
+    this.defaultTelPlaceHolder = '' +
+    '<div>Ex. 양식에 맞춰 작성하세요!</div>' +
+    '<div><br></div>' +
+    '<div>Q. 문의내용</div>' +
+    '<div>사용중 프린터가 안됩니다.</div>' +
+    '<div><br></div>' +
+    '<div>A. 처리내용</div>' +
+    '<div>홈페이지 faq 프린터 검색을 안내하고 처리완료.</div>' +
+    '<div><br></div>';
+
+
     this.defaultHospListItem = '' +
     '<tr class="hosp-item" data-id="{{ID}}" data-index="{{INDEX}}" data-hospnum="{{기관코드}}">' +
     ' <td>{{번호}}</td>' +
@@ -22,8 +45,10 @@
     '  <td class="breakpoints-xs" data-name="기관코드">{{기관코드}}</td>' +
     '  <td data-name="기관명칭">{{기관명칭}}</td>' +
     '  <td class="breakpoints-xs breakpoints-sm">{{프로그램}}</td>' +
-    '  <td class="breakpoints-xs breakpoints-sm" data-name="작성자" data-value="{{작성자}}">{{작성자이름}}</td>' +
-    '  <td >{{작성일자}}</td>' +
+    '  <td data-name="처리일자">{{처리일자}}</td>' +
+    '  <td data-name="작성자" data-value="{{작성자}}">{{작성자이름}}</td>' +
+    '  <td class="breakpoints-xs breakpoints-sm">{{작성일자}}</td>' +
+    
     ' <td>' +
     //'   <button class="btn btn-default btn-xs history-write" data-index="{{INDEX}}" data-toggle="modal" data-target="#history-write-dialog"><i class="fa fa-pencil"></i></button></td>' +
     '   <button class="btn btn-default btn-xs fa fa-pencil" data-type="edit"></button>' +
@@ -100,6 +125,7 @@
       template = template.replace('{{기관코드}}', data[i].기관코드);
       template = template.replace('{{기관명칭}}', data[i].기관명칭);
       template = template.replace('{{프로그램}}', data[i].프로그램);
+      template = template.replace('{{처리일자}}', data[i].처리일자);
       template = template.replace('{{작성자}}', data[i].작성자);
       template = template.replace('{{작성자이름}}', neo.users.GetUserName(data[i].작성자).USER_NAME);
       template = template.replace('{{작성일자}}', data[i].작성일자);      
@@ -176,10 +202,15 @@
     this.$hospSearch = $('input#search');
     this.$hospitalList = $('tbody#hospital-list');
     this.$hospitalTable = this.$hospitalList.parent();    
+    
     // this.$hospitalInfo = $('table.hospital-info tr td');
     this.$hospitalInfo = $('div#hospital-info');
     this.$hospitalUniqInfo = $('table.hospital-info tr td');
     this.$hospitalUniq = $('button[data-target="#hospital-uniq-dialog"]');
+
+    if(mobile){
+      this.$hospitalTabs = $('a.hospital-tabs');
+    }
 
     this.$historySearch = $('button#history-search');
     this.$historyQuickDate = $('button.history-quickDate');
@@ -188,6 +219,7 @@
     this.$historyTable = $('table.history-table')    
     
     this.$historyWrite = $('div#history-body');
+    this.$historyWriteType = $(':input:radio[name="history-type"]');
     
     
     //Pages
@@ -221,21 +253,23 @@
       toolbar : [['style', ['bold', 'italic', 'underline', 'clear']],
           ['fontsize', ['fontsize']],
           ['color', ['color']],
-          ['para', ['ul', 'ol', 'paragraph']],
-          ['picture', ['picture']]],
+          ['para', ['ul', 'ol', 'paragraph']]],
+          // ['picture', ['picture']]],
       lang : 'ko-KR',
       height : 400,
-      placeholder : '<p>Ex.</p>' +
-                    '<p>정기방문 or 요청방문</p><br><br>' +
-                    '<h4> 특이사항 </h4>' +
-                    '<p>별다른 특이사항 없으며, 원장님과 직원들에게 고시변경건 재안내 해줌.</p>',
-      buttons : {}
+      placeholder : self.template.defaultVisitPlaceHolder,
+      buttons : {},
+      callbacks: {
+        onInit: function() {
+          self.$historyEditor_PlaceHolder = $('div.note-placeholder');
+        }
+      }
     });
 
     this.$historyDate.each(function(i,v){
       var today = new Date().GetToday('YYYY-MM');
       var lastday = (new Date( today.split('-')[0], today.split('-')[1], 0)).GetDate_CustomFormat('YYYY-MM-DD');
-      $(v).val($(v).data('name') === 'start' ?  today + "-01" : lastday);
+      $(v).val($(v).data('name') === 'start' ?  today + "-01" : $(v).data('name') === 'end' ? lastday : new Date().GetToday('YYYY-MM-DD'));
       $(v).datepicker({
           format : 'yyyy-mm-dd',
           language:'kr',
@@ -316,6 +350,17 @@
         handler(params);
       })
     
+    }else if(event === 'historyWriteType'){
+
+      console.log('View.bind.historyWriteType execute');
+      var temp = self.$historyWriteType;
+      temp.unbind('click').bind('click', function(event){
+        if($(this).val() == 0){
+          self.$historyEditor_PlaceHolder.empty().append(self.template.defaultVisitPlaceHolder);
+        }else{
+          self.$historyEditor_PlaceHolder.empty().append(self.template.defaultTelPlaceHolder);
+        }
+      });
 
     /**
      * event : historySave
@@ -475,6 +520,9 @@
                     '기관코드' : (function(){
                       return parent.find('td[data-name="기관코드"]').text();
                     })(),
+                    '처리일자' : (function(){
+                      return parent.find('td[data-name="처리일자"]').text();
+                    })()
                   });     
                 }       
               }else{
@@ -547,10 +595,19 @@
         console.log('View.render.showHospInfo execute!');
         self.$uniqDialog.modal('hide');
         self._loadHospInfo(data);
+
+        if(mobile){
+          $(self.$hospitalTabs.eq(1)).tab('show');
+        }
+
       },
       showHistroyWrite : function(){
         console.log('View.render.showHistroyWrite execute');
         self._loadHistoryWritePage(data);
+        // if(mobile){
+        //   $(self.$hospitalTabs.eq(3)).tab('show');
+
+        // }
       },
       showHospUniqInfo : function(){
         console.log('View.render.showHospUniqInfo execute');
@@ -656,7 +713,8 @@
             $span.text('보통');
           }
           $(v).empty().append($span);
-        
+        }else if(key.match(/메모/gim)){
+          $(v).html('<pre class="unstyled-pre">'+data[key]+'</pre>');
         }else{
           $(v).text(data[key]);
         }
@@ -698,6 +756,9 @@
         $(v).find('h3#history-title').text(data.기관명칭 + ' / ' + data.기관코드);
         self.$historyWrite.data('id', data.USER_ID);
         self.$historyWrite.data('key', data.key);
+
+        if(data.처리일자)
+          self.$historyDate.filter('[data-name="work"]').val(data.처리일자);
       }else{
         $(v).addClass('hidden')
       }
@@ -711,6 +772,7 @@
     data.key = this.$historyWrite.data('key');
     data.type = $(":input:radio[name=history-type]:checked").val();
     data.writer = neo.user.USER_ID;
+    data.workdate = this.$historyDate.filter('[data-name="work"]').val();
     data.contents = this.$historyEditor.summernote('code');
     data['지사코드'] = neo.user.user_area
     if(!data.type){      
@@ -782,6 +844,10 @@
           self.view.render('showHistroyWrite',_item);
         });  
       }         
+    });
+
+    this.view.bind('historyWriteType', function(){
+
     });
 
     this.view.bind('historySave', function(data){
