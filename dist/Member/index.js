@@ -60,7 +60,14 @@
           select += "ISNULL(C.코드이름,'미정') AS 프로그램, ISNULL(I.info_president, '') AS 대표자, C.데이터1, I.INFO_AREA AS 지사코드 ";
 
           var where = "";
-          if(params.area !== '') where += " AND I.INFO_AREA = '" + params.area + "'";
+          if(params.area !== ''){
+            if(params.area == '0000'){
+              where += " AND I.INFO_AREA IN ('0000', '0008','0026','0029','0030')";
+            }else{
+              where += " AND I.INFO_AREA = '" + params.area + "'";
+            }
+
+          } 
           if(params.search !== '') where += " AND ( H.user_med_id like '%" + params.search + "%' OR H.user_med_name like '%" + params.search + "%')"
           where += " AND C.데이터1 <> 18 ";
           var sort = " C.데이터1 ";
@@ -175,9 +182,9 @@
           }else{
             query = querys16._HospitalManageHistory_UPDATE;
             query = util.format(query, 
-                                params.contents,
-                                params.workdate,
+                                params.contents,                               
                                 params.type,
+                                params.workdate,
                                 params.key);                                
           }
           console.log(query);
@@ -252,7 +259,9 @@
                       params.computation + "','" + 
                       params.payer + "','" + 
                       // params.extra + "','" + 
-                      params.memo + "'";
+                      params.memo + "','" +
+                      params.writedate + "'," +
+                      params.writer;
           query = util.format(query, params.USER_ID, params.USER_ID, values);
           console.log(query);
           callback(null);
@@ -296,8 +305,14 @@
           where1 += " AND CONVERT(char(10),작성일자 ,120) Between '" + params.start + "' AND '" + params.end + "' ";
           where2 += " AND CONVERT(char(10),접수일자 ,120) Between '" + params.start + "' AND '" + params.end + "' ";
           if(params["지사코드"] !== ''){
-            where1 += " AND 지사코드 ='" + params["지사코드"] + "' ";
-            where2 += " AND 지사코드 ='" + params["지사코드"] + "' ";
+
+            if(params['지사코드'] == '0000'){
+              where1 += " AND 지사코드 IN ('0000', '0008','0026','0029','0030') ";
+              where2 += " AND 지사코드 IN ('0000', '0008','0026','0029','0030') ";
+            }else{
+              where1 += " AND 지사코드 ='" + params["지사코드"] + "' ";
+              where2 += " AND 지사코드 ='" + params["지사코드"] + "' ";
+            }
           }
           query = query.replace(/{{일지조건}}/gim, where1);
           query = query.replace(/{{AS조건}}/gim, where2);

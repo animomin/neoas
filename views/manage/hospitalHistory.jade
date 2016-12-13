@@ -12,7 +12,7 @@ div.row.white-bg.dashboard-header
           div.btn-group
             button.btn.btn-sm.btn-outline.btn-primary.history-quickDate(data-name='y') 어제
             button.btn.btn-sm.btn-outline.btn-primary.history-quickDate(data-name='t') 오늘
-          
+
   div.col-lg-12
     div.tabs-container
       ul.nav.nav-tabs.navs-3
@@ -63,14 +63,15 @@ div.row.white-bg.dashboard-header
             table.history-table.table.small.table-hover#history-table-web
               thead
                 tr
-                  th 인덱스
+                  th.breakpoints-xs.breakpoints-sm 인덱스
                   th.breakpoints-xs 기관코드
                   th 기관명칭
                   th.breakpoints-xs.breakpoints-sm 프로그램
+                  th 구분                  
                   th.breakpoints-xs.breakpoints-sm.breakpoints-md 접수자
                   th.breakpoints-xs.breakpoints-sm.breakpoints-md 접수일자
-                  th.breakpoints-xs.breakpoints-sm.breakpoints-md 처리자
                   th 상태
+                  th 처리자
               tfoot
                 tr
                   td(colspan='8')

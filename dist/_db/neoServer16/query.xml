@@ -3,6 +3,16 @@
   <_DataBaseUpdate>
     BEGIN TRY
 
+      IF NOT EXISTS(Select Name From SYSCOLUMNS Where NAME = '수정자' AND ID = OBJECT_ID('N_병원특이사항'))
+      BEGIN
+        ALTER TABLE NeoAS..N_병원특이사항 ADD 수정자 int NULL        
+      END
+
+      IF NOT EXISTS(Select Name From SYSCOLUMNS Where NAME = '수정일자' AND ID = OBJECT_ID('N_병원특이사항'))
+      BEGIN
+        ALTER TABLE NeoAS..N_병원특이사항 ADD 수정일자 datetime NULL        
+      END
+
       IF NOT EXISTS(Select Name From SYSCOLUMNS Where NAME = '처리일자' AND ID = OBJECT_ID('N_병원일지'))
       BEGIN
         ALTER TABLE NeoAS..N_병원일지 ADD 처리일자 datetime NULL        
@@ -117,7 +127,9 @@
             병원유형 tinyint null,
             전산담당 nvarchar(200) null,
             결제담당 nvarchar(200) null,            
-            메모 ntext null
+            메모 ntext null,
+            수정일자 datetime null,
+            수정자 int null
           )
         END
 
@@ -351,7 +363,7 @@
     AND 삭제 = 0
     {{일지조건}}
     Order By 작성일자 DESC;
-    Select 인덱스, 기관코드, 기관명칭, 프로그램, 접수자, CONVERT(char(10),접수일자 ,120) AS 접수일자 , ISNULL(처리자, '') AS 처리자, 서비스상태, '' AS 내용
+    Select 인덱스, 기관코드, 기관명칭, 프로그램, 접수자, CONVERT(char(10),접수일자 ,120) AS 접수일자 , ISNULL(처리자, '') AS 처리자, 서비스상태, '' AS 내용, 서비스타입
     From NeoAs..N_Service
     Where 1 = 1
     {{AS조건}}
@@ -393,7 +405,7 @@
     END CATCH   
   </_HospitalManageHistory_DELETE>
   <_HospitalManageInfo>
-    SELECT 병원유형, 전산담당, 결제담당, 메모 FROM NeoAS..N_병원특이사항
+    SELECT 병원유형, 전산담당, 결제담당, 메모, ISNULL(CONVERT(char(19), 수정일자, 120),'') AS 수정일자, 수정자 FROM NeoAS..N_병원특이사항
     WHERE USER_ID = %s
   </_HospitalManageInfo>
   <_HospitalManageInfo_SAVE>
@@ -403,7 +415,7 @@
           DELETE FROM N_병원특이사항 WHERE USER_ID = %s
         End
       
-      INSERT INTO NeoAS..N_병원특이사항(USER_ID,병원유형, 전산담당, 결제담당, 메모)
+      INSERT INTO NeoAS..N_병원특이사항(USER_ID,병원유형, 전산담당, 결제담당, 메모, 수정일자, 수정자)
       VALUES (%s)
       Select 0 As Status, 'SUCCESS' as Message 
     End Try

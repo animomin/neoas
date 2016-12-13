@@ -5,7 +5,11 @@
           var item = neo.users.find(function(_item){
             return parseInt(_item.USER_ID) === parseInt(user_id);
           });
-          return item;
+          return item || {
+              USER_ID : 0,
+              USER_NAME : '',
+              user_area : ''
+          };
         }
       }
     }catch(e){

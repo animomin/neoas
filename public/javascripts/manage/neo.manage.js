@@ -57,14 +57,15 @@
 
     this.defaultASListItem = '' +
     '<tr>' +
-    '  <td data-name="인덱스">{{인덱스}}</td>' +
+    '  <td class="breakpoints-xs breakpoints-sm" data-name="인덱스">{{인덱스}}</td>' +
     '  <td class="breakpoints-xs" data-name="기관코드">{{기관코드}}</td>' +
     '  <td data-name="기관명칭">{{기관명칭}}</td>' +
     '  <td class="breakpoints-xs breakpoints-sm">{{프로그램}}</td>' +
+    '  <td>{{서비스타입}}</td>' +
     '  <td class="breakpoints-xs breakpoints-sm breakpoints-md">{{접수자}}</td>' +
-    '  <td class="breakpoints-xs breakpoints-sm breakpoints-md">{{접수일자}}</td>' +
-    '  <td class="breakpoints-xs breakpoints-sm breakpoints-md">{{처리자}}</td>' +
-    '  <td>{{서비스상태}}</td>' +    
+    '  <td class="breakpoints-xs breakpoints-sm breakpoints-md">{{접수일자}}</td>' +    
+    '  <td>{{서비스상태}}</td>' +
+    '  <td>{{처리자}}</td>' +    
     '</tr>';
 
     this.defaultHospitalInfo = '' +
@@ -163,6 +164,27 @@
       template = template.replace('{{처리자}}', data[i].처리자);
       template = template.replace('{{서비스상태}}', ASSTATUS.ServiceName(parseInt(data[i].서비스상태)));      
 
+      var typename;
+      switch (parseInt(data[i].서비스타입)) {
+        case 0:
+          typename='선택없음';
+          break;
+        case 1:
+          typename='장애';
+          break;
+        case 2:
+          typename='사용법';
+          break;
+        case 3:
+          typename='개선';
+          break;
+        case 4:
+          typename='기타';
+          break;
+      }
+      template = template.replace('{{서비스타입}}', typename);
+
+
       view = view + template;
     }
     return view;
@@ -207,7 +229,7 @@
     this.$hospitalInfo = $('div#hospital-info');
     this.$hospitalUniqInfo = $('table.hospital-info tr td');
     this.$hospitalUniq = $('button[data-target="#hospital-uniq-dialog"]');
-
+    this.$hospitalUniqWriteDate = $('small#uniq-writedate');
     if(mobile){
       this.$hospitalTabs = $('a.hospital-tabs');
     }
@@ -257,7 +279,7 @@
           // ['picture', ['picture']]],
       lang : 'ko-KR',
       height : 400,
-      placeholder : self.template.defaultVisitPlaceHolder,
+      // placeholder : self.template.defaultVisitPlaceHolder,
       buttons : {},
       callbacks: {
         onInit: function() {
@@ -277,7 +299,8 @@
           keyboardNavigation: false,
           forceParse: false,
           autoclose: true,
-          todayHighlight: true
+          todayHighlight: true,
+          todayBtn : 'linked'
       });
     });
 
@@ -356,9 +379,11 @@
       var temp = self.$historyWriteType;
       temp.unbind('click').bind('click', function(event){
         if($(this).val() == 0){
-          self.$historyEditor_PlaceHolder.empty().append(self.template.defaultVisitPlaceHolder);
+          // self.$historyEditor_PlaceHolder.empty().append(self.template.defaultVisitPlaceHolder);
+          self.$historyEditor.summernote('code', self.template.defaultVisitPlaceHolder);
         }else{
-          self.$historyEditor_PlaceHolder.empty().append(self.template.defaultTelPlaceHolder);
+          // self.$historyEditor_PlaceHolder.empty().append(self.template.defaultTelPlaceHolder);
+          self.$historyEditor.summernote('code', self.template.defaultTelPlaceHolder);
         }
       });
 
@@ -717,12 +742,11 @@
           $(v).html('<pre class="unstyled-pre">'+data[key]+'</pre>');
         }else{
           $(v).text(data[key]);
-        }
-
-        
+        }        
       }
     });
     
+    this.$hospitalUniqWriteDate.text('수정정보 : ' + ( data['수정일자'] || '') + ' / ' + neo.users.GetUserName(data['수정자']).USER_NAME );
 
     this.$hospitalUniq.data('id', data.user_id);
     this.$historySearch.data('id', data.user_id);
@@ -757,8 +781,10 @@
         self.$historyWrite.data('id', data.USER_ID);
         self.$historyWrite.data('key', data.key);
 
-        if(data.처리일자)
+        if(data.처리일자){
           self.$historyDate.filter('[data-name="work"]').val(data.처리일자);
+          self.$historyDate.filter('[data-name="work"]').datepicker('setDate', data.처리일자);
+        }
       }else{
         $(v).addClass('hidden')
       }
@@ -774,7 +800,9 @@
     data.writer = neo.user.USER_ID;
     data.workdate = this.$historyDate.filter('[data-name="work"]').val();
     data.contents = this.$historyEditor.summernote('code');
-    data['지사코드'] = neo.user.user_area
+    data['지사코드'] = neo.user.user_area;
+
+    debugger;
     if(!data.type){      
       neoNotify.Show({
         text : '일지유형을 선택해주세요.',
@@ -804,9 +832,11 @@
       computation : $('input#uniq-computation').val(),
       payer : $('input#uniq-payer').val(),
       // extra : $('select#uniq-extra-service').selectpicker('val'),
-      memo : $('textarea#uniq-memo').val()
+      memo : $('textarea#uniq-memo').val(),
+      writedate : (new Date()).GetToday('YYYY-MM-DD HH:MM:SS'),
+      writer : neo.user.USER_ID
     };
-
+  
     data.extra = data.extra ? data.extra.toString() : "";
 
     callback(data);
