@@ -78,6 +78,7 @@ exports.isConnected = function(){
 
 Connect(function(){
   member.SetNeoMembers();
+	area.SetNeoArea();
 });
 exports.connection = connection;
 exports.connected = connection.connected;

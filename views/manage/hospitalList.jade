@@ -2,11 +2,12 @@ div.panel-heading.no-padding
   div.form-group.m-b-xs.m-t-xs.m-l-xs.m-r-xs    
     div.input-group        
       span.input-group-btn
-        button.btn.btn-sm.btn-default#area-all 전체        
+        button.btn.btn-default#area-all 전체        
       span.input-group-addon.hidden
         i.fa.fa-search
-
-      input.input.input-sm.form-control#search(
+      span.input-group-btn
+        select.selectpicker.neoMembers(title='담당자')
+      input.input.form-control#search(
         type='text',
         placeholder='요양기관검색')                
     

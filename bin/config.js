@@ -7,15 +7,16 @@
     global.fs = require('fs');
     global.datetime = require('node-datetime');
     global.logger = require('./logger');
-    var neoConst = require('./const');
-    global.area = neoConst.area;
-    global.emrs = neoConst.emrs;
-    neoConst.settings._loadLayouts();
+    
 
     global.server16 = require('../dist/_db/neoServer16');
     global.server22 = require('../dist/_db/neoServer22');
     global.member = require('../dist/Member');
     global.client = require('../dist/Client');
+    var neoConst = require('./const');
+    global.area = neoConst.area;
+    global.emrs = neoConst.emrs;
+    neoConst.settings._loadLayouts();
 
 
     var extend = util._extend;

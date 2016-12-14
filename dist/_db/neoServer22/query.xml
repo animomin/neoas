@@ -16,6 +16,9 @@
     And   NOT ISNULL(USER_NAME,'') = ''
     Order By user_area, USER_ID
   </_NeoMembers>
+  <_NeoArea>
+  </_NeoArea>
+    Select area_id, area_name From NC_N_AREA
   <_HospInfo>
     Select %s
     From NC_H_USER AS U

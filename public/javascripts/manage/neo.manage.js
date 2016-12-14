@@ -28,6 +28,10 @@
     '<div>홈페이지 faq 프린터 검색을 안내하고 처리완료.</div>' +
     '<div><br></div>';
 
+    this.defaultHospListNoData = '' +
+    '<tr>' +
+    ' <td colspan="3" class="text-center"><h4 class="text-center">No Results</h4></td>' +    
+    '</tr>';
 
     this.defaultHospListItem = '' +
     '<tr class="hosp-item" data-id="{{ID}}" data-index="{{INDEX}}" data-hospnum="{{기관코드}}">' +
@@ -63,7 +67,7 @@
     '  <td class="breakpoints-xs breakpoints-sm">{{프로그램}}</td>' +
     '  <td>{{서비스타입}}</td>' +
     '  <td class="breakpoints-xs breakpoints-sm breakpoints-md">{{접수자}}</td>' +
-    '  <td class="breakpoints-xs breakpoints-sm breakpoints-md">{{접수일자}}</td>' +    
+    '  <td>{{접수일자}}</td>' +    
     '  <td>{{서비스상태}}</td>' +
     '  <td>{{처리자}}</td>' +    
     '</tr>';
@@ -101,18 +105,22 @@
   Template.prototype.insertHospItem = function(data){
     console.log('Template.insertHospItem method execute!');
     var view = '';
-    for(var i = 0; i < data.length; i++){
-      var template = this.defaultHospListItem;
+    if(data){
+      for(var i = 0; i < data.length; i++){
+        var template = this.defaultHospListItem;
 
-      template = template.replace(/{{INDEX}}/gim, i);
-      template = template.replace(/{{ID}}/gim, data[i].USER_ID);
-      template = template.replace('{{번호}}', i + 1);
-      template = template.replace('{{기관명칭}}', data[i].기관명칭);
-      template = template.replace(/{{기관코드}}/gim, data[i].기관코드);
-      template = template.replace('{{프로그램}}', data[i].프로그램);
-      template = template.replace('{{대표자}}', data[i].대표자);
+        template = template.replace(/{{INDEX}}/gim, i);
+        template = template.replace(/{{ID}}/gim, data[i].USER_ID);
+        template = template.replace('{{번호}}', i + 1);
+        template = template.replace('{{기관명칭}}', data[i].기관명칭);
+        template = template.replace(/{{기관코드}}/gim, data[i].기관코드);
+        template = template.replace('{{프로그램}}', data[i].프로그램);
+        template = template.replace('{{대표자}}', data[i].대표자);
 
-      view = view + template;
+        view = view + template;
+      }
+    }else{
+      view = this.defaultHospListNoData;
     }
     return view;
   };
@@ -223,6 +231,7 @@
     this.$areaAll = $('button#area-all');
     this.$hospSearch = $('input#search');
     this.$hospitalList = $('tbody#hospital-list');
+    this.$hospManager = $('select.neoMembers');
     this.$hospitalTable = this.$hospitalList.parent();    
     
     // this.$hospitalInfo = $('table.hospital-info tr td');
@@ -250,14 +259,19 @@
 
     //Modls
     this.$uniqDialog = $('div#hospital-uniq-dialog');
-    var temp = this.$uniqDialog.find('select.neo-members');
+    var temp = this.$hospManager;
 
+    temp.prepend('<option value=""> 전체 </option>');
     neo.users.forEach(function(_m){
-      temp.append('<option value="'+_m.USER_ID+'">' + _m.USER_NAME + '</option>');
-      
+      if(_m.USER_ID === neo.user.USER_ID){
+        temp.prepend('<option value="'+_m.USER_ID+'">' + _m.USER_NAME + '</option>');
+      }else{
+        temp.append('<option value="'+_m.USER_ID+'">' + _m.USER_NAME + '</option>');
+      }      
     });
     temp.each(function(i,v){
       $(v).selectpicker({
+        width : 'fit',
         liveSearch : true,
         size : 5,
         title : $(v).data('title')
@@ -268,6 +282,7 @@
       size : 5
     });
 
+    
     
     
     
@@ -337,6 +352,11 @@
         if(event.type == 'keyup' && (event.keyCode == 13 || event.key == 'Enter')){
           handler($(this).val().trim());
         }
+      });
+
+      var temp = self.$hospManager;
+      temp.unbind('changed.bs.select').bind('changed.bs.select', function(event){
+        handler(self.$hospSearch.val().trim());
       });
       
     /**
@@ -802,7 +822,7 @@
     data.contents = this.$historyEditor.summernote('code');
     data['지사코드'] = neo.user.user_area;
 
-    debugger;
+    
     if(!data.type){      
       neoNotify.Show({
         text : '일지유형을 선택해주세요.',
@@ -861,6 +881,8 @@
 
     this.view.bind('hospSearch', function(search){
       self.model.hospSearch = search;
+      self.model.hospManager = self.view.$hospManager.selectpicker('val');
+      
       self.showHospList();
     })
 
@@ -925,7 +947,9 @@
     var self = this;
     this.model.readHosp(function(result){
       if(result.err){
-
+        if(result.err === 'NODATA'){
+          self.view.render('showHospList', null);
+        }
       }else{
         self.view.render('showHospList', result.data);
       }
@@ -1006,9 +1030,17 @@
         var parent = item.target;
         parent.data('target', 'history-' + parent.index() + '-' + item.type);
         parent.addClass('has-child');
+
+        var colCount = 0;
+        parent.find('td').each(function(i,v){
+          // if($(v).is(':visible')){
+            colCount += 1;
+          // }
+        });
+        //debugger;
         parent.after(
           '<tr class="collapse in animated fadeInRight" id="'+'history-' + parent.index()+ '-' + item.type + '"> ' + 
-          '  <td colspan="' + (item.type == 2 ? 7 : 6) + '" class="content-preview">' + result.data[0].내용 + '</td>' +
+          '  <td colspan="' + colCount + '" class="content-preview">' + result.data[0].내용 + '</td>' +
           '</tr>');       
 
       }
@@ -1056,6 +1088,7 @@
     this.storage = storage;
     this.hospAreaAll = false;
     this.hospSearch = '';
+    this.hospManager = '';
   }
 
   Model.prototype.clearData = function(callback){
@@ -1077,7 +1110,8 @@
       url : '/manage/hosplist',
       data : {
         area : this.hospAreaAll ? '' : neo.user.user_area,
-        search : this.hospSearch
+        search : this.hospSearch,
+        manager : this.hospManager
       },
       dataType : 'json',
       method : 'GET',

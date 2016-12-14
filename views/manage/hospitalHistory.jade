@@ -13,7 +13,7 @@ div.row.white-bg.dashboard-header
             button.btn.btn-sm.btn-outline.btn-primary.history-quickDate(data-name='y') 어제
             button.btn.btn-sm.btn-outline.btn-primary.history-quickDate(data-name='t') 오늘
 
-  div.col-lg-12
+  div.col-lg-12.no-padding
     div.tabs-container
       ul.nav.nav-tabs.navs-3
         li.active 
@@ -24,7 +24,7 @@ div.row.white-bg.dashboard-header
           a.history-tabs(href='#tab-3', data-toggle='tab', data-name='웹A/S') 웹A/S
       div.tab-content
         div#tab-1.history-pane.tab-pane.active.fade.in
-          div.history-table-wrapper.wrapper.wrapper-content
+          div.history-table-wrapper
             //- table.history-table.table#history-table-visit(data-paging="false", data-sorting="true", data-filtering="true", data-editing="true", data-editing-always-show="true")
             
             table.history-table.table.table-hover#history-table-visit
@@ -41,7 +41,7 @@ div.row.white-bg.dashboard-header
                   th ACT.
               tbody
         div#tab-2.history-pane.tab-pane.fade
-          div.history-table-wrapper.wrapper.wrapper-content
+          div.history-table-wrapper
             //- table.history-table.table#history-table-tel(data-paging="false", data-sorting="true", data-filtering="true", data-editing="true", data-editing-always-show="true")
 
             table.history-table.table.table-hover#history-table-tel
@@ -58,7 +58,7 @@ div.row.white-bg.dashboard-header
                   th ACT.
               tbody
         div#tab-3.history-pane.tab-pane.fade
-          div.history-table-wrapper.wrapper.wrapper-content
+          div.history-table-wrapper
             //- table.history-table.table#history-table-web(data-paging="false", data-sorting="true", data-filtering="true")
             table.history-table.table.small.table-hover#history-table-web
               thead
@@ -69,7 +69,7 @@ div.row.white-bg.dashboard-header
                   th.breakpoints-xs.breakpoints-sm 프로그램
                   th 구분                  
                   th.breakpoints-xs.breakpoints-sm.breakpoints-md 접수자
-                  th.breakpoints-xs.breakpoints-sm.breakpoints-md 접수일자
+                  th 접수일자
                   th 상태
                   th 처리자
               tfoot

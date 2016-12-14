@@ -63,11 +63,24 @@
           if(params.area !== ''){
             if(params.area == '0000'){
               where += " AND I.INFO_AREA IN ('0000', '0008','0026','0029','0030')";
+            }else if(params.area.match(/0023|0034/gim)){
+              where += " AND I.INFO_AREA IN ('0023', '0034')";
+            }else if(params.area.match(/0028|0035/gim)){
+              where += " AND I.INFO_AREA IN ('0028', '0035')";
+            }else if(params.area.match(/0025|0036/gim)){
+              where += " AND I.INFO_AREA IN ('0025', '0036')";
+            }else if(params.area.match(/0033|0037/gim)){
+              where += " AND I.INFO_AREA IN ('0033', '0037')";
             }else{
               where += " AND I.INFO_AREA = '" + params.area + "'";
             }
 
           } 
+
+          if(params.manager){
+            where += " AND H.user_담당자 =  " + params.manager; 
+          }
+
           if(params.search !== '') where += " AND ( H.user_med_id like '%" + params.search + "%' OR H.user_med_name like '%" + params.search + "%')"
           where += " AND C.데이터1 <> 18 ";
           var sort = " C.데이터1 ";

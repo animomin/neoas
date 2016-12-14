@@ -150,6 +150,22 @@ var neoConst = {
     }
   },
   area : {
+    SetNeoArea : function(){
+      var self = this;
+      // var query = global.querys22._NeoArea;
+      var query = 'Select area_id, area_name From NC_N_AREA';
+      if(server22.connection.connected){
+        server22.RecordSet(query, function(err, records){
+          records.forEach(function(_item){
+            if(self.hasOwnProperty(_item.area_id)){
+              self[_item.area_id] = _item.area_name;
+            }else{
+              self[_item.area_id] = _item.area_name;
+            }
+          });
+        });
+      }
+    },
     "0000" : "본 사",
     "0001" : "서울중부",
     "0002" : "경기북부",
