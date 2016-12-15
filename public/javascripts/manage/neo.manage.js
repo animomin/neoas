@@ -244,6 +244,7 @@
     }
 
     this.$historySearch = $('button#history-search');
+    this.$historyKeyword = $('input#history-keyword');
     this.$historyQuickDate = $('button.history-quickDate');
     this.$historyTabs = $('a.history-tabs');
     this.$historyDate = $('div.input-daterange input');    
@@ -474,7 +475,7 @@
             if(target.dataset.name.toLowerCase() === event.toLowerCase()){
               self._getHospUniqWriteData(function(data){
                 if(data){
-                  handler(data);
+                  handler(data, $(target));
                 }
               });
             }
@@ -484,12 +485,13 @@
     }else if(event === 'historyQuickDate, historySearch'){
       console.log('View.bind.historyQuickDate, historySearch execute');
       var temp = self.$historySearch;
-      temp.unbind('click').bind('click', function(event){        
+      temp.unbind('click').bind('click', function(event){                
         handler({
           id : $(this).data('id'),
+          keyword : self.$historyKeyword.val().trim(),
           start : self.$historyDate.filter('[data-name="start"]').val(),
           end : self.$historyDate.filter('[data-name="end"]').val()
-        })
+        },self.$historySearch);
       });
       temp = self.$historyQuickDate;
       temp.unbind('click').bind('click', function(event){
@@ -504,9 +506,21 @@
         });
         handler({
           id : $(this).data('id'),
+          keyword : self.$historyKeyword.val().trim(),
           start : day,
           end : day
-        });
+        },self.$historySearch);
+      });
+      temp = self.$historyKeyword;
+      temp.unbind('keyup').bind('keyup', function(event){
+        if(event.type == 'keyup' && (event.keyCode == 13 || event.key == 'Enter')){
+          handler({
+            id : self.$historySearch.data('id'),
+            keyword : $(this).val().trim(),
+            start : self.$historyDate.filter('[data-name="start"]').val(),
+            end : self.$historyDate.filter('[data-name="end"]').val()
+          },self.$historySearch);
+        }
       });
     }else if(event === 'historyDetail'){
       console.log('View.bind.historyDetail execute');
@@ -804,6 +818,8 @@
         if(data.처리일자){
           self.$historyDate.filter('[data-name="work"]').val(data.처리일자);
           self.$historyDate.filter('[data-name="work"]').datepicker('setDate', data.처리일자);
+        }else{
+          self.$historyDate.filter('[data-name="work"]').datepicker('setDate', (new Date()).GetToday());
         }
       }else{
         $(v).addClass('hidden')
@@ -910,12 +926,12 @@
       self.view.render('showHospUniqInfo', self.model.storage.getData('hospitalInfo'));
     });
 
-    this.view.bind('hospUniqSave', function(data){
-      self.saveHospitalUniqInfo(data);
+    this.view.bind('hospUniqSave', function(data, loader){
+      self.saveHospitalUniqInfo(data, loader);
     });    
 
-    this.view.bind('historyQuickDate, historySearch', function(item){
-      self.showHospHistoryList(item);
+    this.view.bind('historyQuickDate, historySearch', function(item, loader){
+      self.showHospHistoryList(item, loader);
     });
 
     this.view.bind('historyDetail', function(item){
@@ -967,24 +983,25 @@
     });
   };
 
-  Controller.prototype.showHospHistoryList = function(item){
+  Controller.prototype.showHospHistoryList = function(item, loader){
     var self = this;
 
     if(!item){
       item = {
         id : null,
+        keyword : self.view.$historyKeyword.val().trim(),
         start : self.view.$historyDate.filter('[data-name="start"]').val(),
         end : self.view.$historyDate.filter('[data-name="end"]').val()        
       };      
     }
-    
+
     this.model.readHospHistoryList(item, function(result){
       if(result.err){
 
       }else{
         self.view.render('showHospHistoryList', result.data);        
       }
-    });
+    }, loader);
   }
 
   Controller.prototype.saveHistory = function(data){
@@ -1003,7 +1020,7 @@
     });
   };
 
-  Controller.prototype.saveHospitalUniqInfo = function(data){
+  Controller.prototype.saveHospitalUniqInfo = function(data, loader){
     var self = this;
     this.model.saveHospitalUniqInfo(data, function(result){
       if(result.err){
@@ -1015,7 +1032,7 @@
       }else{
         self.showHospInfo(data.USER_ID);
       }
-    })
+    },loader);
   };
 
   Controller.prototype.showHistoryDetail = function(item){
@@ -1198,14 +1215,20 @@
     });
   };
 
-  Model.prototype.saveHospitalUniqInfo = function(_data, _callback){
+  Model.prototype.saveHospitalUniqInfo = function(_data, _callback, _loader){
     $.ajax({
       url : '/manage/hospinfo',
       data : _data,
       dataType : 'json',
       method : 'POST',
       async : true,
-      beforeSend : function(){},
+      beforeSend : function(){
+        if(_loader){          
+          if(!_loader.find('i').length){
+            _loader.prepend('<i class="fa fa-spinner fa-spin"></i> ').addClass('disabled');
+          }
+        }
+      },
       success : function(result){        
         _callback(result)
       },
@@ -1213,11 +1236,15 @@
         console.log('ERROR!!!');
         console.log(a,b,c);
       },
-      complete : function(result){}
+      complete : function(result){
+        if(_loader){
+          _loader.removeClass('disabled').find('i').remove();
+        }
+      }
     })
   };
 
-  Model.prototype.readHospHistoryList = function(_item, _callback){
+  Model.prototype.readHospHistoryList = function(_item, _callback, _loader){
     var self = this;
     if(_item.id){
       var hosp = this.storage.getData('hospitalInfo');
@@ -1231,10 +1258,15 @@
       data : _item,
       dataType : 'json',
       method : 'GET',
-      async : false,
+      async : true,
       beforeSend : function(){
         if(self.storage){        
           self.storage.removeData('historyList');
+        }
+        if(_loader){          
+          if(!_loader.find('i').length){
+            _loader.prepend('<i class="fa fa-spinner fa-spin"></i> ').addClass('disabled');
+          }
         }
       },
       success : function(result){       
@@ -1247,6 +1279,9 @@
       complete : function(result){        
         if(self.storage){     
           self.storage.setData('historyList', result.responseJSON.data);
+        }
+        if(_loader){
+          _loader.removeClass('disabled').find('i').remove();
         }
       }
     })

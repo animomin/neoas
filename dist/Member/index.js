@@ -327,6 +327,24 @@
               where2 += " AND 지사코드 ='" + params["지사코드"] + "' ";
             }
           }
+
+          if(params.keyword && params.keyword !== ''){
+            where1 += " AND ( 기관코드 like '%" + params.keyword + "%' ";
+            where1 += "    OR 기관명칭 like '%" + params.keyword + "%' ";
+            where1 += "    OR 작성자 like '%" + params.keyword + "%' ";
+            where1 += "    OR 작성일자 like '%" + params.keyword + "%' ";
+            where1 += "    OR 처리일자 like '%" + params.keyword + "%' ";
+            where1 += "    OR 내용 like '%" + params.keyword + "%' )";
+
+            where2 += " AND ( 기관코드 like '%" + params.keyword + "%' ";
+            where2 += "    OR 기관명칭 like '%" + params.keyword + "%' ";
+            where2 += "    OR 접수자 like '%" + params.keyword + "%' ";
+            where2 += "    OR 접수일자 like '%" + params.keyword + "%' ";
+            where2 += "    OR 처리자 like '%" + params.keyword + "%' ";
+            where2 += "    OR 문의내용 like '%" + params.keyword + "%' )";
+
+          }
+
           query = query.replace(/{{일지조건}}/gim, where1);
           query = query.replace(/{{AS조건}}/gim, where2);
 

@@ -1,13 +1,17 @@
 div.row.white-bg.dashboard-header
   div.col-lg-12.wrapper.wrapper-content
     div.form-inline
-      div.form-group.m-r-xs
+      div.form-group
         div.input-daterange.input-group
           input.input-sm.form-control(type='text',data-name='start')
           span.input-group-addon ~
-          input.input-sm.form-control(type='text',data-name='end')
+          input.input-sm.form-control(type='text',data-name='end')          
+      div.form-group
+        div.input-group
+          input.input-sm.form-control#history-keyword(type='search', placeholder='일지검색')
           span.input-group-btn
-            button.btn.btn-sm.btn-primary#history-search 검색
+            button.btn.btn-sm.btn-primary#history-search 검색         
+      div.form-group
         div.form-group.m-r-xs
           div.btn-group
             button.btn.btn-sm.btn-outline.btn-primary.history-quickDate(data-name='y') 어제
