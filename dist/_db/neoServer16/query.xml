@@ -164,7 +164,7 @@
     END CATCH
   </_Request>
   <_RequestList>
-    Select 인덱스, 기관코드, 기관명칭, 지사코드,
+    Select 인덱스, N_Service.기관코드, 기관명칭, 지사코드,
            프로그램, 서비스상태, 컴퓨터정보, 접수자,
            접수연락처, {문의내용}, ISNULL(응급여부, 0) AS 응급여부, CONVERT(char(19),접수일자,120) AS 접수일자,
            현재버전, 보험규정, 병원전화, 팍스, 서버이름, 서버아이디,
@@ -172,8 +172,11 @@
            운영체제, SQL버전, ISNULL(서비스타입,0) AS 서비스타입, 수가, 약가, 치료재료, ISNULL(취소사유,'') AS 취소사유, ISNULL(본사AS, 0) AS 본사AS, 담당자,
            ISNULL(확인자, '') AS 확인자, ISNULL(확인자ID,'') AS 확인자ID, ISNULL(확인자지사,'') AS 확인자지사, ISNULL(확인자연락처,'') AS 확인자연락처, ISNULL(CONVERT(char(19),확인일자,120),'') AS 확인일자,
            ISNULL(인계자, '') AS 인계자, ISNULL(인계자ID,'') AS 인계자ID, ISNULL(인계자지사,'') AS 인계자지사, ISNULL(인계자연락처,'') AS 인계자연락처, ISNULL(CONVERT(char(19),인계일자,120),'') AS 인계일자,
-           ISNULL(처리자, '') AS 처리자, ISNULL(처리자ID,'') AS 처리자ID, ISNULL(처리자지사,'') AS 처리자지사, ISNULL(처리자연락처,'') AS 처리자연락처, ISNULL(CONVERT(char(19),처리일자,120),'') AS 처리일자
+           ISNULL(처리자, '') AS 처리자, ISNULL(처리자ID,'') AS 처리자ID, ISNULL(처리자지사,'') AS 처리자지사, ISNULL(처리자연락처,'') AS 처리자연락처, ISNULL(CONVERT(char(19),처리일자,120),'') AS 처리일자,
+           ISNULL(병원유형, 1) AS 병원유형
     From N_Service
+    LEFT JOIN N_병원특이사항
+    ON N_Service.기관코드 = N_병원특이사항.기관코드
     Where 1 = 1
     %s
     Order By %s
@@ -415,7 +418,7 @@
           DELETE FROM N_병원특이사항 WHERE USER_ID = %s
         End
       
-      INSERT INTO NeoAS..N_병원특이사항(USER_ID,병원유형, 전산담당, 결제담당, 메모, 수정일자, 수정자)
+      INSERT INTO NeoAS..N_병원특이사항(USER_ID, 기관코드, 병원유형, 전산담당, 결제담당, 메모, 수정일자, 수정자)
       VALUES (%s)
       Select 0 As Status, 'SUCCESS' as Message 
     End Try

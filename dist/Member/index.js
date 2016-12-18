@@ -267,7 +267,8 @@
       async.waterfall([
         function(callback){
           params.type = params.type || 1; 
-          var values = params.USER_ID + "," + 
+          var values = params.USER_ID + ",'" + 
+                      params.hospnum + "'," +
                       params.type + ",'" +
                       params.computation + "','" + 
                       params.payer + "','" + 
@@ -329,9 +330,16 @@
           }
 
           if(params.keyword && params.keyword !== ''){
+            
+            var findUser = neoMembers.find(function(_item){
+              return _item.USER_NAME.match(params.keyword);
+            });
+
             where1 += " AND ( 기관코드 like '%" + params.keyword + "%' ";
             where1 += "    OR 기관명칭 like '%" + params.keyword + "%' ";
-            where1 += "    OR 작성자 like '%" + params.keyword + "%' ";
+            if(findUser){
+              where1 += "    OR 작성자 like '%" + findUser.USER_ID + "%' ";
+            }
             where1 += "    OR 작성일자 like '%" + params.keyword + "%' ";
             where1 += "    OR 처리일자 like '%" + params.keyword + "%' ";
             where1 += "    OR 내용 like '%" + params.keyword + "%' )";

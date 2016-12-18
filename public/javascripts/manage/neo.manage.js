@@ -7,10 +7,8 @@
   function Template(){
     console.log('template');
     this.defaultVisitPlaceHolder = '' +
-    '<div>Ex. 양식에 맞춰 작성하세요!</div>' +
-    '<div><br></div>' +
-    '<div>정기방문 or 요청방문 or 영업방문 등</div>' +
-    '<div><br></div>' +
+    '<div>※ 방문형태: </div>' +
+    '<div><br></div>' +        
     '<div>1. 특이사항</div>' +
     '<div><br></div>' +
     '<div>2. 부서별 오류 / 요청사항&nbsp;</div>' +
@@ -443,6 +441,7 @@
         if($(this).attr('id') === 'hospital-uniq-dialog'){
           var target = event.relatedTarget;
           var id = $(target).data('id'); 
+          var hospnum = $(target).data('hospnum'); 
           if(!id){
             event.preventDefault();
             neoNotify.Show({
@@ -452,7 +451,7 @@
             });    
           }else{
             target = self.$uniqDialog.find('h3#uniq-title');
-            target.data('id', id);
+            target.data({'id': id, 'hospnum' : hospnum});
             $(':input:radio[name="uniq-type"]').prop('checked',false)
             temp.find('select').selectpicker('val', '');
             temp.find('textarea').val('');
@@ -782,7 +781,7 @@
     
     this.$hospitalUniqWriteDate.text('수정정보 : ' + ( data['수정일자'] || '') + ' / ' + neo.users.GetUserName(data['수정자']).USER_NAME );
 
-    this.$hospitalUniq.data('id', data.user_id);
+    this.$hospitalUniq.data({'id': data.user_id, 'hospnum' : data['기관코드']});
     this.$historySearch.data('id', data.user_id);
     this.$historyQuickDate.data('id', data.user_id);
 
@@ -864,6 +863,7 @@
   View.prototype._getHospUniqWriteData = function(callback){
     var data = {
       USER_ID : this.$uniqDialog.find('h3#uniq-title').data('id'),
+      hospnum : this.$uniqDialog.find('h3#uniq-title').data('hospnum'),
       type : $(":input:radio[name=uniq-type]:checked").val(),
       computation : $('input#uniq-computation').val(),
       payer : $('input#uniq-payer').val(),

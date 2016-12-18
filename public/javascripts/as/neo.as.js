@@ -466,6 +466,16 @@
             $(v).text(value);
           });
 
+          /** 병원유형 표시 */
+          var hospitalType = (function(){
+              switch(parseInt(_this.data.병원유형)){
+                case 0 :  return '<span class="text-success font-bold">우수</span>'; 
+                case 1 :  return '<span class="text-muted font-bold">보통</span>'; 
+                case 2 :  return '<span class="text-danger font-bold">주의</span>'; 
+              }
+          })();
+          $('#hospital-type').html(hospitalType);
+
           /**
            * AS문의내용 & 확인내용
            */
@@ -890,6 +900,9 @@
           $item.find('span.badge[data-name="서비스타입"]')
               .text(typename)
               .addClass(badgename);
+
+          $item.find('span.badge[data-name="병원유형"]').text(item.병원유형 == 0 ? '우수' : item.병원유형 == 2 ? '주의' : '보통')
+                                                      .addClass(item.병원유형 == 0 ? 'badge-success' : item.병원유형 == 2 ? 'badge-danger' : '')
 
           if(first){
             obj.prepend($item);

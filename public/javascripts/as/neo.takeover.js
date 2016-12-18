@@ -332,7 +332,9 @@
                         $item.find('span.badge[data-name="서비스타입"]')
                             .text(typename)
                             .addClass(badgename);
-
+                        $item.find('span.badge[data-name="병원유형"]')
+                            .text(item.병원유형 == 0 ? '우수' : item.병원유형 == 2 ? '주의' : '보통')
+                            .addClass(item.병원유형 == 0 ? 'badge-success' : item.병원유형 == 2 ? 'badge-danger' : '')
                         if (item.응급여부 === 1) {
                             obj.prepend($item);
                         } else {
