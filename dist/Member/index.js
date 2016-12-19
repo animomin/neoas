@@ -331,14 +331,21 @@
 
           if(params.keyword && params.keyword !== ''){
             
-            var findUser = neoMembers.find(function(_item){
+            var findUser = neoMembers.filter(function(_item){
               return _item.USER_NAME.match(params.keyword);
             });
 
             where1 += " AND ( 기관코드 like '%" + params.keyword + "%' ";
             where1 += "    OR 기관명칭 like '%" + params.keyword + "%' ";
             if(findUser){
-              where1 += "    OR 작성자 like '%" + findUser.USER_ID + "%' ";
+              var userids;
+              if(findUser.length > 1){
+                userids = findUser.map(function(_m){return _m.USER_ID;});
+                userids = userids.join(',');
+                where1 += "    OR 작성자 IN (" + userids + ") ";
+              }else{
+                where1 += "    OR 작성자 = " + findUser[0].USER_ID + " ";
+              }              
             }
             where1 += "    OR 작성일자 like '%" + params.keyword + "%' ";
             where1 += "    OR 처리일자 like '%" + params.keyword + "%' ";
