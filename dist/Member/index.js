@@ -337,7 +337,7 @@
 
             where1 += " AND ( 기관코드 like '%" + params.keyword + "%' ";
             where1 += "    OR 기관명칭 like '%" + params.keyword + "%' ";
-            if(findUser){
+            if(findUser.length){
               var userids;
               if(findUser.length > 1){
                 userids = findUser.map(function(_m){return _m.USER_ID;});
