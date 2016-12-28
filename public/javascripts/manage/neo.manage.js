@@ -16,14 +16,12 @@
     '<div>3. AS 접수내역 및 개발진행 사항</div>' +
     '<div><br></div>';
 
-    this.defaultTelPlaceHolder = '' +
-    '<div>Ex. 양식에 맞춰 작성하세요!</div>' +
-    '<div><br></div>' +
+    this.defaultTelPlaceHolder = '' +    
     '<div>Q. 문의내용</div>' +
-    '<div>사용중 프린터가 안됩니다.</div>' +
+    '<div><br></div>' +
     '<div><br></div>' +
     '<div>A. 처리내용</div>' +
-    '<div>홈페이지 faq 프린터 검색을 안내하고 처리완료.</div>' +
+    '<div><br></div>' +
     '<div><br></div>';
 
     this.defaultHospListNoData = '' +
@@ -250,6 +248,7 @@
     
     this.$historyWrite = $('div#history-body');
     this.$historyWriteType = $(':input:radio[name="history-type"]');
+    this.$historyWriteNotice = $('span#history-write-notice');
     
     
     //Pages
@@ -303,9 +302,13 @@
     });
 
     this.$historyDate.each(function(i,v){
-      var today = new Date().GetToday('YYYY-MM');
-      var lastday = (new Date( today.split('-')[0], today.split('-')[1], 0)).GetDate_CustomFormat('YYYY-MM-DD');
-      $(v).val($(v).data('name') === 'start' ?  today + "-01" : $(v).data('name') === 'end' ? lastday : new Date().GetToday('YYYY-MM-DD'));
+      // var today = new Date().GetToday('YYYY-MM');
+      // var lastday = (new Date( today.split('-')[0], today.split('-')[1], 0)).GetDate_CustomFormat('YYYY-MM-DD');
+      var today = new Date().GetDate_CustomFormat('YYYY-MM-DD');
+      var yesterday = new Date();
+          yesterday.setDate(yesterday.getDate()-1);      
+      yesterday = yesterday.GetDate_CustomFormat('YYYY-MM-DD');
+      $(v).val($(v).data('name') === 'start' ?  yesterday : $(v).data('name') === 'end' ? today : new Date().GetToday('YYYY-MM-DD'));
       $(v).datepicker({
           format : 'yyyy-mm-dd',
           language:'kr',
@@ -400,9 +403,11 @@
         if($(this).val() == 0){
           // self.$historyEditor_PlaceHolder.empty().append(self.template.defaultVisitPlaceHolder);
           self.$historyEditor.summernote('code', self.template.defaultVisitPlaceHolder);
+          self.$historyWriteNotice.text('반드시 양식에 맞춰 작성할 것! / 방문형태 상단 필수 작성 ( 정기 or 요청 or 영업 )');
         }else{
           // self.$historyEditor_PlaceHolder.empty().append(self.template.defaultTelPlaceHolder);
           self.$historyEditor.summernote('code', self.template.defaultTelPlaceHolder);
+          self.$historyWriteNotice.text('반드시 양식에 맞춰 작성할 것!');
         }
       });
 
@@ -1183,7 +1188,7 @@
       data : _data,
       dataType : 'json',
       method : 'POST',
-      async : true,
+      async : false,
       beforeSend : function(){},
       success : function(result){
         _callback(result);

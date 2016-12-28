@@ -274,7 +274,11 @@
 
                 where = "";
                 // if (parseInt(params.total) === 0) {
+                if(params.month){
                     where += " AND LEFT(convert(varchar(10), 접수일자, 120),7) = '" + params.month + "'";
+                }else if(params.day){
+                    where += " AND convert(varchar(10), 접수일자, 120) = '" + params.day + "'";
+                }
                 // }
 
                 // if (req.params.mode !== 'emr') {

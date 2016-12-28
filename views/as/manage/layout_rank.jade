@@ -46,6 +46,7 @@ div.container-fluid
                   h1.no-margins.total_as(data-kind="본사") 0 건
                   h5 본사 A/S            
   div.row.p-sm.m-l-sm.m-r-sm                    
+
     div.col-xs-12
       div.row 
         div.col-lg-4
@@ -104,6 +105,21 @@ div.container-fluid
                         th.text-right (인계건수 * 3000) + (인계건수(응급) * 5000)
                         th 수수료 합계
                     tbody(data-kind="member_takeover")
-                
-              
+  div.row            
+    div.col-xs-12
+      div.ibox.m-b-none.small
+        div.ibox-title 
+          div.form-inline
+            div.form-group
+              h3.m-t-none 
+                i.fa.fa-bar-chart
+                |  A/S 통계                        
+            div.form-group.m-l-md
+              div.input-group.date
+                span.input-group-addon
+                  i.fa.fa-calendar
+                input.form-control#rankDay(type='text')      
+        div.ibox-content
+          canvas#barChart_member_all_day
+          
           

@@ -91,6 +91,8 @@
                 return dd;
             case "YYYY년 MM월":
                 return yyyy + '년 ' + MM + "월";
+            case "YYYY년 MM월 DD일":
+                return yyyy + '년 ' + MM + "월 " + dd + "일";
             case "YYYY-MM":
                 return yyyy + '-' + MM;
             case "YYYY-MM-DD":

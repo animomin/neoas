@@ -207,14 +207,15 @@
     function AsRank(){
       var _this = this;
       this.options.month = (new Date()).GetToday('YYYY-MM');
-
+      this.options.day = (new Date()).GetToday('YYYY-MM-DD');
       var elem = this.elem;
       elem.$month = $('input#rankMonth');
+      elem.$day = $('input#rankDay');
       elem.$canvas = $('canvas');
       elem.$table = $('tbody');
 
       elem.$month.val(this.options.month.replace('-', '년 ') + '월');
-      $('.input-group.date').datepicker({
+      elem.$month.datepicker({
           format : 'yyyy년 mm월',
           language:'kr',
           minViewMode: 1,
@@ -226,29 +227,46 @@
         selDate = new Date($(this).datepicker('getDate'));
         _this.events.onMonthPick(selDate, _this);
       });
-
+      
+      elem.$day.val(new Date().GetToday('YYYY년 MM월 DD일'));
+      elem.$day.datepicker({      
+          format : 'yyyy년 mm월 dd일',    
+          language:'kr',          
+          keyboardNavigation: false,
+          forceParse: false,
+          autoclose: true,
+          todayHighlight: true
+      }).bind('hide', function(e){        
+        selDate = new Date($(this).datepicker('getDate'));
+        _this.events.onDayPick(selDate, _this);
+      });
 
     }
     AsRank.prototype = {
       /* DOM elements */
       elem : {
         $month : null,
+        $day : null,
         $canvas : null,
         $table : null
       },
 
       /* DOM Events */
       events : {
-        onMonthPick : function(selDate, _this){
-          console.log();
+        onMonthPick : function(selDate, _this){          
           _this.options.month = selDate.GetDate_CustomFormat("YYYY-MM");
           _this.Load();
+        },
+        onDayPick : function(selDate, _this){
+          _this.options.day = selDate.GetDate_CustomFormat("YYYY-MM-DD");
+          _this.member.Load_Day(_this.options);
         }
       },
 
       /* Search */
       options : {
-        month : null
+        month : null,
+        day : null
       },
 
       company : {
@@ -604,6 +622,81 @@
 
             }
           });
+        },
+        Load_Day : function(opt){
+          
+          var _this = this;
+          neoAJAX.GetAjax({
+            url : '/rank/member',
+            data : {
+              day : opt.day
+            },
+            dataType : 'json',
+            method : 'GET',
+            async : false,
+            beforeSend : function(){              
+              _this.data = null;
+              if(window.memberAllChart_day){
+                window.memberAllChart_day.destroy();                
+              }              
+            },
+            success : function(opts,data){
+              if(data.err){
+                return neoNotify.Show({
+                  title : '직원별 A/S처리현황',
+                  text : data.err === 'NODATA' ? _NODATA : data.err.message,
+                  desktop : false
+                });
+              }
+              _this.data = data.data;
+              var count = 0;
+              _this.data.forEach(function(_item){
+                count += _item.완료 +
+                         _item.미완료 +
+                         _item.취소;
+              });
+              $('span#member_all_total').text(count+'건');
+            },
+            callback : function(){              
+              if(!_this.data) return false;
+              var ctx = document.getElementById('barChart_member_all_day').getContext('2d');
+              var myNewChart = new Chart(ctx, {
+                type : 'bar',
+                data : {
+                  labels : _this.data.map(function(item){return item.처리자;}),
+                  datasets : [
+                    {
+                      label : '완료',
+                      backgroundColor: "rgba(28,132,198,0.5)",
+                      borderColor : "rgba(28,132,198,1)",
+                      borderWidth : 1,
+                      data :  _this.data.map(function(item){return item.완료;})
+                    },
+                    {
+                      label : '미완료',
+                      backgroundColor: "rgba(248,172,89,0.5)",
+                      borderColor : "rgba(248,172,89,1)",
+                      borderWidth : 1,
+                      data :  _this.data.map(function(item){return item.미완료;})
+                    },
+                    {
+                      label : '취소',
+                      backgroundColor: "rgba(35,198,200,0.5)",
+                      borderColor : "rgba(35,198,200,1)",
+                      borderWidth : 1,
+                      data :  _this.data.map(function(item){return item.취소;})
+                    }
+                  ]
+                },
+                options : chartOptions
+              });
+              window.memberAllChart_day = myNewChart;
+
+             
+
+            }
+          });
+        
         }
       },
 
@@ -624,7 +717,7 @@
         _this.area.Load(this.options);
         _this.member.Load(this.options);
         _this.company.Load(this.options);
-
+        _this.member.Load_Day(this.options);
       }
     }
 
