@@ -126,7 +126,7 @@
         function(callback){
           if (server22.connection.connected) {
               server22.RecordSet(query, function(err, records) {
-                  console.log(records[0]);
+                  console.log(records);
                   if(records[1].length > 0){
                     var extra = '';
                     for(var i = 0; i < records[1].length; i++){
@@ -330,35 +330,93 @@
           }
 
           if(params.keyword && params.keyword !== ''){
-            
-            var findUser = neoMembers.filter(function(_item){
-              return _item.USER_NAME.match(params.keyword);
-            });
+            if(params.writer){
+              where1 += " AND 작성자 = " + params.keyword;
+              where2 += " AND 처리자ID = " + params.keyword;
+            }else{
+              var findUser = neoMembers.filter(function(_item){
+                return _item.USER_NAME.match(params.keyword);
+              });
 
-            where1 += " AND ( 기관코드 like '%" + params.keyword + "%' ";
-            where1 += "    OR 기관명칭 like '%" + params.keyword + "%' ";
-            if(findUser.length){
-              var userids;
-              if(findUser.length > 1){
-                userids = findUser.map(function(_m){return _m.USER_ID;});
-                userids = userids.join(',');
-                where1 += "    OR 작성자 IN (" + userids + ") ";
-              }else{
-                where1 += "    OR 작성자 = " + findUser[0].USER_ID + " ";
-              }              
+              where1 += " AND ( 기관코드 like '%" + params.keyword + "%' ";
+              where1 += "    OR 기관명칭 like '%" + params.keyword + "%' ";
+              if(findUser.length){
+                var userids;
+                if(findUser.length > 1){
+                  userids = findUser.map(function(_m){return _m.USER_ID;});
+                  userids = userids.join(',');
+                  where1 += "    OR 작성자 IN (" + userids + ") ";
+                }else{
+                  where1 += "    OR 작성자 = " + findUser[0].USER_ID + " ";
+                }              
+              }
+              where1 += "    OR 작성일자 like '%" + params.keyword + "%' ";
+              where1 += "    OR 처리일자 like '%" + params.keyword + "%' ";
+              where1 += "    OR 내용 like '%" + params.keyword + "%' )";
+
+              where2 += " AND ( 기관코드 like '%" + params.keyword + "%' ";
+              where2 += "    OR 기관명칭 like '%" + params.keyword + "%' ";
+              where2 += "    OR 접수자 like '%" + params.keyword + "%' ";
+              where2 += "    OR 접수일자 like '%" + params.keyword + "%' ";
+              where2 += "    OR 처리자 like '%" + params.keyword + "%' ";
+              where2 += "    OR 문의내용 like '%" + params.keyword + "%' )";
             }
-            where1 += "    OR 작성일자 like '%" + params.keyword + "%' ";
-            where1 += "    OR 처리일자 like '%" + params.keyword + "%' ";
-            where1 += "    OR 내용 like '%" + params.keyword + "%' )";
-
-            where2 += " AND ( 기관코드 like '%" + params.keyword + "%' ";
-            where2 += "    OR 기관명칭 like '%" + params.keyword + "%' ";
-            where2 += "    OR 접수자 like '%" + params.keyword + "%' ";
-            where2 += "    OR 접수일자 like '%" + params.keyword + "%' ";
-            where2 += "    OR 처리자 like '%" + params.keyword + "%' ";
-            where2 += "    OR 문의내용 like '%" + params.keyword + "%' )";
-
           }
+
+          query = query.replace(/{{일지조건}}/gim, where1);
+          query = query.replace(/{{AS조건}}/gim, where2);
+
+          
+          console.log(query);
+          callback(null);
+        },
+        function(callback){
+          if (server16.connection.connected) {
+              server16.RecordSet(query, function(err, records) {
+                  callback(err, records);                  
+              });
+          }
+        }
+      ], function(err, records){
+        if (err) {
+            logger.error(err);
+            data.err = err;
+            data.data = null;
+        } else if (!records || records.length <= 0) {
+            data.err = 'NODATA';
+            data.data = null;
+        } else {
+            data.err = null;
+            data.data = records;
+        }
+        _callback(data);
+      });
+    };
+
+    exports.GethospitalHistoryWriters = function(req, _callback){
+      var params = req.query;
+      async.waterfall([
+        function(callback){
+
+          var where1 = '', where2 = '';
+          query = querys16._HospitalManageHistoryWriters
+
+          if(params.id){
+            where1 = " AND USER_ID = " + params.id;
+            where2 = " AND 기관코드 = '" + params["기관코드"] + "' ";            
+          }
+          where1 += " AND CONVERT(char(10),작성일자 ,120) Between '" + params.start + "' AND '" + params.end + "' ";
+          where2 += " AND CONVERT(char(10),접수일자 ,120) Between '" + params.start + "' AND '" + params.end + "' ";
+          if(params["지사코드"] !== ''){
+
+            if(params['지사코드'] == '0000'){
+              where1 += " AND 지사코드 IN ('0000', '0008','0026','0029','0030') ";
+              where2 += " AND 지사코드 IN ('0000', '0008','0026','0029','0030') ";
+            }else{
+              where1 += " AND 지사코드 ='" + params["지사코드"] + "' ";
+              where2 += " AND 지사코드 ='" + params["지사코드"] + "' ";
+            }
+          }          
 
           query = query.replace(/{{일지조건}}/gim, where1);
           query = query.replace(/{{AS조건}}/gim, where2);

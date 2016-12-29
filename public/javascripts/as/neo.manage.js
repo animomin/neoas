@@ -516,9 +516,10 @@
                   desktop : false
                 });
               }
+              
               _this.data = data.data;
               var count = 0;
-              _this.data.forEach(function(_item){
+              _this.data[0].forEach(function(_item){
                 count += _item.완료 +
                          _item.미완료 +
                          _item.취소;
@@ -528,32 +529,33 @@
             callback : function(){
               console.log(_this);
               if(!_this.data) return false;
+              
               var ctx = document.getElementById('barChart_member_all').getContext('2d');
               var myNewChart = new Chart(ctx, {
                 type : 'bar',
                 data : {
-                  labels : _this.data.map(function(item){return item.처리자;}),
+                  labels : _this.data[0].map(function(item){return item.처리자;}),
                   datasets : [
                     {
                       label : '완료',
                       backgroundColor: "rgba(28,132,198,0.5)",
                       borderColor : "rgba(28,132,198,1)",
                       borderWidth : 1,
-                      data :  _this.data.map(function(item){return item.완료;})
+                      data :  _this.data[0].map(function(item){return item.완료;})
                     },
                     {
                       label : '미완료',
                       backgroundColor: "rgba(248,172,89,0.5)",
                       borderColor : "rgba(248,172,89,1)",
                       borderWidth : 1,
-                      data :  _this.data.map(function(item){return item.미완료;})
+                      data :  _this.data[0].map(function(item){return item.미완료;})
                     },
                     {
                       label : '취소',
                       backgroundColor: "rgba(35,198,200,0.5)",
                       borderColor : "rgba(35,198,200,1)",
                       borderWidth : 1,
-                      data :  _this.data.map(function(item){return item.취소;})
+                      data :  _this.data[0].map(function(item){return item.취소;})
                     }
                   ]
                 },
@@ -561,9 +563,9 @@
               });
               window.memberAllChart = myNewChart;
 
-              _this.data = _this.data.filter(function(item){
-                if(parseInt(item.인계) > 0 || parseInt(item.응급) > 0){
-                  return item;
+              _this.data = _this.data[1].filter(function(item){
+                if(parseInt(item.인계) > 0 || parseInt(item.응급) > 0){                  
+                  return item;                  
                 }
               });
 

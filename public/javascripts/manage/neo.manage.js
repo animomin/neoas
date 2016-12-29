@@ -29,9 +29,18 @@
     ' <td colspan="3" class="text-center"><h4 class="text-center">No Results</h4></td>' +    
     '</tr>';
 
+    this.defaultNewHospListItem = '' +
+    '<tr class="hosp-item" data-id="-1" data-index="-1" data-hospnum="0">' +
+    ' <td class="text-center"> <span class="label label-white text-white">New</span> </td>' +
+    ' <td>미등록거래처</td>' +    
+    ' <td>' +
+    //'   <button class="btn btn-default btn-xs history-write" data-index="{{INDEX}}" data-toggle="modal" data-target="#history-write-dialog"><i class="fa fa-pencil"></i></button></td>' +
+    '   <button class="btn btn-default btn-xs history-write" data-index="-1"><i class="fa fa-pencil"></i></button></td>' +
+    '</tr>';
+
     this.defaultHospListItem = '' +
     '<tr class="hosp-item" data-id="{{ID}}" data-index="{{INDEX}}" data-hospnum="{{기관코드}}">' +
-    ' <td>{{번호}}</td>' +
+    ' <td class="text-center">{{번호}}</td>' +
     ' <td>{{기관명칭}} / {{기관코드}}</td>' +    
     ' <td>' +
     //'   <button class="btn btn-default btn-xs history-write" data-index="{{INDEX}}" data-toggle="modal" data-target="#history-write-dialog"><i class="fa fa-pencil"></i></button></td>' +
@@ -101,7 +110,8 @@
   Template.prototype.insertHospItem = function(data){
     console.log('Template.insertHospItem method execute!');
     var view = '';
-    if(data){
+    view = this.defaultNewHospListItem;
+    if(data){      
       for(var i = 0; i < data.length; i++){
         var template = this.defaultHospListItem;
 
@@ -116,7 +126,21 @@
         view = view + template;
       }
     }else{
-      view = this.defaultHospListNoData;
+      view += this.defaultHospListNoData;
+    }
+    return view;
+  };
+
+  Template.prototype.insertHistoryWriters = function(data){
+    console.log('Template.insertHistoryWriters method execute');
+    var view = '';
+    if(data){      
+      for(var i = 0; i < data.length; i++){
+        var template = '<a href="#" class="btn btn-xs btn-default m-r-xs" data-value="{{작성자}}">{{작성자이름}}</a>';
+        template = template.replace('{{작성자}}', data[i].작성자);
+        template = template.replace('{{작성자이름}}', neo.users.GetUserName(data[i].작성자).USER_NAME);
+        view = view + template;
+      }
     }
     return view;
   };
@@ -242,6 +266,7 @@
     this.$historySearch = $('button#history-search');
     this.$historyKeyword = $('input#history-keyword');
     this.$historyQuickDate = $('button.history-quickDate');
+    this.$historyWriters = $('div#history-writers');
     this.$historyTabs = $('a.history-tabs');
     this.$historyDate = $('div.input-daterange input');    
     this.$historyTable = $('table.history-table')    
@@ -526,6 +551,22 @@
           },self.$historySearch);
         }
       });
+    }else if(event === 'historyWriter'){
+      console.log('View.bind.historyWriter execute');
+      var temp = self.$historyWriters;
+      temp.unbind('click').bind('click', function(event){
+        var target = $(event.target);
+        if(target[0].tagName.toLowerCase() === 'a'){
+          target.addClass('btn-primary').removeClass('btn-default').siblings().removeClass('btn-primary').addClass('btn-default');
+          handler({
+              id : self.$historySearch.data('id'),
+              keyword : target.data('value'),
+              start : self.$historyDate.filter('[data-name="start"]').val(),
+              end : self.$historyDate.filter('[data-name="end"]').val()
+            },self.$historySearch);
+        }
+      });
+    
     }else if(event === 'historyDetail'){
       console.log('View.bind.historyDetail execute');
       self.$historyTable.each(function(i ,v){
@@ -694,6 +735,11 @@
         });
 
       },
+      showHospHistoryWriters : function(){
+        console.log('View.render.showHospHistoryWriters execute');
+        self.$historyWriters.empty();
+        self._addHistoryWriters(data);
+      },
       showHistoryASPage : function(){
         console.log('View.render.showHistoryASPage execute');
         var _table = self.$historyTable.eq(2);    
@@ -727,6 +773,10 @@
     this.$historyQuickDate.removeData('id');
   };
 
+  View.prototype._addHistoryWriters = function(data){
+    this.$historyWriters.append(this.template.insertHistoryWriters(data));
+  };
+
   View.prototype._loadHospInfo = function(data){
     var self = this;
     this.$page.each(function(i,v){
@@ -738,6 +788,25 @@
     });
     this.$hospitalInfo.toggleClass('fadeIn'); 
     var template = this.template.defaultHospitalInfo;
+    if(data === 'unregister'){
+      data = {
+        '기관명칭' : '미등록거래처',
+        '기관코드' : '',
+        '프로그램' : '',
+        '진료과목' : '',
+        '대표자' : '',
+        '전화번호' : '',
+        '팩스번호' : '',
+        '핸드폰번호' : '',
+        '우편번호' : '',
+        '주소' : '',
+        '이메일' : '',
+        '담당자' : '',
+        '부가서비스' : '', 
+        '수정일자' : '',
+        '수정자' : ''        
+      };
+    }
     template = template.replace('{{기관명칭}}', data['기관명칭']);
     template = template.replace('{{기관코드}}', data['기관코드']);
     template = template.replace('{{프로그램}}', data['프로그램']);
@@ -812,21 +881,30 @@
         $(':input:radio[name="history-type"]').prop('checked',false);
         self.$historyEditor.summernote('code', '');
 
-        $(':input:radio[name="history-type"]:eq('+data.type+')').prop('checked',true);
-        self.$historyEditor.summernote('code', data.내용);
-
-        $(v).find('h3#history-title').text(data.기관명칭 + ' / ' + data.기관코드);
-        self.$historyWrite.data('id', data.USER_ID);
-        self.$historyWrite.data('key', data.key);
-
-        if(data.처리일자){
-          self.$historyDate.filter('[data-name="work"]').val(data.처리일자);
-          self.$historyDate.filter('[data-name="work"]').datepicker('setDate', data.처리일자);
+        if(data === 'unregister'){
+          $(v).find('h3#history-title').addClass('hidden');
+          $(v).find('input#history-unregister-title').removeClass('hidden');
+          self.$historyWrite.data('id', -1);
         }else{
-          self.$historyDate.filter('[data-name="work"]').datepicker('setDate', (new Date()).GetToday());
+          $(v).find('h3#history-title').removeClass('hidden');
+          $(v).find('input#history-unregister-title').addClass('hidden');
+          $(':input:radio[name="history-type"]:eq('+data.type+')').prop('checked',true);
+          self.$historyEditor.summernote('code', data.내용);
+
+          $(v).find('h3#history-title').text(data.기관명칭 + ' / ' + data.기관코드);
+          self.$historyWrite.data('id', data.USER_ID);
+          self.$historyWrite.data('key', data.key);
+
+          if(data.처리일자){
+            self.$historyDate.filter('[data-name="work"]').val(data.처리일자);
+            self.$historyDate.filter('[data-name="work"]').datepicker('setDate', data.처리일자);
+          }else{
+            self.$historyDate.filter('[data-name="work"]').datepicker('setDate', (new Date()).GetToday());
+          }
         }
+        
       }else{
-        $(v).addClass('hidden')
+        $(v).addClass('hidden');
       }
     });
 
@@ -859,6 +937,21 @@
         desktop : false
       });
       callback(null);
+    }
+
+    if(data.USER_ID === -1){
+      data['기관명칭'] = $('input#history-unregister-title').val().trim();
+      if(data['기관명칭'] === ''){
+        neoNotify.Show({
+          text : '거래처명칭을 작성해주세요.',
+          type : 'error',
+          desktop : false
+        });
+        callback(null);
+      }else{
+        data['기관코드'] = '미등록';
+        data['프로그램'] = '미등록';
+      }
     }
 
     callback(data);
@@ -897,6 +990,7 @@
       self.clearData(function(){
         self.showHospList();
         self.showHospHistoryList();
+        self.showHospHistoryWriters();
       });      
     });
 
@@ -908,15 +1002,25 @@
     })
 
     this.view.bind('hospClick', function(item){
-      if(item.hasOwnProperty('id')){
-        self.showHospInfo(item.id);
+
+      if(item.hasOwnProperty('id')){        
+        self.showHospInfo(item.id);        
         self.showHospHistoryList(item);
       }else if(item.hasOwnProperty('index')){
-        self.model.findItem('hospitalList', item.index, function(_item){
-          self.model.storage.setData('hospitalInfo', _item);
-          self.view.render('showHistroyWrite',_item);
-        });  
+        if(item.index < 0){
+          self.view.render('showHistroyWrite','unregister');
+        }else{
+          self.model.findItem('hospitalList', item.index, function(_item){
+            self.model.storage.setData('hospitalInfo', _item);
+            self.view.render('showHistroyWrite',_item);
+          });  
+        }
       }         
+    });
+    
+    this.view.bind('historyWriter', function(item, loader){
+      item.writer = true;
+      self.showHospHistoryList(item, loader);
     });
 
     this.view.bind('historyWriteType', function(){
@@ -950,7 +1054,6 @@
         self.historyASPaging(item);
       }
     });
-
    
     this.view.bind('historyRemove', function(item){
       self.removeHistory(item);
@@ -958,6 +1061,7 @@
 
     this.showHospList();
     this.showHospHistoryList();
+    this.showHospHistoryWriters();
   }
 
   Controller.prototype.clearData = function(callback){
@@ -979,13 +1083,17 @@
 
   Controller.prototype.showHospInfo = function(id){
     var self = this;
-    this.model.readHospInfo(id, function(result){
-      if(result.err){
+    if(id < 0){
+      self.view.render('showHospInfo', 'unregister');
+    }else{
+      this.model.readHospInfo(id, function(result){
+        if(result.err){
 
-      }else{
-        self.view.render('showHospInfo', result.data[0]);
-      }
-    });
+        }else{
+          self.view.render('showHospInfo', result.data[0]);
+        }
+      });
+    }
   };
 
   Controller.prototype.showHospHistoryList = function(item, loader){
@@ -1007,6 +1115,27 @@
         self.view.render('showHospHistoryList', result.data);        
       }
     }, loader);
+  };
+
+  Controller.prototype.showHospHistoryWriters = function(item){
+    var self = this;
+    if(!item){
+      item = {
+        id : null,
+        keyword : self.view.$historyKeyword.val().trim(),
+        start : self.view.$historyDate.filter('[data-name="start"]').val(),
+        end : self.view.$historyDate.filter('[data-name="end"]').val()        
+      };      
+    }
+
+    this.model.readHospHistoryWriters(item, function(result){
+      if(result.err){
+
+      }else{
+        self.view.render('showHospHistoryWriters', result.data);        
+      }
+    });
+
   }
 
   Controller.prototype.saveHistory = function(data){
@@ -1176,12 +1305,13 @@
 
   
   Model.prototype.saveHistory = function(_data, _callback){
-
-    var hosp = this.storage.getData('hospitalInfo');
-    _data["기관코드"] = hosp["기관코드"];
-    _data["기관명칭"] = hosp["기관명칭"];
-    _data["프로그램"] = hosp["프로그램"];
-    _data["지사코드"] = hosp["지사코드"];
+    if(_data.USER_ID > 0){
+      var hosp = this.storage.getData('hospitalInfo');
+      _data["기관코드"] = hosp["기관코드"];
+      _data["기관명칭"] = hosp["기관명칭"];
+      _data["프로그램"] = hosp["프로그램"];
+      _data["지사코드"] = hosp["지사코드"];
+    }
     
     $.ajax({
       url : '/manage/history',
@@ -1289,8 +1419,43 @@
           _loader.removeClass('disabled').find('i').remove();
         }
       }
-    })
+    });
   };
+
+  Model.prototype.readHospHistoryWriters = function(_item, _callback){
+    var self = this;
+    if(_item.id){
+      var hosp = this.storage.getData('hospitalInfo');
+      _item["기관코드"] = hosp["기관코드"];
+    }
+    // _item["지사코드"] = neo.user.user_area;
+    
+    _item['지사코드'] = this.hospAreaAll ? '' : neo.user.user_area;
+    $.ajax({
+      url : '/manage/history/writers',
+      data : _item,
+      dataType : 'json',
+      method : 'GET',
+      async : true,
+      beforeSend : function(){
+        if(self.storage){        
+          self.storage.removeData('historyListWriters');
+        }        
+      },
+      success : function(result){       
+        _callback(result)
+      },
+      error : function(a,b,c){
+        console.log('ERROR!!!');
+        console.log(a,b,c);
+      },
+      complete : function(result){        
+        if(self.storage){     
+          self.storage.setData('historyListWriters', result.responseJSON.data);
+        }       
+      }
+    });
+  }
 
   Model.prototype.getHistoryDetail = function(_item, _callback){
     $.ajax({

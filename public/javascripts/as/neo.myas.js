@@ -22,6 +22,7 @@
       toolbar : [
           ['mybutton', ['capture', 'done']],
           ['mybutton2', ['saveContext']],
+          ['mybutton2', ['pass']],
           ['style', ['bold', 'italic', 'underline', 'clear']],
           ['fontsize', ['fontsize']],
           ['color', ['color']],
@@ -101,6 +102,20 @@
             buttonID : 'peerAS',
             customClass : 'btn-danger',
             click : function(){_me.events.onPeerAS($(this));}
+          });
+          return button.render();
+        },
+        pass : function(context){
+          var ui = $.summernote.ui;
+          var button = ui.button({
+            contents : '<i class="fa fa-share"></i> 전달',
+            tooltip : '해당 A/S를 다른사람에게 전달합니다.',
+            buttonID : 'pass',
+            customClass : 'btn-default as-status-btn',
+            customAttr : {
+              attrName : 'data-type',
+              attrValue : '-2'
+            }            
           });
           return button.render();
         }
@@ -467,7 +482,7 @@
        * 2. 인계접수 : 서비스상태 업데이트 -> 클라이언트 상태변경 메세지 전송, 문의내용 업데이트 + (data.문의내용 값변경) , 상태바 리로드(왼쪽 리스트 새로 뿌리기)
        * 3. 완료 : 서비스상태 업데이트 -> 클라이언트 상태변경 메세지 전송, 문의내용 업데이트 + (data.문의내용 값변경) , 상태바 리로드(왼쪽 리스트 새로 뿌리기)
        */
-      UpdateAS : function(status){
+      UpdateAS : function(status, passer){
         var _this = _me.selItem;
         var cData = JSON.parse(JSON.stringify(_this.data));
         /* 선택된 AS건의 데이터 갱신 */
@@ -513,6 +528,12 @@
             cData.처리일자 = (new Date()).GetToday('YYYY-MM-DD HH:MM:SS');
             // cData.문의내용 = _me.elem.$edit.summernote('code');
             break;
+          case -2:
+            cData.처리자 = passer.USER_NAME;
+            cData.처리자ID = passer.USER_ID;
+            cData.처리자지사 = passer.user_area;
+            cData.처리자연락처 = passer.info_hp || passer.info_tel;
+
           default:
             break;
         }
@@ -1084,24 +1105,51 @@
         if(type >= 0){
           msg += "<br><small class='font-bold text-danger'> 서비스상태를 변경하면 접수자의 컴퓨터에도 알림이 나탑니다. </small> <br> 계속하시겠습니까?";
         }
-        swal({
-          title: 'AS 상태 변경',
-          //text: msg,
-          html : msg,
-          type: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-          confirmButtonText: '네, 변경합니다.'
-        }).then(function() {
-          _me.selItem.UpdateAS(type);
+        if(type === -2){
           swal({
-            title : '변경완료!',
-            text : 'AS상태가 변경되었습니다.',
-            type : 'success',
-            timer : 2000
+            title: '전달하실 직원을 선택해주세요.',
+            input: 'select',
+            inputOptions: (function(){
+              var members = {};
+              neo.users.forEach(function(_item){
+                members[_item.USER_ID] = _item.USER_NAME;
+              });
+              return members;
+            })(),
+            inputPlaceholder: '전달할 직원선택',
+            showCancelButton: true,
+            inputValidator: function (value) {
+              return new Promise(function (resolve, reject) {
+                if (value && parseInt(value) !== neo.user.USER_ID) {
+                  resolve();
+                } else {
+                  reject('직원을 선택해주세요.');
+                }
+              })
+            }
+          }).then(function (result) {
+            _me.selItem.UpdateAS(type,neo.users.GetUserName(parseInt(result)));
+          })
+        }else{
+          swal({
+            title: 'AS 상태 변경',
+            //text: msg,
+            html : msg,
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: '네, 변경합니다.'
+          }).then(function() {
+            _me.selItem.UpdateAS(type);
+            swal({
+              title : '변경완료!',
+              text : 'AS상태가 변경되었습니다.',
+              type : 'success',
+              timer : 2000
+            });
           });
-        });
+        }
 
       },
       onPopupImage : function(img){
@@ -1205,6 +1253,9 @@
         }else{
           b.find('i').removeClass('fa-check-square-o').addClass('fa-square-o');
         }
+      },
+      onPass : function(b){
+        console.log('object');
       },
 
       onChangeStatus : function(data){

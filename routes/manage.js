@@ -51,6 +51,12 @@ router.put('/history', function(req, res, next){
   });
 });
 
+router.get('/history/writers', function(req, res, next){
+  member.GethospitalHistoryWriters(req, function(result){
+    res.send(result);
+  });
+});
+
 router.get('/history/contents', function(req, res, next){
   member.GetHospitalHistoryDetail(req, function(result){
     res.send(result);

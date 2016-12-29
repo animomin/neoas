@@ -286,7 +286,14 @@
                 // } else {
                 //     query = util.format(query, where, where);
                 // }
+                if(req.params.mode === 'member'){
+                    if(params.month){
+                        query = query + ';' + query.replace('--','');
+                    }
+                }
+
                 logger.info(query);
+                console.log(query);
                 return callback2();
             },
             function(callback2) {

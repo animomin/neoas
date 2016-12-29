@@ -4,8 +4,11 @@ div.row.border-bottom.white-bg.dashboard-header
           i.fa.fa-pencil
           |  일지작성
         div.hr-line-dashed
-        h3#history-title
+        h3#history-title        
         div#history-body(data-id="-1")
+          div.form-group
+            label.control-label 거래처명칭: 
+            input.input.form-control#history-unregister-title(type='text', placeholder='거래처명칭')
           div.form-group
             div.input-daterange.form-inline.m-b-xs
               label.control-label 처리일자

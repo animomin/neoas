@@ -318,10 +318,11 @@
     FROM NeoAs..N_Service
     WHERE 1=1
     AND ISNULL(처리자ID,0) &lt;&gt; 0
-    AND 지사코드 NOT IN ('0000', '0030', '0040')
+    --AND 지사코드 NOT IN ('0000', '0030', '0040')
     %s
     GROUP BY 처리자ID, 처리자, 처리자지사
     ORDER BY 완료 DESC, 인계 DESC, 응급 DESC
+
   </_RankMember>
   <_RankHosp>
     SELECT 기관코드, 기관명칭,
@@ -372,6 +373,20 @@
     {{AS조건}}
     Order By 접수일자 DESC
   </_HospitalManageHistory>
+  <_HospitalManageHistoryWriters>
+    Select 작성자 From (
+      Select 작성자
+      From NeoAs..N_병원일지
+      Where 삭제 = 0
+      {{일지조건}}      
+      union all  
+      Select ISNULL(처리자ID, 0) AS 작성자
+      From NeoAs..N_Service
+      Where 1 = 1
+      AND ISNULL(처리자ID, 0) &lt;&gt; 0
+      {{AS조건}}      
+    ) AS T Group By T.작성자
+  </_HospitalManageHistoryWriters>
   <_HospitalManageHistory_SAVE>
     Begin Try
       Insert Into NeoAS..N_병원일지(USER_ID, 기관코드, 기관명칭, 프로그램, 지사코드, 일지구분, 내용, 작성자, 작성일자, 처리일자)
