@@ -709,9 +709,7 @@ body.canvas-menu.mini-navbar nav.navbar-static-side {
         display: block;
         float: none;
     }
-    .breakpoints-sm {
-        display : none !important;
-    }
+    
 }
 
 .menu-visible-lg,
@@ -3073,15 +3071,9 @@ a.forum-item-title:hover {
     .forum-desc {
         float: none !important;
     }
-    .breakpoints-md {
-        display: none !important;
-    }
+    
 }
-@media (max-width: 480px){
-    .breakpoints-xs {
-        display: none !important;
-    }
-}
+
 
 .vertical-container {
     margin: 0 auto;
@@ -8060,6 +8052,7 @@ body.landing-page {
     .landing-page .featurette-heading {
         margin-top: 120px;
     }
+    
 }
 
 @media (max-width: 768px) {

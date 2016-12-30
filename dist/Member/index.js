@@ -448,6 +448,40 @@
       });
     };
 
+    exports.GetHospitalVisitStatus = function(req, _callback){
+      var params = req.query;
+      async.waterfall([
+        function(callback){
+          query = querys16._HospitalVisitStatus;
+          query = query.replace(/{{작성자}}/gim, params.keyword);
+          console.log(query);
+          callback(null);
+        },
+        function(callback){
+          if (server16.connection.connected) {
+              server16.RecordSet(query, function(err, records) {
+                  console.log(err, records);
+                  callback(err, records);                  
+              });
+          }
+        }
+      ], function(err, records){
+        if (err) {
+            logger.error(err);
+            data.err = err;
+            data.data = null;
+        } else if (!records || records.length <= 0) {
+            data.err = 'NODATA';
+            data.data = null;
+        } else {
+            data.err = null;
+            data.data = records;
+        }
+        
+        _callback(data);
+      });
+    };
+
     exports.GetHospitalHistoryDetail = function(req, _callback){
       var params = req.query;
       async.waterfall([

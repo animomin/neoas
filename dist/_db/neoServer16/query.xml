@@ -450,4 +450,33 @@
     SELECT 문의내용 AS 내용 FROM NEOAS..N_Service
     WHERE 인덱스 = {{KEY}}
   </_HospitalManageHistoryDetail_AS>
+  <_HospitalVisitStatus>  
+    SELECT COUNT(작성자) AS TOTAL
+    FROM NEOAS..N_병원일지
+    WHERE CONVERT(char(4), 처리일자, 120) = CONVERT(char(4), GETDATE(), 120)
+    AND 일지구분 = 0
+    AND 작성자 = {{작성자}};
+
+    SELECT USER_ID, 기관코드, 기관명칭, 작성자,
+      SUM(CASE WHEN CONVERT(char(7), 처리일자, 120) = CONVERT(char(4), GETDATE(), 120) + '-01' THEN 1 ELSE 0 END) AS '1월',
+      SUM(CASE WHEN CONVERT(char(7), 처리일자, 120) = CONVERT(char(4), GETDATE(), 120) + '-02' THEN 1 ELSE 0 END) AS '2월',
+      SUM(CASE WHEN CONVERT(char(7), 처리일자, 120) = CONVERT(char(4), GETDATE(), 120) + '-03' THEN 1 ELSE 0 END) AS '3월',
+      SUM(CASE WHEN CONVERT(char(7), 처리일자, 120) = CONVERT(char(4), GETDATE(), 120) + '-04' THEN 1 ELSE 0 END) AS '4월',
+      SUM(CASE WHEN CONVERT(char(7), 처리일자, 120) = CONVERT(char(4), GETDATE(), 120) + '-05' THEN 1 ELSE 0 END) AS '5월',
+      SUM(CASE WHEN CONVERT(char(7), 처리일자, 120) = CONVERT(char(4), GETDATE(), 120) + '-06' THEN 1 ELSE 0 END) AS '6월',
+      SUM(CASE WHEN CONVERT(char(7), 처리일자, 120) = CONVERT(char(4), GETDATE(), 120) + '-07' THEN 1 ELSE 0 END) AS '7월',
+      SUM(CASE WHEN CONVERT(char(7), 처리일자, 120) = CONVERT(char(4), GETDATE(), 120) + '-08' THEN 1 ELSE 0 END) AS '8월',
+      SUM(CASE WHEN CONVERT(char(7), 처리일자, 120) = CONVERT(char(4), GETDATE(), 120) + '-09' THEN 1 ELSE 0 END) AS '9월',
+      SUM(CASE WHEN CONVERT(char(7), 처리일자, 120) = CONVERT(char(4), GETDATE(), 120) + '-10' THEN 1 ELSE 0 END) AS '10월',
+      SUM(CASE WHEN CONVERT(char(7), 처리일자, 120) = CONVERT(char(4), GETDATE(), 120) + '-11' THEN 1 ELSE 0 END) AS '11월',
+      SUM(CASE WHEN CONVERT(char(7), 처리일자, 120) = CONVERT(char(4), GETDATE(), 120) + '-12' THEN 1 ELSE 0 END) AS '12월'	
+    FROM NEOAS..N_병원일지 
+    WHERE CONVERT(char(4), 처리일자, 120) = CONVERT(char(4), GETDATE(), 120)
+    AND 일지구분 = 0
+    AND 작성자 = {{작성자}}
+    GROUP BY USER_ID, 작성자, 기관코드, 기관명칭
+    ORDER BY  기관명칭
+	
+  </_HospitalVisitStatus>
+  
 </query>

@@ -51,13 +51,13 @@
     '<tr>' +
     '  <td class="hidden" data-name="인덱스">{{인덱스}}</td>' +
     '  <td class="hidden" data-name="USER_ID">{{USER_ID}}</td>' +    
-    '  <td class="breakpoints-xs" data-name="기관코드">{{기관코드}}</td>' +
-    '  <td data-name="기관명칭">{{기관명칭}}</td>' +
-    '  <td class="breakpoints-xs breakpoints-sm">{{프로그램}}</td>' +
-    '  <td data-name="처리일자">{{처리일자}}</td>' +
-    '  <td data-name="작성자" data-value="{{작성자}}">{{작성자이름}}</td>' +
-    '  <td class="breakpoints-xs breakpoints-sm">{{작성일자}}</td>' +
-    
+    '  <td class="breakpoints-xs breakpoints-sm " data-name="기관코드">{{기관코드}}</td>' +
+    '  <td class="breakpoints-xs breakpoints-sm " data-name="기관명칭">{{기관명칭}}</td>' +
+    '  <td class="breakpoints-xs breakpoints-sm ">{{프로그램}}</td>' +
+    '  <td class="breakpoints-xs breakpoints-sm " data-name="처리일자">{{처리일자}}</td>' +
+    '  <td class="breakpoints-xs breakpoints-sm " data-name="작성자" data-value="{{작성자}}">{{작성자이름}}</td>' +
+    '  <td class="breakpoints-xs breakpoints-sm ">{{작성일자}}</td>' +
+    '  <td class="breakpoints-md breakpoints-lg">{{방문일지}}</td>' +
     ' <td>' +
     //'   <button class="btn btn-default btn-xs history-write" data-index="{{INDEX}}" data-toggle="modal" data-target="#history-write-dialog"><i class="fa fa-pencil"></i></button></td>' +
     '   <button class="btn btn-default btn-xs fa fa-pencil" data-type="edit"></button>' +
@@ -101,6 +101,24 @@
 
     this.defaultExtraService = '<li><a href="#">{{부가서비스}}</a></li>';
 
+    this.defaultHistoryVisitStatusItem = '' +
+    '<tr>' +
+    '  <td colspan="12" class="light-gray-bg">{{기관명칭}}</td>' +
+    '</tr>' +
+    '<tr>' +
+    '  <td class="text-center">{{1월}}</td>' +
+    '  <td class="text-center">{{2월}}</td>' +
+    '  <td class="text-center">{{3월}}</td>' +
+    '  <td class="text-center">{{4월}}</td>' +
+    '  <td class="text-center">{{5월}}</td>' +
+    '  <td class="text-center">{{6월}}</td>' +
+    '  <td class="text-center">{{7월}}</td>' +
+    '  <td class="text-center">{{8월}}</td>' +
+    '  <td class="text-center">{{9월}}</td>' +
+    '  <td class="text-center">{{10월}}</td>' +
+    '  <td class="text-center">{{11월}}</td>' +
+    '  <td class="text-center">{{12월}}</td>' +
+    '</tr>';
    
     // 
 
@@ -145,6 +163,22 @@
     return view;
   };
 
+  Template.prototype.insertHistoryVisitStatus = function(data){
+    console.log('Template.insertHistoryVisitStatus method execute');
+    var view = '';
+    if(data){      
+      for(var i = 0; i < data.length; i++){
+        var template = this.defaultHistoryVisitStatusItem;
+        template = template.replace('{{기관명칭}}', data[i].기관명칭);
+        for(var j = 1; j < 13; j++){          
+          template = template.replace('{{'+j+'월}}', (data[i][j+'월'] > 0 ? '<span class="font-bold text-success">' + data[i][j+'월'] + '</span>' : '0'));
+        }
+        view = view + template;
+      }
+    }
+    return view;
+  };
+
   Template.prototype.insertHistoryItem = function(data){
     var view = '';
     for(var i = 0; i < data.length; i++){
@@ -157,7 +191,15 @@
       template = template.replace('{{처리일자}}', data[i].처리일자);
       template = template.replace('{{작성자}}', data[i].작성자);
       template = template.replace('{{작성자이름}}', neo.users.GetUserName(data[i].작성자).USER_NAME);
-      template = template.replace('{{작성일자}}', data[i].작성일자);      
+      template = template.replace('{{작성일자}}', data[i].작성일자);     
+      var badgename = (function(){
+        if(data[i].프로그램.toLowerCase().match('sense')) return 'badge-sense';
+        if(data[i].프로그램.toLowerCase().match(/medi|hanimac/gim)) return 'badge-medi';
+        if(data[i].프로그램.toLowerCase().match('eplus')) return 'badge-eplus';
+        if(data[i].프로그램.toLowerCase().match('echart')) return 'badge-medi';
+        return 'badge-done';
+      })();
+      template = template.replace('{{방문일지}}', '('+data[i].기관코드+')' + data[i].기관명칭 + '<br><span class="badge ' + badgename + '">' + data[i].프로그램.toUpperCase() + '</span> / ' + neo.users.GetUserName(data[i].작성자).USER_NAME + ' ' + data[i].작성일자);
 
       view = view + template;
     }
@@ -721,17 +763,20 @@
         console.log('View.render.showHospHistoryList execute');
         
         self.$historyTable.each(function(i,_table){
-       
-          var $tab = $(self.$historyTabs.eq(i));
-          $tab.html($tab.data('name') + ' <span class="badge">'+data[i].length+'</span>');
-          // $(_table).parent().addClass('hidden');  
-          if(i < 2){
-            $(_table).find('tbody').empty().append(self.template.insertHistoryItem(data[i]));
+          if(i < 3){
+            var $tab = $(self.$historyTabs.eq(i));
+            $tab.html($tab.data('name') + ' <span class="badge">'+data[i].length+'</span>');
+            // $(_table).parent().addClass('hidden');  
+            if(i < 2){
+              $(_table).find('tbody').empty().append(self.template.insertHistoryItem(data[i]));
+            }else{
+              $(_table).find('ul.pager').empty().append(self.template.insertASItemPagination(data[i]));
+              $(_table).find('tbody').empty().append(self.template.insertASItem(data[i], 1));
+            }
           }else{
-            $(_table).find('ul.pager').empty().append(self.template.insertASItemPagination(data[i]));
-            $(_table).find('tbody').empty().append(self.template.insertASItem(data[i], 1));
+            // var $tab = $(self.$historyTabs.eq(i));
+            // $tab.html($tab.data('name') + ' <span class="badge">0</span>');
           }
-          
         });
 
       },
@@ -739,6 +784,11 @@
         console.log('View.render.showHospHistoryWriters execute');
         self.$historyWriters.empty();
         self._addHistoryWriters(data);
+      },
+      showHospVisitStatus : function(){
+        console.log('View.render.showHospHistoryWriters execute');
+        $(self.$historyTable[3]).find('tbody').empty();
+        self._addHistoryVisitStatus(data);
       },
       showHistoryASPage : function(){
         console.log('View.render.showHistoryASPage execute');
@@ -777,7 +827,15 @@
     this.$historyWriters.append(this.template.insertHistoryWriters(data));
   };
 
+  View.prototype._addHistoryVisitStatus = function(data){
+    var $tab = $(this.$historyTabs[3]);
+    
+    $tab.html($tab.data('name') + ' <span class="badge">'+data[0][0]["TOTAL"]+'</span>');
+    $(this.$historyTable[3]).find('tbody').append(this.template.insertHistoryVisitStatus(data[1]));
+  }
+
   View.prototype._loadHospInfo = function(data){
+    
     var self = this;
     this.$page.each(function(i,v){
       if($(v).data('page') === 'history-main'){
@@ -804,7 +862,7 @@
         '담당자' : '',
         '부가서비스' : '', 
         '수정일자' : '',
-        '수정자' : ''        
+        '수정자' : ''            
       };
     }
     template = template.replace('{{기관명칭}}', data['기관명칭']);
@@ -817,7 +875,7 @@
     template = template.replace('{{휴대폰번호}}', data['핸드폰번호']);
     template = template.replace('{{주소}}', '(' + data['우편번호'] +') ' + data['주소']);
     template = template.replace('{{이메일}}', data['이메일']);
-    template = template.replace('{{담당자}}', data['담당자']);
+    template = template.replace('{{담당자}}', data['담당자'] + (data['지사코드'] ? ' / ' + neo.area[data['지사코드']] : '') );
 
     var extras = data['부가서비스'].split(',');
     var extraItems = '';
@@ -989,7 +1047,7 @@
       self.model.hospAreaAll = checked;
       self.clearData(function(){
         self.showHospList();
-        self.showHospHistoryList();
+        self.showHospHistoryList();        
         self.showHospHistoryWriters();
       });      
     });
@@ -1020,7 +1078,8 @@
     
     this.view.bind('historyWriter', function(item, loader){
       item.writer = true;
-      self.showHospHistoryList(item, loader);
+      self.showHospHistoryList(item, loader);      
+      self.showHospVisitStatus(item);
     });
 
     this.view.bind('historyWriteType', function(){
@@ -1136,7 +1195,19 @@
       }
     });
 
-  }
+  };
+  
+  Controller.prototype.showHospVisitStatus = function(item){
+    var self = this;
+    if(!item) return;
+    this.model.readHospVisitStatus(item, function(result){      
+      if(result.err){
+
+      }else{
+        self.view.render('showHospVisitStatus', result.data);  
+      }
+    });
+  };
 
   Controller.prototype.saveHistory = function(data){
     var self = this;
@@ -1188,7 +1259,7 @@
             colCount += 1;
           // }
         });
-        //debugger;
+        
         parent.after(
           '<tr class="collapse in animated fadeInRight" id="'+'history-' + parent.index()+ '-' + item.type + '"> ' + 
           '  <td colspan="' + colCount + '" class="content-preview">' + result.data[0].내용 + '</td>' +
@@ -1455,7 +1526,29 @@
         }       
       }
     });
-  }
+  };
+
+  Model.prototype.readHospVisitStatus = function(_item, _callback){
+    var self = this;
+    $.ajax({
+      url : '/manage/history/visitstatus',
+      data : _item,
+      dataType : 'json',
+      method : 'GET',
+      async : true,
+      beforeSend : function(){        
+      },
+      success : function(result){       
+        _callback(result)
+      },
+      error : function(a,b,c){
+        console.log('ERROR!!!');
+        console.log(a,b,c);
+      },
+      complete : function(result){                
+      }
+    });
+  };
 
   Model.prototype.getHistoryDetail = function(_item, _callback){
     $.ajax({

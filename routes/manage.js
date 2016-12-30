@@ -63,4 +63,10 @@ router.get('/history/contents', function(req, res, next){
   });
 });
 
+router.get('/history/visitstatus', function(req, res, next){
+  member.GetHospitalVisitStatus(req, function(result){
+    res.send(result);
+  });
+});
+
 module.exports = router;
