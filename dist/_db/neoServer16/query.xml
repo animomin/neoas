@@ -478,5 +478,98 @@
     ORDER BY  기관명칭
 	
   </_HospitalVisitStatus>
-  
+  <_TodayWorkList>
+    Select *
+    From NeoAs..N_병원일지
+    Where 일지구분 = 0
+    AND 삭제 = 0
+    %s;
+    Select *
+    From NeoAs..N_병원일지
+    Where 일지구분 = 1
+    AND 삭제 = 0
+    %s;
+    Select *
+    From NeoAs..N_Service
+    Where 서비스상태 = 4    
+    %s;
+  </_TodayWorkList>
+  <_SaveDailyReport>
+    Begin Try
+      Insert Into NeoAs..N_업무보고(
+        기타업무, 작성자, 작성일자, 보고일자, 부서, 부서명
+      )
+      Values (
+        '{{기타업무}}', {{작성자}}, '{{작성일자}}', '{{보고일자}}', {{부서}}, '{{부서명}}'
+      )
+      Select 0 As Status, 'SUCCESS' as Message, max(인덱스) as 'index'  From NeoAs..N_업무보고
+    End Try
+    Begin CATCH
+      SELECT ERROR_NUMBER() AS Status, ERROR_MESSAGE() AS Message;
+    END CATCH
+  </_SaveDailyReport>
+  <_SaveDailyReport_Sub>
+    Begin Try
+      Insert Into NeoAs..N_업무보고sub(
+        인덱스, 일지인덱스, 일지구분
+      )
+      Values {{일지}}
+      Select 0 As Status, 'SUCCESS' as Message  From NeoAs..N_업무보고sub
+    End Try
+    Begin CATCH
+      SELECT ERROR_NUMBER() AS Status, ERROR_MESSAGE() AS Message;
+    END CATCH
+  </_SaveDailyReport_Sub>
+  <_DailyReportsList>
+    Select *
+    From NeoAs..N_업무보고
+    Where Convert(char(10),보고일자, 120) = '{{보고일자}}'
+    %s
+    ORDER BY 인덱스 DESC;
+
+    Select A.인덱스, SS.인덱스 AS 보고서인덱스, A.USER_ID, A.기관코드, A.기관명칭, A.프로그램, A.작성자,
+          CONVERT(char(10),A.작성일자 ,120) AS 작성일자, A.내용, CONVERT(char(10), A.처리일자, 120) AS 처리일자
+    From NeoAs..N_병원일지 AS A
+    INNER JOIN (Select S.일지인덱스, M.인덱스
+                      From NeoAS..N_업무보고sub AS S
+                      INNER JOIN NeoAs..N_업무보고 AS M
+                      ON M.인덱스 = S.인덱스
+                      Where S.일지구분 = 0
+                      AND Convert(char(10),M.보고일자, 120) = '{{보고일자}}') AS SS
+    On A.인덱스 = SS.일지인덱스    
+    Where A.일지구분 = 0
+    AND A.삭제 = 0
+    %s;
+
+    Select A.인덱스, SS.인덱스 AS 보고서인덱스, A.USER_ID, A.기관코드, A.기관명칭, A.프로그램, A.작성자,
+          CONVERT(char(10),A.작성일자 ,120) AS 작성일자, A.내용, CONVERT(char(10), A.처리일자, 120) AS 처리일자
+    From NeoAs..N_병원일지 AS A
+    INNER JOIN (Select S.일지인덱스, M.인덱스
+                      From NeoAS..N_업무보고sub AS S
+                      INNER JOIN NeoAs..N_업무보고 AS M
+                      ON M.인덱스 = S.인덱스
+                      Where S.일지구분 = 1
+                      AND Convert(char(10),M.보고일자, 120) = '{{보고일자}}') AS SS
+    On A.인덱스 = SS.일지인덱스    
+    Where A.일지구분 = 1
+    AND A.삭제 = 0
+    %s;
+
+    Select A.인덱스, SS.인덱스 AS 보고서인덱스, A.기관코드, A.기관명칭, A.프로그램, A.접수자,
+            CONVERT(char(10),A.접수일자 ,120) AS 접수일자 ,
+            ISNULL(A.처리자, '') AS 처리자, A.서비스상태, A.문의내용, A.서비스타입
+    From NeoAs..N_Service AS A
+    INNER JOIN (
+    Select S.일지인덱스, M.인덱스
+                      From NeoAS..N_업무보고sub AS S
+                      INNER JOIN NeoAs..N_업무보고 AS M
+                      ON M.인덱스 = S.인덱스
+                      Where S.일지구분 = 2
+                      AND Convert(char(10),M.보고일자, 120) = '{{보고일자}}'
+    ) AS SS
+    ON A.인덱스 = SS.일지인덱스
+    Where 1 = 1
+    %s;
+
+  </_DailyReportsList>
 </query>

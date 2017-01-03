@@ -189,7 +189,8 @@ var MENU = {
     MYAS: 503,
     MANAGE_STATUS: 504,
     MANAGE_STATISTIC: 505,
-    MANAGE : 601
+    MANAGE : 601,
+    WORKLIST : 701
 };
 
 var SETTINGS = {
@@ -233,6 +234,10 @@ var neoModules = {
                 break;
             case MENU.MANAGE:
                 view = 'manage-layout';
+                start = callback;
+                break;
+            case MENU.WORKLIST:
+                view = 'worklist-layout';
                 start = callback;
                 break;
             default:

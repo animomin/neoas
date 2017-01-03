@@ -1,0 +1,22 @@
+div.page.animated.fadeInRight(data-page="history-main")
+  
+  div.sidebar-container
+    ul.nav.nav-tabs.navs-3
+        li.active
+            a.hospital-tabs(href='#mtab-1', data-toggle='tab') 리스트
+        li
+            a.hospital-tabs(href='#mtab-2',data-toggle='tab') 일지  
+        li
+            a.hospital-tabs(href='#mtab-3',data-toggle='tab') 병원정보       
+        
+    div.tab-content
+        div#mtab-1.tab-pane.white-bg.fade.in.active
+            include ./hospitalList.jade
+        div#mtab-2.tab-pane.white-bg.fade
+            include ./hospitalHistory.jade        
+        div#mtab-3.tab-pane.white-bg.fade            
+            include ./hospitalInfo.jade
+             
+div.page.hidden.animated.fadeInRight(data-page="history-write")
+    include ./hospitalHistoryWrite.jade        
+        

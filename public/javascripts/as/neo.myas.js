@@ -381,7 +381,7 @@
 
           if(_this.data.서비스상태 === ASSTATUS.DONE){
             _me.elem.$asStatus.addClass('disabled');
-            $(_me.elem.$asStatus[_me.elem.$asStatus.length-1]).removeClass('disabled');
+            $(_me.elem.$asStatus[_me.elem.$asStatus.length-2]).removeClass('disabled');
           }else{
             _me.elem.$asStatus.removeClass('disabled');
           }

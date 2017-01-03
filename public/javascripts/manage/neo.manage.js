@@ -41,7 +41,8 @@
     this.defaultHospListItem = '' +
     '<tr class="hosp-item" data-id="{{ID}}" data-index="{{INDEX}}" data-hospnum="{{기관코드}}">' +
     ' <td class="text-center">{{번호}}</td>' +
-    ' <td>{{기관명칭}} / {{기관코드}}</td>' +    
+    // ' <td>{{기관명칭}} / {{기관코드}}</td>' +    
+    ' <td>{{기관정보}}</td>' +
     ' <td>' +
     //'   <button class="btn btn-default btn-xs history-write" data-index="{{INDEX}}" data-toggle="modal" data-target="#history-write-dialog"><i class="fa fa-pencil"></i></button></td>' +
     '   <button class="btn btn-default btn-xs history-write" data-index="{{INDEX}}"><i class="fa fa-pencil"></i></button></td>' +
@@ -138,8 +139,17 @@
         template = template.replace('{{번호}}', i + 1);
         template = template.replace('{{기관명칭}}', data[i].기관명칭);
         template = template.replace(/{{기관코드}}/gim, data[i].기관코드);
-        template = template.replace('{{프로그램}}', data[i].프로그램);
+        // template = template.replace('{{프로그램}}', data[i].프로그램);
         template = template.replace('{{대표자}}', data[i].대표자);
+
+        var badgename = (function(){
+        if(data[i].프로그램.toLowerCase().match('sense')) return 'badge-sense';
+        if(data[i].프로그램.toLowerCase().match(/medi|hanimac/gim)) return 'badge-medi';
+        if(data[i].프로그램.toLowerCase().match('eplus')) return 'badge-eplus';
+        if(data[i].프로그램.toLowerCase().match('echart')) return 'badge-medi';
+        return 'badge-done';
+      })();
+      template = template.replace('{{기관정보}}', '('+data[i].기관코드+')' + data[i].기관명칭 + '<br><span class="badge ' + badgename + '">' + data[i].프로그램.toUpperCase() + '</span>');
 
         view = view + template;
       }

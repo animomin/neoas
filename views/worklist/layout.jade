@@ -1,0 +1,32 @@
+div.page.animated.fadeInRight
+  div.container-fluid.scroll-container
+    div.row
+      div.col-lg-3.col-md-3
+        div.panel.panel-default.m-t-md
+          div.panel-body
+            center
+              div.worklist-date#worklist-datepicker-embed.breakpoints-sm.breakpoints-xs
+              div.form-group
+                div.input-group.breakpoints-lg.breakpoints-md
+                  span.input-group-addon
+                    i.fa.fa-calendar
+                  input.input.input-sm.form-control.worklist-date#worklist-datepicker(
+                    type='text', 
+                    name='worklist-datepicker',
+                    placeholder='보고일자'                
+                  )
+              button.btn.btn-primary.btn-block(type='button', data-toggle='modal', data-target='#worklist-write') 보고서작성
+            div.hr-line-dashed
+            div.form-group.text-left
+              div.input-group
+                span.input-group-addon
+                  i.fa.fa-search
+                input.input.form-control#worklist-search(type='search', placeholder='업무보고서 검색')            
+            h5.tag-title 부서
+            div#positionKind
+      
+        
+      div.col-lg-9.col-md-9
+        div#worklist-list
+
+      

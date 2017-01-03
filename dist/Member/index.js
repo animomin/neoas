@@ -83,7 +83,7 @@
 
           if(params.search !== '') where += " AND ( H.user_med_id like '%" + params.search + "%' OR H.user_med_name like '%" + params.search + "%')"
           where += " AND C.데이터1 <> 18 ";
-          var sort = " C.데이터1 ";
+          var sort = " LEN(C.데이터1), C.데이터1 ";
 
           query = util.format(query, select, where, sort);
           console.log(query);
@@ -520,4 +520,180 @@
       });
     };
 
+    exports.GetTodayWorkList = function(req, _callback){
+      var params = req.query;
+      var where = ['',''];
+      async.waterfall([
+        function(callback){
+          query = querys16._TodayWorkList;
+          where[0] = " AND 작성자 = " + params.user;
+          where[0] += " AND CONVERT(CHAR(10),처리일자,120) = '" + params.date + "' ";
+          where[1] = " AND 처리자ID = " + params.user;
+          where[1] += " AND CONVERT(CHAR(10),처리일자,120) = '" + params.date + "' ";
+
+          query = util.format(query, where[0], where[0], where[1]);
+          console.log(query);
+          callback(null);
+        },
+        function(callback){
+          if (server16.connection.connected) {
+              server16.RecordSet(query, function(err, records) {
+                  callback(err, records);                  
+              });
+          }
+        }
+      ], function(err, records){
+        if (err) {
+            logger.error(err);
+            data.err = err;
+            data.data = null;
+        } else if (!records || records.length <= 0) {
+            data.err = 'NODATA';
+            data.data = null;
+        } else {
+            data.err = null;
+            data.data = records;
+        }
+        _callback(data);
+      });
+    };
+
+    exports.GetDailyReportsList = function(req, _callback){
+      var params = req.query;
+      var where = ['','','',''];
+      async.waterfall([
+        function(callback){
+          query = querys16._DailyReportsList;
+          query = query.replace(/{{보고일자}}/gim, params.report_date);
+
+          if(params.report_keyword && params.report_keyword !== ''){
+            where[0] = " AND CONTAINS(기타업무, '" + params.report_keyword + "')";
+            where[1] = " AND CONTAINS(내용, '" + params.report_keyword + "')";
+            where[2] = " AND CONTAINS(내용, '" + params.report_keyword + "')";
+            where[3] = " AND CONTAINS(문의내용, '" + params.report_keyword + "')";            
+          }
+          query = util.format(query, where[0], where[1], where[2], where[3]);
+          console.log(query);     
+          callback(null);     
+        },
+        function(callback){
+          if (server16.connection.connected) {
+              server16.RecordSet(query, function(err, records) {
+                  callback(err, records);                  
+              });
+          }
+        }
+      ], function(err, records){
+        if (err) {
+            logger.error(err);
+            data.err = err;
+            data.data = null;
+        } else if (!records || records.length <= 0) {
+            data.err = 'NODATA';
+            data.data = null;
+        } else {
+            data.err = null;
+            data.data = records;
+        }
+        _callback(data);
+      });
+    };
+
+    exports.SaveDailyReport = function(req, _callback){
+      var params = req.body;
+      query = querys16._SaveDailyReport;
+
+      async.waterfall([
+        function(callback){
+          query = query.replace('{{기타업무}}', params.memo);
+          query = query.replace('{{작성자}}', params.writer);
+          query = query.replace('{{작성일자}}', params.write_date);
+          query = query.replace('{{보고일자}}', params.report_date);
+          query = query.replace('{{부서}}', params.position_kind);
+          query = query.replace('{{부서명}}', params.position_name);
+          console.log(query);
+          callback(null);
+        },
+        function(callback){
+          if (server16.connection.connected) {
+              server16.execute(query, function(err, records) {
+                  return callback(err, records);
+              });
+          }
+        }
+        
+      ], function(err, records){
+        if (err) {
+            logger.error(err);
+            data.err = err;
+            data.data = null;
+        } else if (!records || records.length <= 0) {
+            data.err = 'NODATA';
+            data.data = null;
+        } else {
+            data.err = null;
+            data.data = records;
+        }
+        _callback(data);
+      });
+
+    };
+
+    exports.SaveDailyReportSub = function(req, index, _callback){
+      var params = req.body;
+      query = querys16._SaveDailyReport_Sub;
+
+      async.waterfall([
+        function(callback){
+          var values = '';
+          params.visit = params.visit.split(',');
+          params.tel = params.tel.split(',');
+          params.as = params.as.split(',');
+
+          if(params.visit.length>0) values = _makeQuery(values, 0, params.visit);
+          if(params.tel.length>0) values = _makeQuery(values, 1, params.tel);
+          if(params.as.length>0) values = _makeQuery(values, 2, params.as);
+
+          if(values !== ''){
+            values.replace(')(', '),(');
+          }
+
+          query = query.replace('{{일지}}', values);
+          console.log(query);
+          callback(null);
+          function _makeQuery(_query, kind, list){
+            _query = _query || '';
+            list.forEach(function(_item){
+              if(_item){
+                if(_query.length >0) _query += ',';
+                _query += '('+index+','+_item+',' + kind +')';
+              }
+            });
+            return _query;
+          }
+
+        },
+        function(callback){
+          if (server16.connection.connected) {
+              server16.execute(query, function(err, records) {
+                  return callback(err, records);
+              });
+          }
+        }
+        
+      ], function(err, records){
+        if (err) {
+            logger.error(err);
+            data.err = err;
+            data.data = null;
+        } else if (!records || records.length <= 0) {
+            data.err = 'NODATA';
+            data.data = null;
+        } else {
+            data.err = null;
+            data.data = records;
+        }
+        _callback(data);
+      });
+    };
 })();

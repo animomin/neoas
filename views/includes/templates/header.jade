@@ -35,6 +35,9 @@ div.row.border-bottom
           
           li(class=menu==601 ? 'active' : '')
             a.navbar-mngr(href='/manage', data-as='601') 거래처관리
+          - if(user.USER_ID === 89)
+            li(class=menu==701 ? 'active' : '')
+              a.navbar-mngr(href='/worklist', data-as='601') 업무보고
         ul.nav.navbar-nav.navbar-right 
           li
             a(href='/download/webpage?fdr=help&fle=neoas.pdf') 도움말

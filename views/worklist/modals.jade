@@ -1,0 +1,53 @@
+div.modal.inmodal.fade#worklist-write(tabindex='-1', role='dialog', aria-hidden='true')
+  div.modal-dialog.modal-lg
+    div.modal-content      
+      div.modal-body
+        button.close(type='button',data-dismiss='modal')
+          span(aria-hidden='true') &times;
+          span.sr-only Close
+        h2 
+          i.fa.fa-sticky-note-o
+          |  업무보고서 작성
+        div.hr-line-dashed        
+        div#worklist-write-body       
+          div.form-group
+            div.row
+              div.col-lg-3.col-md-3.col-sm-4.col-xs-8
+                div.input-group
+                  span.input-group-addon
+                    i.fa.fa-calendar
+                  input.input.form-control.worklist-date#worklist-write-datepicker(
+                    type='text', 
+                    name='worklist-write-datepicker')           
+          div.form-group
+            label.control-label 부서구분
+            div.input-group
+              span.input-group-btn
+                select.selectpicker#worklist-position-kind(title='부서선택')
+                  option(value='0') 개발실
+                  option(value='1') 영업팀
+                  option(value='2') QC
+                  option(value='3') 부가서비스
+                  option(value='4') 기타
+              input.input.form-control#worklist-position-name(type='text', disabled, placeholder='부서명칭 입력')
+          div.form-group
+            label.control-label 방문일지 : 
+            span#visit-history.work-history-tag-container
+            ul.unstyled
+              li#visit-history-content.work-history-content-container
+          div.form-group
+            label.control-label 전화일지 : 
+            span#tel-history.work-history-tag-container
+            ul.unstyled
+              li#tel-history-content.work-history-content-container
+          div.form-group
+            label.control-label A/S일지 : 
+            span#as-history.work-history-tag-container
+            ul.unstyled
+              li#as-history-content.work-history-content-container
+          div.form-group
+            label.control-label 기타업무 :
+            textarea.form-control#worklist-write-memo
+      div.modal-footer
+        button.btn.btn-white(type='button', data-dismiss='modal') 닫기
+        button.btn.btn-primary(type='button' data-name='worklistSave') 저장
