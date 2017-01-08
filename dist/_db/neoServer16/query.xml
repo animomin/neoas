@@ -359,19 +359,19 @@
     Where 일지구분 = 0
     AND 삭제 = 0
     {{일지조건}}
-    Order By 작성일자 DESC;
+    Order By 인덱스 DESC;
     Select 인덱스, USER_ID, 기관코드, 기관명칭, 프로그램, 작성자, 
             CONVERT(char(10),작성일자 ,120) AS 작성일자, '' AS 내용, CONVERT(char(10), 처리일자, 120) AS 처리일자 
     From NeoAs..N_병원일지
     Where 일지구분 = 1
     AND 삭제 = 0
     {{일지조건}}
-    Order By 작성일자 DESC;
+    Order By 인덱스 DESC;
     Select 인덱스, 기관코드, 기관명칭, 프로그램, 접수자, CONVERT(char(10),접수일자 ,120) AS 접수일자 , ISNULL(처리자, '') AS 처리자, 서비스상태, '' AS 내용, 서비스타입
     From NeoAs..N_Service
     Where 1 = 1
     {{AS조건}}
-    Order By 접수일자 DESC
+    Order By 인덱스 DESC
   </_HospitalManageHistory>
   <_HospitalManageHistoryWriters>
     Select 작성자 From (
@@ -455,7 +455,8 @@
     FROM NEOAS..N_병원일지
     WHERE CONVERT(char(4), 처리일자, 120) = CONVERT(char(4), GETDATE(), 120)
     AND 일지구분 = 0
-    AND 작성자 = {{작성자}};
+    AND 작성자 = {{작성자}}
+    AND 삭제 = 0;
 
     SELECT USER_ID, 기관코드, 기관명칭, 작성자,
       SUM(CASE WHEN CONVERT(char(7), 처리일자, 120) = CONVERT(char(4), GETDATE(), 120) + '-01' THEN 1 ELSE 0 END) AS '1월',
@@ -474,6 +475,7 @@
     WHERE CONVERT(char(4), 처리일자, 120) = CONVERT(char(4), GETDATE(), 120)
     AND 일지구분 = 0
     AND 작성자 = {{작성자}}
+    AND 삭제 = 0
     GROUP BY USER_ID, 작성자, 기관코드, 기관명칭
     ORDER BY  기관명칭
 	
@@ -497,10 +499,10 @@
   <_SaveDailyReport>
     Begin Try
       Insert Into NeoAs..N_업무보고(
-        기타업무, 작성자, 작성일자, 보고일자, 부서, 부서명
+        기타업무, 작성자, 작성일자, 보고일자, 부서, 부서명, 삭제
       )
       Values (
-        '{{기타업무}}', {{작성자}}, '{{작성일자}}', '{{보고일자}}', {{부서}}, '{{부서명}}'
+        '{{기타업무}}', {{작성자}}, '{{작성일자}}', '{{보고일자}}', {{부서}}, '{{부서명}}', 0
       )
       Select 0 As Status, 'SUCCESS' as Message, max(인덱스) as 'index'  From NeoAs..N_업무보고
     End Try
@@ -508,6 +510,22 @@
       SELECT ERROR_NUMBER() AS Status, ERROR_MESSAGE() AS Message;
     END CATCH
   </_SaveDailyReport>
+  <_EditDailyReport>
+    Begin Try
+      Update NeoAS..N_업무보고
+      SET 기타업무 = '{{기타업무}}',
+      작성자 = {{작성자}},
+      작성일자 = '{{작성일자}}',
+      보고일자 = '{{보고일자}}',
+      부서 = {{부서}},
+      부서명 = '{{부서명}}'
+      Where 인덱스 = {{인덱스}}
+      Select 0 As Status, 'SUCCESS' as Message       
+    End Try
+    Begin CATCH
+      SELECT ERROR_NUMBER() AS Status, ERROR_MESSAGE() AS Message;
+    END CATCH
+  </_EditDailyReport>
   <_SaveDailyReport_Sub>
     Begin Try
       Insert Into NeoAs..N_업무보고sub(
@@ -521,55 +539,65 @@
     END CATCH
   </_SaveDailyReport_Sub>
   <_DailyReportsList>
-    Select *
-    From NeoAs..N_업무보고
-    Where Convert(char(10),보고일자, 120) = '{{보고일자}}'
-    %s
-    ORDER BY 인덱스 DESC;
+    Select 작성자 From NeoAs..N_업무보고 Where Convert(char(10),보고일자, 120) = '{{보고일자}}' AND 삭제 = 0  Group By 작성자;
+    Select 부서 From NeoAs..N_업무보고 Where Convert(char(10),보고일자, 120) = '{{보고일자}}' AND 삭제 = 0 Group By 부서;
 
-    Select A.인덱스, SS.인덱스 AS 보고서인덱스, A.USER_ID, A.기관코드, A.기관명칭, A.프로그램, A.작성자,
+    SELECT M.인덱스, M.기타업무, M.작성자, CONVERT(char(10), M.보고일자, 120) AS 보고일자, CONVERT(varchar(20),M.작성일자, 120) AS 작성일자, M.부서, M.부서명
+    From NeoAs..N_업무보고 AS M
+    Where CONVERT(char(10), M.보고일자, 120) = '{{보고일자}}'
+    AND M.삭제 = 0
+    {{보고서조건}}
+    Order By 인덱스 DESC
+    ;
+
+    Select A.인덱스, A.USER_ID, A.기관코드, A.기관명칭, A.프로그램, A.작성자,
           CONVERT(char(10),A.작성일자 ,120) AS 작성일자, A.내용, CONVERT(char(10), A.처리일자, 120) AS 처리일자
     From NeoAs..N_병원일지 AS A
-    INNER JOIN (Select S.일지인덱스, M.인덱스
-                      From NeoAS..N_업무보고sub AS S
-                      INNER JOIN NeoAs..N_업무보고 AS M
-                      ON M.인덱스 = S.인덱스
-                      Where S.일지구분 = 0
-                      AND Convert(char(10),M.보고일자, 120) = '{{보고일자}}') AS SS
-    On A.인덱스 = SS.일지인덱스    
+    INNER JOIN NeoAS..N_업무보고 AS M
+    ON CONVERT(char(10), M.보고일자, 120) = CONVERT(char(10), A.처리일자, 120)
+    AND A.작성자 = M.작성자
+    {{보고서조건}}
     Where A.일지구분 = 0
     AND A.삭제 = 0
-    %s;
+    AND M.삭제 = 0
+    AND CONVERT(char(10), A.처리일자, 120) = '{{보고일자}}';
 
-    Select A.인덱스, SS.인덱스 AS 보고서인덱스, A.USER_ID, A.기관코드, A.기관명칭, A.프로그램, A.작성자,
+    Select A.인덱스, A.USER_ID, A.기관코드, A.기관명칭, A.프로그램, A.작성자,
           CONVERT(char(10),A.작성일자 ,120) AS 작성일자, A.내용, CONVERT(char(10), A.처리일자, 120) AS 처리일자
     From NeoAs..N_병원일지 AS A
-    INNER JOIN (Select S.일지인덱스, M.인덱스
-                      From NeoAS..N_업무보고sub AS S
-                      INNER JOIN NeoAs..N_업무보고 AS M
-                      ON M.인덱스 = S.인덱스
-                      Where S.일지구분 = 1
-                      AND Convert(char(10),M.보고일자, 120) = '{{보고일자}}') AS SS
-    On A.인덱스 = SS.일지인덱스    
+    INNER JOIN NeoAS..N_업무보고 AS M
+    ON CONVERT(char(10), M.보고일자, 120) = CONVERT(char(10), A.처리일자, 120)
+    AND A.작성자 = M.작성자
+    {{보고서조건}}
     Where A.일지구분 = 1
     AND A.삭제 = 0
-    %s;
+    AND M.삭제 = 0
+    AND CONVERT(char(10), A.처리일자, 120) = '{{보고일자}}';
 
-    Select A.인덱스, SS.인덱스 AS 보고서인덱스, A.기관코드, A.기관명칭, A.프로그램, A.접수자,
+    Select A.인덱스, A.기관코드, A.기관명칭, A.프로그램, A.접수자,
             CONVERT(char(10),A.접수일자 ,120) AS 접수일자 ,
-            ISNULL(A.처리자, '') AS 처리자, A.서비스상태, A.문의내용, A.서비스타입
+            ISNULL(A.처리자, '') AS 처리자, ISNULL(A.처리자ID,0) AS 작성자, A.서비스상태, A.문의내용, A.서비스타입
     From NeoAs..N_Service AS A
-    INNER JOIN (
-    Select S.일지인덱스, M.인덱스
-                      From NeoAS..N_업무보고sub AS S
-                      INNER JOIN NeoAs..N_업무보고 AS M
-                      ON M.인덱스 = S.인덱스
-                      Where S.일지구분 = 2
-                      AND Convert(char(10),M.보고일자, 120) = '{{보고일자}}'
-    ) AS SS
-    ON A.인덱스 = SS.일지인덱스
-    Where 1 = 1
-    %s;
+    INNER JOIN NeoAS..N_업무보고 AS M
+    ON CONVERT(char(10), M.보고일자, 120) = CONVERT(char(10), A.처리일자, 120)
+    AND A.처리자ID = M.작성자
+    {{보고서조건}}
+    WHERE CONVERT(char(10), A.처리일자, 120) = '{{보고일자}}'
+    AND A.서비스상태 IN (3, 4)
+    AND M.삭제 = 0;
+    
+    Select 인덱스 From NeoAS..N_업무보고 Where Convert(char(10),보고일자, 120) = '{{보고일자}}' AND 작성자 = {{작성자}} AND 삭제 = 0
 
   </_DailyReportsList>
+  <_DailyReportDelete>
+    Begin Try
+      Update NeoAS..N_업무보고
+      SET 삭제 = 1
+      Where 인덱스 = %s
+      Select 0 As Status, 'SUCCESS' as Message 
+    End Try
+    Begin CATCH
+      SELECT ERROR_NUMBER() AS Status, ERROR_MESSAGE() AS Message;
+    END CATCH   
+  </_DailyReportDelete>
 </query>

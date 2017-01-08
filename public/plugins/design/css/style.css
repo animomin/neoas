@@ -1342,32 +1342,32 @@ button.dim:active::before {
 
 .label-sense,
 .badge-sense {
-    background-color: #3f7bf9;
-    color: #FFFFFF;
+    background-color: #3f7bf9 !important;
+    color: #FFFFFF !important;
 }
 
 .label-eplus,
 .badge-eplus {
-    background-color: #35a246;
-    color: #FFFFFF;
+    background-color: #35a246 !important;
+    color: #FFFFFF !important;
 }
 
 .label-medi,
 .badge-medi {
-    background-color: #446bbd;
-    color: #FFFFFF;
+    background-color: #446bbd !important;
+    color: #FFFFFF !important;
 }
 
 .label-echart,
 .badge-echart {
-    background-color: #8d3bff;
-    color: #FFFFFF;
+    background-color: #8d3bff !important;
+    color: #FFFFFF !important;
 }
 
 .label-done,
 .badge-done {
-    background-color: #2f4050;
-    color: #FFFFFF;
+    background-color: #2f4050 !important;
+    color: #FFFFFF !important;
 }
 
 .onoffswitch {
@@ -5641,10 +5641,11 @@ ul.notes li div {
     border-radius: 2px;
     color: inherit;
     display: block;
-    font-size: 10px;
+    font-size: 11px;
     margin-right: 5px;
     margin-top: 5px;
     padding: 5px 12px;
+    font-weight: 800;
 }
 
 .file {

@@ -73,6 +73,8 @@
         var hh = pad(this.getHours(), 2);
         var mm = pad(this.getMinutes(), 2);
         var ss = pad(this.getSeconds(), 2);
+        var ampm = hh > 12 ? '오후' : '오전';
+            hh = hh > 12 ? '0' + (hh - 12) : hh;
 
         function pad(number, length) {
             var str = '' + number;
@@ -93,6 +95,8 @@
                 return yyyy + '년 ' + MM + "월";
             case "YYYY년 MM월 DD일":
                 return yyyy + '년 ' + MM + "월 " + dd + "일";
+            case "YYYY년 MM월 DD일 오전/오후 HH:MM:SS":
+                return yyyy + '년 ' + MM + "월 " + dd + "일 " + ampm + ' ' + hh + ":" + mm + ":" + ss;
             case "YYYY-MM":
                 return yyyy + '-' + MM;
             case "YYYY-MM-DD":

@@ -35,7 +35,7 @@ div.row.border-bottom
           
           li(class=menu==601 ? 'active' : '')
             a.navbar-mngr(href='/manage', data-as='601') 거래처관리
-          - if(user.USER_ID === 89)
+          - if(user.user_area.match(/0000|0008|0026|0029|0030/gim))
             li(class=menu==701 ? 'active' : '')
               a.navbar-mngr(href='/worklist', data-as='601') 업무보고
         ul.nav.navbar-nav.navbar-right 
