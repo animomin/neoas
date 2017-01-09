@@ -210,9 +210,10 @@
 
         for (var i = 0; i < mainData.length; i++) {
             var template = this.defaultDailyReport;
+            
             template = template.replace(/{{보고일자}}/gim, new Date(mainData[i]['보고일자']).GetDate_CustomFormat('YYYY년 MM월 DD일'));
             template = template.replace('{{작성자이름}}', neo.users.GetUserName(mainData[i]['작성자']).USER_NAME);
-            template = template.replace('{{작성일자}}', new Date(mainData[i]['작성일자']).GetDate_CustomFormat('YYYY년 MM월 DD일 오전/오후 HH:MM:SS'));
+            template = template.replace('{{작성일자}}', mainData[i]['작성일자']);
             // template = template.replace('{{방문일지}}', this.insertWorkHistoryTags(0, { err : null, data : [visitData]}));
             // template = template.replace('{{전화일지}}', this.insertWorkHistoryTags(1, { err : null, data : [null,telData]}));
             // template = template.replace('{{AS일지}}', this.insertWorkHistoryTags(2, { err : null, data : [null,null,asData]}));

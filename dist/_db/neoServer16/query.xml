@@ -542,7 +542,7 @@
     Select 작성자 From NeoAs..N_업무보고 Where Convert(char(10),보고일자, 120) = '{{보고일자}}' AND 삭제 = 0  Group By 작성자;
     Select 부서 From NeoAs..N_업무보고 Where Convert(char(10),보고일자, 120) = '{{보고일자}}' AND 삭제 = 0 Group By 부서;
 
-    SELECT M.인덱스, M.기타업무, M.작성자, CONVERT(char(10), M.보고일자, 120) AS 보고일자, CONVERT(varchar(20),M.작성일자, 120) AS 작성일자, M.부서, M.부서명
+    SELECT M.인덱스, M.기타업무, M.작성자, CONVERT(char(10), M.보고일자, 120) AS 보고일자, CONVERT(varchar,M.작성일자, 120) AS 작성일자, M.부서, M.부서명
     From NeoAs..N_업무보고 AS M
     Where CONVERT(char(10), M.보고일자, 120) = '{{보고일자}}'
     AND M.삭제 = 0
