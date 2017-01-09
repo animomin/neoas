@@ -15,11 +15,11 @@ div.modal.inmodal.fade#report-add(tabindex='-1', role='dialog', aria-hidden='tru
           div.form-group
             label.col-sm-3.control-label 구분
             div.col-sm-9              
-              input.input.form-control#report-add-kind(type='text', name='report-add-kind', data-name='구분', placeholder='예) 수정, 개발 등')   
+              input.input.form-control#report-add-kind(type='text', name='report-add-kind', data-name='구분', placeholder='수정, 개발, 외근, 외근예정, 계약, 문의')   
           div.form-group
             label.col-sm-3.control-label 프로그램
             div.col-sm-9              
-              input.input.form-control#report-add-program(type='text', name="report-add-program", data-name='프로그램')   
+              input.input.form-control#report-add-program(type='text', name="report-add-program", data-name='프로그램', placeholder='전체, 센스, 메디, 이플러스, 이챠트, 한의맥, 홈페이지')   
           div.form-group
             label.col-sm-3.control-label 요청자
             div.col-sm-9              
@@ -31,11 +31,11 @@ div.modal.inmodal.fade#report-add(tabindex='-1', role='dialog', aria-hidden='tru
           div.form-group.required
             label.col-sm-3.control-label 상태
             div.col-sm-9              
-              input.input.form-control#report-add-status(type='text', name="report-add-status", data-name='상태', placeholder='예) 작업중, 완료, 1% ~ 100%', required) 
+              input.input.form-control#report-add-status(type='text', name="report-add-status", data-name='상태', placeholder='작업중, 완료, 1% ~ 100%, 보류', required) 
           div.form-group.required
             label.col-sm-3.control-label 작업내용
             div.col-sm-9              
-              textarea.form-control#report-add-content(rows="10", name="report-add-content", data-name='내용', required)
+              textarea.form-control#report-add-content(rows="10", name="report-add-content", data-name='내용', placeholder='내용은 상세하게 작성해주세요!', required)
             
 
         div.modal-footer

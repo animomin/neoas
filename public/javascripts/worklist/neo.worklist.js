@@ -43,36 +43,36 @@
             '                  <div class="ibox-title">' +
             '                       <h5>방문일지 </h5>' +
             '                       <div class="ibox-tools">' +
-            '                           <a class="collapse-child-all-link" data-collapse="#work-0">' +
+            '                           <a class="collapse-child-all-link" data-collapse="#work-{{INDEX}}0">' +
             '                                       <i class="fa fa-chevron-up"></i>' +
             '                                   </a>' +
             '                       </div>' +
             '                  </div>' +
-            '               <div class="ibox-content no-padding"><table class="table table-hover" id="work-0">{{방문일지}}</table></div></div>' +
+            '               <div class="ibox-content no-padding"><table class="table table-hover" id="work-{{INDEX}}0">{{방문일지}}</table></div></div>' +
             '           </div>' +
             '            <div class="col-lg-4">' +
             '               <div class="ibox">' +
             '                  <div class="ibox-title">' +
             '                       <h5>전화일지 </h5>' +
             '                       <div class="ibox-tools">' +
-            '                           <a class="collapse-child-all-link" data-collapse="#work-1">' +
+            '                           <a class="collapse-child-all-link" data-collapse="#work-{{INDEX}}1">' +
             '                                       <i class="fa fa-chevron-up"></i>' +
             '                                   </a>' +
             '                       </div>' +
             '                  </div>' +
-            '               <div class="ibox-content no-padding"><table class="table table-hover" id="work-1">{{전화일지}}</table></div></div>' +
+            '               <div class="ibox-content no-padding"><table class="table table-hover" id="work-{{INDEX}}1">{{전화일지}}</table></div></div>' +
             '           </div>' +
             '            <div class="col-lg-4">' +
             '               <div class="ibox">' +
             '                  <div class="ibox-title">' +
             '                       <h5>AS일지 </h5>' +
             '                       <div class="ibox-tools">' +
-            '                           <a class="collapse-child-all-link" data-collapse="#work-2">' +
+            '                           <a class="collapse-child-all-link" data-collapse="#work-{{INDEX}}2">' +
             '                                       <i class="fa fa-chevron-up"></i>' +
             '                                   </a>' +
             '                       </div>' +
             '                  </div>' +
-            '               <div class="ibox-content no-padding"><table class="table table-hover" id="work-2">{{AS일지}}</table></div></div>' +
+            '               <div class="ibox-content no-padding"><table class="table table-hover" id="work-{{INDEX}}2">{{AS일지}}</table></div></div>' +
             '           </div>' +
             '            <div class="col-lg-12">' +
             '               <h3 class="tag-title">기타업무 {{수정버튼}} </h3>' +
@@ -401,6 +401,13 @@
             autoclose: true,
             todayHighlight: true,
             todayBtn: 'linked'
+        });
+        this.$datepickers.each(function(){
+            var tagName = $(this)[0].tagName;
+            console.log(tagName);
+            if(tagName.toLowerCase() === 'input'){
+                $(this).attr('readonly', true);
+            }
         });
         this.$listCalendar.datepicker('setDate', new Date().GetToday('YYYY-MM-DD'));
         this.$listDatePicker.datepicker('setDate', new Date().GetToday('YYYY-MM-DD'));
@@ -883,7 +890,7 @@
             }).tooltip('show')
             self.$writePositionKind.focus();
             return null;
-        } else if (parseInt(params.position_kind) === 4 && params.position_name === '') {
+        } else if ((parseInt(params.position_kind) === 0 || parseInt(params.position_kind) === 1 ) && params.position_name === '') {
             self.$writePositionName.tooltip({
                 placement: 'top',
                 title: '부서명을 입력해주세요!'

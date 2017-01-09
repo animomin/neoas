@@ -394,8 +394,8 @@
         forceParse: false,
         autoclose: true,
         todayHighlight: true,
-        todayBtn: 'linked'
-      });
+        todayBtn: 'linked'        
+      }).attr('readonly', true);
     });
 
 
@@ -1110,6 +1110,7 @@
 
     this.view.bind('historyQuickDate, historySearch', function (item, loader) {
       self.showHospHistoryList(item, loader);
+      self.showHospHistoryWriters();
     });
 
     this.view.bind('historyDetail', function (item) {

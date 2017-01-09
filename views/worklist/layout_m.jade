@@ -1,22 +1,76 @@
-div.page.animated.fadeInRight(data-page="history-main")
-  
-  div.sidebar-container
-    ul.nav.nav-tabs.navs-3
-        li.active
-            a.hospital-tabs(href='#mtab-1', data-toggle='tab') 리스트
-        li
-            a.hospital-tabs(href='#mtab-2',data-toggle='tab') 일지  
-        li
-            a.hospital-tabs(href='#mtab-3',data-toggle='tab') 병원정보       
+div.page.animated.fadeInUp
+  div.container-fluid.scroll-container
+    div.row
+      div.col-lg-3.col-md-3
+        div.panel.panel-default.m-t-md
+          div.panel-body
+            center
+              div.worklist-date#worklist-datepicker-embed.breakpoints-sm.breakpoints-xs
+              div.form-group
+                div.input-group.breakpoints-lg.breakpoints-md
+                  span.input-group-addon
+                    i.fa.fa-calendar
+                  input.input.input-sm.form-control.worklist-date#worklist-datepicker(
+                    type='text', 
+                    name='worklist-datepicker',
+                    placeholder='보고일자'                
+                  )
+              
+            div.hr-line-dashed
+            div.form-group.text-left
+              div.input-group
+                span.input-group-addon
+                  i.fa.fa-search
+                input.input.form-control#worklist-search(type='search', placeholder='업무보고서 검색')            
+              p 선택한 일자의 업무보고서 중에서만 검색합니다.
+          div.panel-body
+            h5.tag-title 부서
+            div#positionKind            
+          div.panel-body
+            h5.tag-title 작성자
+            div#writers
+      
         
-    div.tab-content
-        div#mtab-1.tab-pane.white-bg.fade.in.active
-            include ./hospitalList.jade
-        div#mtab-2.tab-pane.white-bg.fade
-            include ./hospitalHistory.jade        
-        div#mtab-3.tab-pane.white-bg.fade            
-            include ./hospitalInfo.jade
-             
-div.page.hidden.animated.fadeInRight(data-page="history-write")
-    include ./hospitalHistoryWrite.jade        
-        
+      div.col-lg-9.col-md-9
+        div#wroklist-write
+          div.ibox.animated.fadeInUp.m-t-md
+            div.ibox-title
+              h5#worklist-write-date 업무보고서 작성              
+            div.ibox-content
+              h5#worklist-write-writer 작성자: 서재민 / 작성일자: 2017-01-05 09:31:00
+              p.text-danger 방문일지, 전화일지, A/S처리내역은 해당일자에 기록이 있으면 저장시 자동으로 추가됩니다.
+              div.form-group
+                label.control-label 부서구분
+                div.input-group
+                  span.input-group-btn
+                    select.selectpicker#worklist-position-kind(title='부서선택')
+                      option(value='1') 개발실
+                      option(value='2') 영업팀
+                      option(value='3') QC
+                      option(value='4') 부가서비스
+                      option(value='5') 총무과
+                      option(value='0') 기타                      
+                  input.input.form-control#worklist-position-name(type='text', disabled, placeholder='부서명칭 입력')
+              div.form-group
+                label.control-label 기타업무
+                table.table.footables#worklist-write-reportTable(
+                  data-editing="true",
+                  data-editing-always-show="true",
+                  data-editing-add-text="기타업무 등록"
+                )
+                  thead
+                    tr
+                      th(data-name="id", data-title="id", data-visible="false") ID
+                      th(data-name="구분", data-title="구분") 구분
+                      th(data-name="프로그램", data-title="프로그램") 프로그램
+                      th(data-name="요청자", data-breakpoints="xs sm", data-title="요청자") 요청자
+                      th(data-name="거래처", data-breakpoints="xs sm", data-title="거래처") 거래처
+                      th(data-name="상태", data-title="상태") 상태
+                      th(data-name="내용", data-breakpoints="xs sm md", data-title="내용") 내용
+            div.ibox-footer.text-right
+              button.btn.btn-danger#writeReportSave 보고서 저장
+                  
+                  
+        div#worklist-list
+
+      
