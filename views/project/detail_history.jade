@@ -1,0 +1,80 @@
+div.row.m-t-sm
+  div.col-lg-12.no-padding
+    div.panel.panel-blank
+      div.panel-heading
+        div.panel-options
+          ul.nav.nav-tabs
+            li.active: a(data-toggle='tab', data-target='#tab-1') 메세지
+            li: a(data-toggle='tab', data-target='#tab-2') 진행내용
+
+      div.panel-body
+        div.tab-content
+          div#tab-1.tab-pane.fade.in.active
+            div.feed-activity-list
+              div.feed-element       
+                i.fa.fa-user-circle-o.pull-left.fa-2x     
+                div.media-body                  
+                  strong 서재민 
+                  | 님이 메시지를 등록하셨습니다.
+                  br
+                  small.text-muted 2016-12-13 12:23:00
+                  div.well.
+                    이부분은 뭐 어쩌고 저쩌고 해서 어쩌구해요...
+                    
+              div.feed-element       
+                i.fa.fa-user-circle-o.pull-left.fa-2x     
+                div.media-body                  
+                  strong 서재민 
+                  | 님이 메시지를 등록하셨습니다.
+                  br
+                  small.text-muted 2016-12-13 12:23:00
+                  div.well.
+                    이부분은 뭐 어쩌고 저쩌고 해서 어쩌구해요...
+              div.feed-element
+                i.fa.fa-user-circle-o.pull-left.fa-2x.text-success
+                div.media-body                  
+                  textarea.form-control(placeholder="메세지를 입력하세요... (줄바꿈 : Shift + Enter)")
+          div#tab-2.tab-pane.fade
+            table.table.table-hover.table-striped.table-responsive
+              thead
+                tr 
+                  th.text-center 구분
+                  th.text-center 내용
+                  th.text-center 작성자
+                  th.text-center 작성일자
+              
+              tbody
+                tr
+                  td.text-center: label.label.label-primary 회의
+                  td
+                    p.small
+                      | 회의를 했어요....
+                      br
+                      | 이거는 이렇게 하구요
+                      br
+                      | 저거는 저렇게 해줘요
+                      br 
+                      | 프로젝트 내용이 처음과 달라졌어요
+                  td.text-center 
+                    p.small  서재민
+                  td.text-center
+                    p.small 2016-12-14
+                tr
+                  td.text-center: label.label.label-success 진행상황
+                  td
+                    p.small
+                      | [완료건]
+                      br 
+                      | 1. 데이터베이스 테이블을 설계했어요.
+                      br
+                      | 2. 공통 클래스파일을 만들고 있죠
+                       
+                  td.text-center                    
+                    p.small  서재민
+                  td.text-center
+                    p.small 2016-12-14
+                    
+            tfooter
+                tr 
+                  td(colspan='4').text-right
+                    button.btn.btn-white.btn-xs.pull-right 작성하기

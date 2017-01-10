@@ -194,7 +194,8 @@ var MENU = {
     MANAGE_STATUS: 504,
     MANAGE_STATISTIC: 505,
     MANAGE : 601,
-    WORKLIST : 701
+    WORKLIST : 701,
+    PROJECT : 801
 };
 
 var SETTINGS = {
@@ -242,6 +243,10 @@ var neoModules = {
                 break;
             case MENU.WORKLIST:
                 view = 'worklist-layout';
+                start = callback;
+                break;
+            case MENU.PROJECT:
+                view = 'project-layout';
                 start = callback;
                 break;
             default:

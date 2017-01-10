@@ -1,3 +1,6 @@
+#wrapper {
+    -webkit-overflow-scrolling: touch !important;
+}
 .split {
   -webkit-box-sizing: border-box;
      -moz-box-sizing: border-box;
@@ -272,4 +275,8 @@
 
 table.footable-details>tbody>tr>th:nth-child(1) {
     width: 60px !important;
+}
+
+table.footable.breakpoint-lg>tbody>tr>td.footable-last-visible {
+    width: 60% !important;
 }

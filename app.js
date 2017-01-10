@@ -16,6 +16,7 @@ var clients = require('./routes/clients');
 var as = require('./routes/as');
 var manage = require('./routes/manage');
 var worklist = require('./routes/worklist');
+var project = require('./routes/project');
 
 var app = express();
 app.locals.pretty = true;
@@ -46,6 +47,7 @@ app.use('/clients', clients);
 app.use('/as', as);
 app.use('/manage', manage);
 app.use('/worklist', worklist);
+app.use('/project', project);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

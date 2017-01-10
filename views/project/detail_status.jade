@@ -1,0 +1,46 @@
+div.wrapper.wrapper-content.animated.fadeInUp
+  div.ibox
+    div.ibox-content
+      div.row
+        div.col-lg-12
+          div.m-b-md
+            a.btn.btn-danger.btn-sm.pull-right 프로젝트 수정             
+            a.btn.btn-primary.btn-sm.pull-right(href='/project') 목록으로
+            h3 (PROJECT ID) 프로젝트 제목
+          dl.dl-horizontal
+            dt 진행상태            
+            dd
+              div.progress.progress-striped.active                
+                div.progress-bar(style='width:30%;') 진행중
+
+              
+      div.row
+        div.col-lg-5.col-md-6.col-sm-6
+          dl.dl-horizontal
+            dt 등록자
+            dd 홍길동
+            dt 등록일자
+            dd 2016-12-14
+            dt 프로그램 / 실행파일
+            dd 공통 / 진료실
+            dt 요청병원
+            dd 네오테스트병원(99996654)
+        div.col-lg-7.col-md-6.col-sm-6
+          dl.dl-horizontal
+            dt 개발 참여자
+            dd 
+              div.team-members
+                button.btn.btn-info.btn-outline.btn-xs 서재민
+                button.btn.btn-info.btn-outline.btn-xs 박희빈
+                button.btn.btn-info.btn-outline.btn-xs 박정수
+            dt 개발기간
+            dd 1개월
+            dt 개발비용
+            dd 100만원
+            
+      
+    div.ibox-footer
+      span.pull-right 마지막 수정일자 : 2016-12-12              
+      button.btn.btn-white.fa.fa-thumbs-o-up  120            
+    div.ibox-content
+      include ./detail_history.jade        

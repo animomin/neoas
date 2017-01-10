@@ -81,7 +81,7 @@
           where += " AND H.user_담당자 =  " + params.manager;
         }
 
-        if (params.search !== '') where += " AND ( H.user_med_id like '%" + params.search + "%' OR H.user_med_name like '%" + params.search + "%')"
+        if (params.search !== '') where += " AND ( H.user_med_id like '%" + params.search + "%' OR H.user_med_name like '%" + params.search + "%')";
         where += " AND C.데이터1 <> 18 ";
         var sort = " LEN(C.데이터1), C.데이터1 ";
 
@@ -111,7 +111,7 @@
       _callback(data);
     });
 
-  }
+  };
 
   exports.GetHospitalInfo = function (req, _callback) {
     var params = req.query;
@@ -176,7 +176,7 @@
       }
       _callback(data);
     });
-  }
+  };
 
   exports.SaveHospitalHistory = function (req, _callback) {
     var params = req.body;
@@ -302,7 +302,7 @@
       _callback(data);
     });
 
-  }
+  };
 
   exports.GetHospitalHistoryList = function (req, _callback) {
     var params = req.query;
@@ -310,7 +310,7 @@
       function (callback) {
 
         var where1 = '', where2 = '';
-        query = querys16._HospitalManageHistory
+        query = querys16._HospitalManageHistory;
 
         if (params.id) {
           where1 = " AND USER_ID = " + params.id;
@@ -399,7 +399,7 @@
       function (callback) {
 
         var where1 = '', where2 = '';
-        query = querys16._HospitalManageHistoryWriters
+        query = querys16._HospitalManageHistoryWriters;
 
         if (params.id) {
           where1 = " AND USER_ID = " + params.id;
@@ -705,6 +705,72 @@
         if (server16.connection.connected) {
           server16.execute(query, function (err, records) {
             return callback(err, records);
+          });
+        }
+      }
+    ], function (err, records) {
+      if (err) {
+        logger.error(err);
+        data.err = err;
+        data.data = null;
+      } else if (!records || records.length <= 0) {
+        data.err = 'NODATA';
+        data.data = null;
+      } else {
+        data.err = null;
+        data.data = records;
+      }
+      _callback(data);
+    });
+  };
+
+  exports.GetNewProjectID = function (_callback) {
+    async.waterfall([
+      function (callback) {
+        query = querys16._ProjectID;
+        callback(null);
+      },
+      function (callback) {
+        if (server16.connection.connected) {
+          server16.RecordSet(query, function (err, records) {
+            callback(err, records);
+          });
+        }
+      }
+    ], function (err, records) {
+      if (err) {
+        logger.error(err);
+        data.err = err;
+        data.data = null;
+      } else if (!records || records.length <= 0) {
+        data.err = 'NODATA';
+        data.data = null;
+      } else {
+        data.err = null;
+        data.data = records;
+      }
+      _callback(data);
+    });
+  };
+  exports.GetProjectList = function (req, _callback) {
+    var params = req.query;
+
+    async.waterfall([
+      function (callback) {
+        query = querys16._ProjectList;
+        if (!params.program && !params.keyword) {
+          query = query.replace('{{검색조건}}', '');
+        } else {
+
+        }
+
+        console.log(query);
+        callback(null);
+      },
+      function (callback) {
+        if (server16.connection.connected) {
+          server16.RecordSet(query, function (err, records) {
+            callback(err, records);
           });
         }
       }

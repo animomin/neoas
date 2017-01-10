@@ -600,4 +600,19 @@
       SELECT ERROR_NUMBER() AS Status, ERROR_MESSAGE() AS Message;
     END CATCH   
   </_DailyReportDelete>
+  <_ProjectID>
+    Select ISNULL(MAX(인덱스),0) + 1 AS ID 
+    From NeoAS..N_프로젝트
+  </_ProjectID>
+  <_ProjectList>
+    Select P.인덱스, P.프로젝트ID, P.프로젝트명, P.프로그램, ISNULL(P.요청거래처, '') AS 요청거래처, 
+           P.상세내용, P.기대효과, P.등록자, CONVERT(varchar, P.등록일자, 120) AS 등록일자,
+           I.상태, ISNULL(I.개발자, '') AS 개발자, ISNULL(I.개발시작일, '') AS 개발시작일, ISNULL(I.개발종료일, '') AS 개발종료일
+    From NeoAS..N_프로젝트 AS P
+    Inner Join NeoAs..N_프로젝트INFO AS I
+    ON P.프로젝트ID = I.프로젝트ID
+    Where P.삭제 = 0
+    {{검색조건}}
+    Order By 인덱스 DESC 
+  </_ProjectList>
 </query>

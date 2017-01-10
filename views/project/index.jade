@@ -1,0 +1,38 @@
+extends ../layout_member
+block styles
+  include ./includes/style.jade
+  -if(menu === 8011)
+    link(rel='stylesheet', href='/plugins/fileupload/css/jquery.fileupload.css')
+    link(rel='stylesheet', href='/plugins/fileupload/css/style.css')
+block content
+  div#wrapper
+    div.gray-bg#page-wrapper
+      //header include
+      include ../includes/templates/header.jade
+      
+      div#workspace 
+        -if(menu === 801)
+          include ./layout.jade
+        -if(menu === 8011)
+          include ./write.jade   
+        -if(menu === 8012)
+          include ./detail.jade
+        
+        
+block scripts
+  include ./includes/script.jade  
+  -if(menu === 8011)
+    script(src='/plugins/fileupload/js/vendor/jquery.ui.widget.js')
+    script(src='/plugins/fileupload/js/jquery.iframe-transport.js')    
+    script(src='/plugins/fileupload/js/jquery.fileupload.js')    
+
+  - var folder = ''
+  - folder = menu === 801 ? 'list' : menu === 8011 ? 'write' : '';
+    script(src='/javascripts/project/#{folder}/template.js')
+    script(src='/javascripts/project/#{folder}/view.js')
+    script(src='/javascripts/project/#{folder}/controller.js')
+    script(src='/javascripts/project/#{folder}/model.js')
+    script(src='/javascripts/project/#{folder}/storage.js')
+    script(src='/javascripts/project/#{folder}/index.js')
+  
+  

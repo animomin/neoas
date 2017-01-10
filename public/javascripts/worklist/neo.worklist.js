@@ -368,6 +368,7 @@
         this.$listDailyReports = $('div#worklist-list');
         this.$listPositionKinds = $('div#positionKind');
         this.$listWriters = $('div#writers');
+        this.$listScrollTop = $('a#scroll-top');
 
 
         this.$writeReport = $('div#wroklist-write');
@@ -428,6 +429,22 @@
 
 
         this.ReportTableInit();
+
+        
+        $('#wrapper').scroll(function(){
+            if ($(this).scrollTop() > 50) {
+                self.$listScrollTop.fadeIn();
+            } else {
+                self.$listScrollTop.fadeOut();
+            }
+        });
+        // scroll body to 0px on click
+        this.$listScrollTop.click(function () {                        
+            $('#wrapper').animate({scrollTop: self.$writeReport.position().top +'px'}, 800);   
+            return false;
+        });
+        
+        
 
         callback();
     };
@@ -638,6 +655,7 @@
             console.log('View.bind.saveNewWorkList execute!');
             var temp = self.$writeReportSave;
             temp.unbind('click').bind('click', function () {
+                self.$writeReport.fadeOut('fast');
                 self._ParseWorkListData(function (params) {
                     if (params) handler(params, temp);
                 });
@@ -819,6 +837,17 @@
                     var jsonData = $this.html();
                     jsonData = jsonData.replace(/\r?\n/g, '<br />');
                     jsonData = JSON.parse(jsonData);
+
+                    var ids = [], filteredData = [];
+                    jsonData.forEach(function(item, index){
+                        if($.inArray(item.id, ids) === -1){
+                            ids.push(item.id);
+                            filteredData.push(item);
+                        }
+                    });
+
+                    jsonData = filteredData;
+
                     $this.empty();
                     var $table = $('<table/>').appendTo($this);
                     $table.addClass('table table-hover daily-report-table').footable({
@@ -840,6 +869,8 @@
                     self.$writePositionName.val('');
                     self.ReportTableInit();
                 }
+
+                self.$writeReport.fadeIn('fast');
             },
             editReport : function(){
                 var report_index = data['인덱스'];
@@ -861,6 +892,7 @@
                     callback();
                 })(function(){
                     self.$writeReport.removeClass('hidden');
+                    $('#wrapper').animate({scrollTop: self.$writeReport.position().top +'px'}, 1000);                    
                 });                
             }
         };
@@ -1044,7 +1076,7 @@
     Controller.prototype.getWorkDetail = function (param) {
         var self = this;
         this.model.getWorkDetail(param, function (result) {
-            if (!result) console.log('NOT FOUND');
+            if (result.err) console.log(result.err);
             else {
                 result.type = param.type;
                 result.kind = param.kind;
@@ -1065,7 +1097,7 @@
             loader: loader
         };
         this.model.saveDailyWork(option, function (result) {
-            if (!result) console.log(result.err);
+            if (result.err) console.log(result.err);
 
             self.showDailyReportsList({
                 report_date: param.report_date
@@ -1085,7 +1117,7 @@
         };
 
         this.model.deleteDailyReport(option, function (result) {
-            if (!result) console.log(result.err);
+            if (result.err) console.log(result.err);
             self.showDailyReportsList({
                 report_date: param.report_date
             });
