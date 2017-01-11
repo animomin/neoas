@@ -205,6 +205,34 @@
       SELECT ERROR_NUMBER() AS Status, ERROR_MESSAGE() AS Message;
     END catch
   </_TakeOver>
+  <_ASListSummary>
+    Select 기관코드, 기관명칭, 지사코드, 프로그램, -- 서비스상태, ISNULL(응급여부, 0) AS 응급여부, ISNULL(본사AS, 0) AS 본사AS, 담당자,
+          CASE 서비스상태 WHEN 0 THEN '미확인'
+                         WHEN 1 THEN '미완료'
+                         WHEN 2 THEN '미완료'
+                         WHEN 3 THEN '미완료'
+                         WHEN 4 THEN '완료'
+                         WHEN 5 THEN '취소' ELSE '미정' END AS 상태,
+          CASE ISNULL(응급여부, 0) WHEN 0 THEN '' ELSE '응급' END AS 응급여부,
+          CASE ISNULL(본사AS, 0) WHEN 1 THEN '본사AS' ELSE '' END AS 본사AS,
+          CONVERT(char(19),접수일자,120) AS 접수일자,
+          ISNULL(확인자, '') AS 확인자, ISNULL(확인자지사,'') AS 확인자지사, ISNULL(CONVERT(char(19),확인일자,120),'') AS 확인일자,
+          ISNULL(인계자, '') AS 인계자, ISNULL(인계자지사,'') AS 인계자지사, ISNULL(CONVERT(char(19),인계일자,120),'') AS 인계일자,
+          ISNULL(처리자, '') AS 처리자, ISNULL(처리자지사,'') AS 처리자지사, ISNULL(CONVERT(char(19),처리일자,120),'') AS 처리일자,
+
+          CASE WHEN 서비스상태 = 4 AND ISNULL(응급여부, 0) = 0 AND ISNULL(본사AS,0) = 0 THEN '3000원' ELSE ' - '
+               WHEN 서비스상태 = 4 AND ISNULL(응급여부, 0) = 1 AND ISNULL(본사AS,0) = 0 THEN '5000원' ELSE ' - ' END AS 수수료
+
+    From N_Service
+    Where 1 = 1
+    AND 지사코드 NOT IN ('0000', '0030', '0040')
+    AND ISNULL(본사AS,0) = 0
+    AND ISNULL(서비스상태,0) = 4
+    AND 인계자ID &lt;&gt; 0 AND 처리자ID &lt;&gt; 0
+    AND 인계자지사 &lt;&gt; 처리자지사
+    {{검색조건}}
+    Order By 지사코드
+  </_ASListSummary>
   <_Versions_SENSE>
     Select 배포버전 From OCS_SERVER.MediChart.dbo.TB_센스라이브 Order By 배포버전 DESC
   </_Versions_SENSE>
@@ -604,6 +632,35 @@
     Select ISNULL(MAX(인덱스),0) + 1 AS ID 
     From NeoAS..N_프로젝트
   </_ProjectID>
+  <_SaveNewProject>
+    Begin Try
+      Insert Into NeoAs..N_프로젝트(
+        프로젝트ID, 프로젝트명, 프로그램, 요청거래처, 상세내용, 기대효과, 등록자, 등록일자, 수정일자, 삭제
+      )
+      Values (
+        '{{프로젝트ID}}', '{{프로젝트명}}', {{프로그램}}, '{{요청거래처}}', '{{상세내용}}', '{{기대효과}}', {{등록자}}, GETDATE(), GETDATE(), 0
+      )
+
+      Insert Into NeoAs..N_프로젝트INFO(
+        프로젝트ID, 상태
+      )
+      values (
+        '{{프로젝트ID}}', 0
+      )
+
+      Insert Into NeoAs..N_프로젝트FILE(
+        프로젝트ID, 파일명
+      )
+      Values
+      {{첨부파일}}
+
+      Select 0 As Status, 'SUCCESS' as Message 
+    End Try
+    Begin CATCH
+      SELECT ERROR_NUMBER() AS Status, ERROR_MESSAGE() AS Message;
+    END CATCH
+  </_SaveNewProject>
+  
   <_ProjectList>
     Select P.인덱스, P.프로젝트ID, P.프로젝트명, P.프로그램, ISNULL(P.요청거래처, '') AS 요청거래처, 
            P.상세내용, P.기대효과, P.등록자, CONVERT(varchar, P.등록일자, 120) AS 등록일자,
@@ -615,4 +672,5 @@
     {{검색조건}}
     Order By 인덱스 DESC 
   </_ProjectList>
+
 </query>

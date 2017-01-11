@@ -18,9 +18,12 @@ block scripts
       console.log('loaded');      
       $('body').attr('class', 'white-bg');
       var $pTable = $('table#data-table');
-      var params = $.extend(true, {},window.opener.historyData);
-      var neo =  $.extend(true, {},window.opener.neo);      
-      var ASSTATUS = $.extend(true, {},window.opener.ASSTATUS);      
+      //- var params = $.extend(true, {},window.opener.historyData);      
+      //- var neo =  $.extend(true, {},window.opener.neo);      
+      //- var ASSTATUS = $.extend(true, {},window.opener.ASSTATUS); 
+      var params = JSON.parse(localStorage.getItem('historyData'));     
+      var neo = JSON.parse(localStorage.getItem('neo'));     
+      var ASSTATUS = JSON.parse(localStorage.getItem('ASSTATUS'));     
       var columns = [
           { 'name': '인덱스', 'title': 'ID', 'style': { 'width': 50, 'maxWidth': 50 },  'breakpoints' : 'xs' },
           { 'name': '기관코드', 'title': '기관번호' },

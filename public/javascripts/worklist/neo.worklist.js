@@ -448,7 +448,7 @@
 
         callback();
     };
-    View.prototype.ReportTableInit = function () {
+    View.prototype.ReportTableInit = function (callback) {
         var self = this;
         if (!this.$writeReportTableFT) {
             this.$writeReportTableFT = FooTable.init('#' + this.$writeReportTable.attr('id'),
@@ -497,11 +497,15 @@
             );
         } else {
             if (this.$writeReportTableFT.rows.all.length) {
-                var rows = this.$writeReportTableFT.rows.all;
-                rows.forEach(function (row) {
-                    row.delete();
-                });
+                var rows = this.$writeReportTableFT.rows.all;                
+                // rows.forEach(function (row) {
+                //     row.delete();
+                // });
+                for(var i = rows.length -1; i >= 0 ; i--){
+                    rows[i].delete();
+                }
             }
+            callback();
         }
     };
     // View.prototype.editorInit = function () {
@@ -877,19 +881,20 @@
                 var jsData = JSON.parse(data['기타업무']);
                 (function(callback){
                     self.$writeReport.removeData('reportindex').data('reportindex', report_index);
-                    self.$listDailyReports.find('.dailyReports[data-reportindex="'+report_index+'"]').fadeOut(500);
+                    self.$listDailyReports.find('.dailyReports[data-reportindex="'+report_index+'"]').fadeOut();
                     self.$writeReport.find('h5#worklist-write-writer').text(
                         '작성자:' + neo.user.USER_NAME + ' / 작성일자: ' + new Date().GetToday('YYYY년 MM월 DD일 오전/오후 HH:MM:SS')
                     );
                     self.$writePositionKind.selectpicker('val', data['부서']);
                     self.$writePositionName.val(data['부서명']);
-                    self.ReportTableInit();
-
-                    jsData.forEach(function(item){
-                        self.$writeReportTableFT.rows.add(item);
+                    self.ReportTableInit(function(){
+                        jsData.forEach(function(item){
+                            self.$writeReportTableFT.rows.add(item);
+                        });
                     });
-
-                    callback();
+                    setTimeout(function(){
+                        callback();
+                    }, 800);                    
                 })(function(){
                     self.$writeReport.removeClass('hidden');
                     $('#wrapper').animate({scrollTop: self.$writeReport.position().top +'px'}, 1000);                    
@@ -1002,7 +1007,7 @@
         //////////////////////////////////////////////////////////////////////////////////////////////////
         this.view.bind('switchDate', function (param) {
             window.worklistDateChange = false;
-            self.showDailyReportsList(param);
+            if(window.worklistLoad) self.showDailyReportsList(param);
         });
 
         this.view.bind('searchDailyReports');
@@ -1024,6 +1029,7 @@
 
         this.view.init(function () {
             self.showDailyReportsList();
+            window.worklistLoad = true;
         });
     }
 

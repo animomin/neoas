@@ -17,7 +17,8 @@ block scripts
       console.log('loaded');
       $('body').attr('class', 'white-bg');
       var $pTable = $('table#data-table');
-      var params = $.extend(true, {},window.opener.historyData);
+      var params = JSON.parse(localStorage.getItem('historyData'));//$.extend(true, {},window.opener.historyData);
+      
       var columns = params.columns;
       var rows = params.rows;
       var options = params.options;

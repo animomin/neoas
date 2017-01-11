@@ -31,7 +31,7 @@
     query = util.format(querys22.UserInfo, id, pwd);
     logger.info('Member login :: ' + JSON.stringify(req.query));
     logger.info('Query :: ' + query);
-
+    
     if (server22.connection.connected) {
       server22.RecordSet(query, function (err, records) {
         if (err) {
@@ -788,5 +788,56 @@
       }
       _callback(data);
     });
+  };
+
+  exports.SaveNewProject = function(req, _callback){
+    var params = req.body;
+    query = querys16._SaveNewProject;
+
+    async.waterfall([
+      function (callback) {
+        query = query.replace(/{{프로젝트ID}}/gim, params['project-id']);
+        query = query.replace(/{{프로젝트명}}/gim, params['project-name']);
+        query = query.replace(/{{프로그램}}/gim, params['project-program']);
+        query = query.replace(/{{요청거래처}}/gim, params['project-clients']);
+        query = query.replace(/{{상세내용}}/gim, params['project-detail']);
+        query = query.replace(/{{기대효과}}/gim, params['project-effect']);
+        query = query.replace(/{{등록자}}/gim, params['project-writer']);
+        
+        var uploadFiles = typeof params['project-uploaded-file'] === 'object' ? params['project-uploaded-file'] : [params['project-uploaded-file']];
+        var values = '';
+        uploadFiles.forEach(function(file){
+          if(values !== '') values += ',';
+          values += "('" + params['project-id'] + "','" + file + "')";
+        });
+        
+        query = query.replace('{{첨부파일}}', values);
+        
+        
+        callback(null);
+      },
+      function (callback) {
+        if (server16.connection.connected) {
+          server16.execute(query, function (err, records) {
+            return callback(err, records);
+          });
+        }
+      }
+
+    ], function (err, records) {
+      if (err) {
+        logger.error(err);
+        data.err = err;
+        data.data = null;
+      } else if (!records || records.length <= 0) {
+        data.err = 'NODATA';
+        data.data = null;
+      } else {
+        data.err = null;
+        data.data = records;
+      }
+      _callback(data);
+    });
+
   };
 })();

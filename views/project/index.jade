@@ -3,7 +3,7 @@ block styles
   include ./includes/style.jade
   -if(menu === 8011)
     link(rel='stylesheet', href='/plugins/fileupload/css/jquery.fileupload.css')
-    link(rel='stylesheet', href='/plugins/fileupload/css/style.css')
+    //- link(rel='stylesheet', href='/plugins/fileupload/css/style.css')
 block content
   div#wrapper
     div.gray-bg#page-wrapper
@@ -24,7 +24,8 @@ block scripts
   -if(menu === 8011)
     script(src='/plugins/fileupload/js/vendor/jquery.ui.widget.js')
     script(src='/plugins/fileupload/js/jquery.iframe-transport.js')    
-    script(src='/plugins/fileupload/js/jquery.fileupload.js')    
+    script(src='/plugins/fileupload/js/jquery.fileupload.js') 
+    script(src='/plugins/bootstrap-validator/dist/validator.min.js')
 
   - var folder = ''
   - folder = menu === 801 ? 'list' : menu === 8011 ? 'write' : '';

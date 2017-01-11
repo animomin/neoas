@@ -13,6 +13,10 @@ div.container-fluid
                 span.input-group-addon
                   i.fa.fa-calendar
                 input.form-control#rankMonth(type='text')      
+                span.input-group-btn
+                  button.btn.btn-primary.rank-download(data-type="area")
+                    i.fa.fa-download
+                    |  엑셀저장
         div.ibox-content
           div.row.no-padding.no-margins
             div.col-lg-2.col-md-4.col-sm-4
@@ -64,6 +68,7 @@ div.container-fluid
               p.font-bold.text-right.text-danger  
                 i.fa.fa-asterisk
                 |  본사A/S는 산정되지않음. 지사에서 A/S를 인계접수를 하였고 해당 A/S건이 처리가 완료된 경우만 산정하였음.
+                
             div.ibox-content
               div.row
                 div.col-xs-6
@@ -75,7 +80,7 @@ div.container-fluid
                         th 지사명
                         th.text-right (인계건수 * 3000) + (인계건수(응급) * 5000)
                         th 수수료 합계
-                    tbody(data-kind="area_takeover")
+                    tbody(data-kind="area_takeover")                 
                 
       div.row
         div.col-lg-4
@@ -92,7 +97,7 @@ div.container-fluid
               h5 직원별 A/S 인계건 처리현황
               p.font-bold.text-right.text-danger  
                 i.fa.fa-asterisk
-                |  본사A/S는 산정되지않음. 본사에서 인계된 A/S 처리건을 제외하고, 인계자의 지사와 처리자의 지사가 다른 경우만 산정하였음.
+                |  본사A/S는 산정되지않음. 본사에서 인계된 A/S 처리건을 제외하고, 인계자의 지사와 처리자의 지사가 다른 경우만 산정하였음.                
             div.ibox-content
               div.row
                 div.col-xs-6

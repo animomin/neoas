@@ -142,6 +142,15 @@ router.get('/rank/:mode', function(req, res,next){
   });
 });
 
+router.get('/rank/download/area', function(req, res, next){
+  console.log('here', req.query);
+  client.GetASListMonth('area', req, function(result){
+    res.send(result);
+  });
+  
+});
+
+
 router.get('/print', function(req, res, next){
   res.render('print.jade');
 });

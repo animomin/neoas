@@ -2,4 +2,5 @@ public/uploads
 public/agent
 public/apps
 public/settings
+public/project
 .startup.bat
