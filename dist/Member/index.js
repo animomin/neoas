@@ -23,6 +23,17 @@
       item.use_areaName = area[item.user_area];
     });
 
+    neoMembers.GetUser = function(id){
+      var item = neoMembers.find(function(_item){
+        return parseInt(_item.USER_ID) === parseInt(id);
+      });
+      return item || {
+          USER_ID : 0,
+          USER_NAME : '',
+          user_area : ''
+      };
+    };
+
   };
 
   exports.login = function (req, callback) {
@@ -796,24 +807,33 @@
 
     async.waterfall([
       function (callback) {
-        query = query.replace(/{{프로젝트ID}}/gim, params['project-id']);
-        query = query.replace(/{{프로젝트명}}/gim, params['project-name']);
-        query = query.replace(/{{프로그램}}/gim, params['project-program']);
-        query = query.replace(/{{요청거래처}}/gim, params['project-clients']);
-        query = query.replace(/{{상세내용}}/gim, params['project-detail']);
-        query = query.replace(/{{기대효과}}/gim, params['project-effect']);
-        query = query.replace(/{{등록자}}/gim, params['project-writer']);
-        
-        var uploadFiles = typeof params['project-uploaded-file'] === 'object' ? params['project-uploaded-file'] : [params['project-uploaded-file']];
-        var values = '';
-        uploadFiles.forEach(function(file){
-          if(values !== '') values += ',';
-          values += "('" + params['project-id'] + "','" + file + "')";
-        });
-        
-        query = query.replace('{{첨부파일}}', values);
-        
-        
+        try{
+          query = query.replace(/{{프로젝트ID}}/gim, params['project-id']);
+          query = query.replace(/{{프로젝트명}}/gim, params['project-name']);
+          query = query.replace(/{{프로그램}}/gim, params['project-program']);
+          query = query.replace(/{{요청거래처}}/gim, params['project-clients']);
+          query = query.replace(/{{상세내용}}/gim, params['project-detail']);
+          query = query.replace(/{{기대효과}}/gim, params['project-effect']);
+          query = query.replace(/{{등록자}}/gim, params['project-writer']);
+          
+          var insert = '', values = '' ;
+          if(params['project-uploaded-file']){
+            insert = 'Insert Into NeoAs..N_프로젝트FILE(' +
+            '               프로젝트ID, 파일명 ' +
+            '             ) values {{첨부파일}} ';
+            var uploadFiles = typeof params['project-uploaded-file'] === 'object' ? params['project-uploaded-file'] : [params['project-uploaded-file']];
+            
+            uploadFiles.forEach(function(file){
+              if(values !== '') values += ',';
+              values += "('" + params['project-id'] + "','" + file + "')";
+            });
+            insert = insert.replace('{{첨부파일}}', values);
+          }
+          query = query.replace('{{첨부파일}}', insert);
+        }catch(e){
+          console.log(e);
+        }
+        console.log(query);
         callback(null);
       },
       function (callback) {
@@ -839,5 +859,37 @@
       _callback(data);
     });
 
+  };
+
+  exports.GetProjectDetail = function(req, _callback){
+    var params = req.params;    
+    async.waterfall([
+      function (callback) {
+        query = querys16._ProjectDetail;
+        query = query.replace(/{{프로젝트ID}}/gim, params.projectid);
+        console.log(query);
+        callback(null);
+      },
+      function (callback) {
+        if (server16.connection.connected) {
+          server16.RecordSet(query, function (err, records) {
+            callback(err, records);
+          });
+        }
+      }
+    ], function (err, records) {
+      if (err) {
+        logger.error(err);
+        data.err = err;
+        data.data = null;
+      } else if (!records || records.length <= 0) {
+        data.err = 'NODATA';
+        data.data = null;
+      } else {
+        data.err = null;
+        data.data = records;
+      }
+      _callback(data);
+    });
   };
 })();

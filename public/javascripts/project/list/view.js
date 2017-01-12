@@ -15,8 +15,9 @@
         var viewCommand = {
             showProjectList : function(){
                 self.$projectList.empty().append(
-                    self.template.insertProjectItem(data)
+                    self.template.insertProjectItem(data)                    
                 );
+                
             }
         };
         viewCommand[command]();

@@ -10,7 +10,7 @@ block content
       //header include
       include ../includes/templates/header.jade
       
-      div#workspace 
+      div#workspace.no-scroll
         -if(menu === 801)
           include ./layout.jade
         -if(menu === 8011)
@@ -28,7 +28,7 @@ block scripts
     script(src='/plugins/bootstrap-validator/dist/validator.min.js')
 
   - var folder = ''
-  - folder = menu === 801 ? 'list' : menu === 8011 ? 'write' : '';
+  - folder = menu === 801 ? 'list' : menu === 8011 ? 'write' : menu === 8012 ? 'detail' : '';
     script(src='/javascripts/project/#{folder}/template.js')
     script(src='/javascripts/project/#{folder}/view.js')
     script(src='/javascripts/project/#{folder}/controller.js')

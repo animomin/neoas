@@ -6,7 +6,7 @@
         this.model = model;
         this.view = view;
 
-        // this.showProjectList();
+        this.showProjectList();
     }
 
     Controller.prototype.showProjectList = function(item){

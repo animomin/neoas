@@ -1,80 +1,67 @@
+- var project_default = project[0][0], project_his = project[3]
+- var comments = project_his.filter(function(element){return element['구분'] === 0;})
+- var meeting = project_his.filter(function(element){return element['구분'] === 1;})
+- var devlog = project_his.filter(function(element){return element['구분'] === 2;})
+//- div= JSON.stringify(devlog)
 div.row.m-t-sm
   div.col-lg-12.no-padding
     div.panel.panel-blank
       div.panel-heading
         div.panel-options
           ul.nav.nav-tabs
-            li.active: a(data-toggle='tab', data-target='#tab-1') 메세지
-            li: a(data-toggle='tab', data-target='#tab-2') 진행내용
+            li.active: a(data-toggle='tab', data-target='#tab-1') 메세지 #{comments.length ?  comments.length : ''}
+            li: a(data-toggle='tab', data-target='#tab-2') 진행내용 #{meeting.length + devlog.length > 0 ?  meeting.length + devlog.length : ''}
 
       div.panel-body
         div.tab-content
           div#tab-1.tab-pane.fade.in.active
             div.feed-activity-list
-              div.feed-element       
-                i.fa.fa-user-circle-o.pull-left.fa-2x     
-                div.media-body                  
-                  strong 서재민 
-                  | 님이 메시지를 등록하셨습니다.
-                  br
-                  small.text-muted 2016-12-13 12:23:00
-                  div.well.
-                    이부분은 뭐 어쩌고 저쩌고 해서 어쩌구해요...
-                    
-              div.feed-element       
-                i.fa.fa-user-circle-o.pull-left.fa-2x     
-                div.media-body                  
-                  strong 서재민 
-                  | 님이 메시지를 등록하셨습니다.
-                  br
-                  small.text-muted 2016-12-13 12:23:00
-                  div.well.
-                    이부분은 뭐 어쩌고 저쩌고 해서 어쩌구해요...
+              - if(comments.length){
+                  - comments.forEach(function(comment){
+                      div.feed-element
+                        div.media-body
+                          strong.text-success #{neoMembers.GetUser(comment["작성자"]).USER_NAME}
+                          | 님이 댓글을 등록하셨습니다.
+                          br
+                          small.text-muted #{comment["작성일자"]}
+                          div.well #{comment["내용"]}
+                  - });
+              - }
               div.feed-element
                 i.fa.fa-user-circle-o.pull-left.fa-2x.text-success
-                div.media-body                  
-                  textarea.form-control(placeholder="메세지를 입력하세요... (줄바꿈 : Shift + Enter)")
+                div.media-body         
+                  div.input-group
+                    textarea.form-control.custom-control#project-comment(placeholder="메세지를 입력하세요...", data-projectid="#{project_default['프로젝트ID']}" style="resize:none;")
+                    span.input-group-addon.btn.btn-primary#project-comment-write 등록
           div#tab-2.tab-pane.fade
-            table.table.table-hover.table-striped.table-responsive
-              thead
-                tr 
-                  th.text-center 구분
-                  th.text-center 내용
-                  th.text-center 작성자
-                  th.text-center 작성일자
-              
-              tbody
-                tr
-                  td.text-center: label.label.label-primary 회의
-                  td
-                    p.small
-                      | 회의를 했어요....
-                      br
-                      | 이거는 이렇게 하구요
-                      br
-                      | 저거는 저렇게 해줘요
-                      br 
-                      | 프로젝트 내용이 처음과 달라졌어요
-                  td.text-center 
-                    p.small  서재민
-                  td.text-center
-                    p.small 2016-12-14
-                tr
-                  td.text-center: label.label.label-success 진행상황
-                  td
-                    p.small
-                      | [완료건]
-                      br 
-                      | 1. 데이터베이스 테이블을 설계했어요.
-                      br
-                      | 2. 공통 클래스파일을 만들고 있죠
-                       
-                  td.text-center                    
-                    p.small  서재민
-                  td.text-center
-                    p.small 2016-12-14
-                    
-            tfooter
-                tr 
-                  td(colspan='4').text-right
-                    button.btn.btn-white.btn-xs.pull-right 작성하기
+            div.table-responsive
+              table.table.table-hover.table-striped
+                thead
+                  tr 
+                    th.text-center 구분
+                    th.text-center 내용
+                    th.text-center 작성자
+                    th.text-center 작성일자                
+                tbody                  
+                  - if(meeting.length + devlog.length > 0){
+                    - project_his.forEach(function(his){
+                        - if(his['구분'] > 0){
+                            tr
+                              td.text-center: label.label(class="label label-#{his['구분'] === 1 ? 'primary' : 'success'}") #{his['구분'] === 1 ? '회의' : '진행상황'}
+                              td 
+                                p.small #{his['내용']}
+                              td.text-center #{neoMembers.GetUser(his["작성자"]).USER_NAME}
+                              td.text-center #{his["작성일자"]}
+                        - }
+                    - })
+                  - } 
+            div.well
+              div.form-group
+                select.selectpicker(title='구분', data-width='fit')
+                  option(value=1) 회의
+                  option(value=2) 진행상황                    
+                button.btn.btn-primary#project-history-write 저장   
+              div.form-group
+                textarea.form-control                    
+                               
+                        

@@ -1,81 +1,81 @@
-div.wrapper.wrapper-content.animated.fadeInUp.no-padding 
-  div.ibox
-    div.ibox-title
-        h5 프로젝트 등록
-        div.ibox-tools
-            a.btn.btn-xs.btn-default(href='/project')
-                i.fa.fa-close
-            
-            
-    div.ibox-content
-      form.form-horizontal(role='form',data-toggle="validator", data-projectid="#{projectid}", data-isnew="#{newproject}", method="POST", action="/project/new" )
-        input(type='hidden', name='project-id', value='#{projectid}')
-        input(type='hidden', name='project-writer', value='#{user.USER_ID}')
-        //- input(type='hidden', name='project-date', value="#{new Date().GetToday('YYYY-MM-DD HH:MM:SS')}")
+div.row.wrapper.border-bottom.white-bg.page-heading
+    div.col-lg-12
+      h2 프로젝트 등록
+        span.pull-right
+          a.btn.btn-link(href='/project'): i.fa.fa-reply  목록으로
+div.wrapper.wrapper-content.animated.fadeInRight.blog
+  div.row
+    div.col-lg-12.no-padding
+      div.ibox  
+        div.ibox-content
+          form.form-horizontal(role='form',data-toggle="validator", data-projectid="#{projectid}", data-isnew="#{newproject}", method="POST", action="/project/new" )
+            input(type='hidden', name='project-id', value='#{projectid}')
+            input(type='hidden', name='project-writer', value='#{user.USER_ID}')
+            //- input(type='hidden', name='project-date', value="#{new Date().GetToday('YYYY-MM-DD HH:MM:SS')}")
 
-        div.row
-          div.col-lg-8
-            div.form-group
-              div.col-sm-12
-                label.control-label(for='project-id') 프로젝트 번호:  
-                span.form-control-static  #{projectid}                
-          div.col-lg-4
-            div.form-group              
-              div.col-sm-12.text-right
-                p.form-control-static #{user.USER_NAME} / #{new Date().GetToday('YYYY-MM-DD HH:MM:SS')}            
-        div.row
-          div.col-lg-12
-            div.form-group.required
-              label.control-label.col-sm-3 프로젝트 이름 
-              div.col-sm-9
-                input.input.form-control#project-name(type='text', name='project-name', required, placeholder='프로젝트 이름을 간략하게 입력해주세요.')
-                div.help-block.with-errors
-            div.form-group.required
-              label.control-label.col-sm-3 프로그램
-              div.col-sm-9
-                div.input-group
-                  select.selectpicker#project-program(title='프로그램', name='project-program', required)
-                    option(value='0') 공통
-                    option(value='20') SenseChart
-                    option(value='8') MediChart
-                    option(value='1') Eplus                                      
-                div.help-block.with-errors
-            div.form-group
-              label.control-label.col-sm-3 요청병원
-              div.col-sm-9
-                input.input.form-control#project-clients-name(type='text', name='project-clients', placeholder='요청한병원 명칭을 입력해주세요. 예) 네오병원, 테스트병원')
-            div.form-group
-              label.control-label.col-sm-3 첨부파일:  
-              div.col-sm-9
-                div.row
-                  div.col-xs-12.m-b-md#project-files
-                    span.text-muted 첨부파일을 등록해주세요...                    
-                  div.col-xs-12
-                    div#project-upload-progress.progress
-                      div.progress-bar.progress-bar-success.progress-bar-striped.active           
-                    span.btn.btn-info.fileinput-button
-                      i.fa.fa-folder-open
-                      span  찾아보기
-                      input#project-file(type='file', name='project-file')                                
-                    div.help-block#errorBlock                                
-        div.hr-line-dashed
-        div.row
-          div.col-lg-12
-            div.form-group.required
-              label.control-label.col-sm-3 상세내용
-              div.col-sm-9
-                textarea.form-control.auto-height#project-detail(placeholder='상세하게 작성해주세요', name='project-detail', rows="10%", required)
-                div.help-block.with-errors
-            div.form-group.required
-              label.control-label.col-sm-3 기대효과
-              div.col-sm-9
-                textarea.form-control.auto-height#project-effect(placeholder='상세하게 작성해주세요', name='project-effect', rows="10%", required)
-                div.help-block.with-errors
-        div.hr-line-dashed
-        div.row
-          div.col-lg-12.text-center
-            a.btn.btn-default(href="/project") 목록으로
-            button.btn.btn-primary(type='submit') 프로젝트 등록
+            div.row
+              div.col-lg-8
+                div.form-group
+                  div.col-sm-12
+                    label.control-label(for='project-id') 프로젝트 번호:  
+                    span.form-control-static  #{projectid}                
+              div.col-lg-4
+                div.form-group              
+                  div.col-sm-12.text-right
+                    p.form-control-static #{user.USER_NAME} / #{new Date().GetToday('YYYY-MM-DD HH:MM:SS')}            
+            div.row
+              div.col-lg-12
+                div.form-group.required
+                  label.control-label.col-sm-3 프로젝트 이름 
+                  div.col-sm-9
+                    input.input.form-control#project-name(type='text', name='project-name', required, placeholder='프로젝트 이름을 간략하게 입력해주세요.')
+                    div.help-block.with-errors
+                div.form-group.required
+                  label.control-label.col-sm-3 프로그램
+                  div.col-sm-9
+                    div.input-group
+                      select.selectpicker#project-program(title='프로그램', name='project-program', required)
+                        option(value='0') 공통
+                        option(value='20') SenseChart
+                        option(value='8') MediChart
+                        option(value='1') Eplus                                      
+                    div.help-block.with-errors
+                div.form-group
+                  label.control-label.col-sm-3 요청병원
+                  div.col-sm-9
+                    input.input.form-control#project-clients-name(type='text', name='project-clients', placeholder='요청한병원 명칭을 입력해주세요. 예) 네오병원, 테스트병원')
+                div.form-group
+                  label.control-label.col-sm-3 첨부파일:  
+                  div.col-sm-9
+                    div.row
+                      div.col-xs-12.m-b-md#project-files
+                        span.text-muted 첨부파일을 등록해주세요...                    
+                      div.col-xs-12
+                        div#project-upload-progress.progress
+                          div.progress-bar.progress-bar-success.progress-bar-striped.active           
+                        span.btn.btn-info.fileinput-button
+                          i.fa.fa-folder-open
+                          span  찾아보기
+                          input#project-file(type='file', name='project-file')                                
+                        div.help-block#errorBlock                                
+            div.hr-line-dashed
+            div.row
+              div.col-lg-12
+                div.form-group.required
+                  label.control-label.col-sm-3 상세내용
+                  div.col-sm-9
+                    textarea.form-control.auto-height#project-detail(placeholder='상세하게 작성해주세요', name='project-detail', rows="10%", required)
+                    div.help-block.with-errors
+                div.form-group.required
+                  label.control-label.col-sm-3 기대효과
+                  div.col-sm-9
+                    textarea.form-control.auto-height#project-effect(placeholder='상세하게 작성해주세요', name='project-effect', rows="10%", required)
+                    div.help-block.with-errors
+            div.hr-line-dashed
+            div.row
+              div.col-lg-12.text-center
+                a.btn.btn-default(href="/project") 목록으로
+                button.btn.btn-primary(type='submit') 프로젝트 등록
 
 
-            
+                

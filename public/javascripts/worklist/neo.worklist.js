@@ -505,6 +505,7 @@
                     rows[i].delete();
                 }
             }
+            callback = callback || function(){};
             callback();
         }
     };
@@ -571,7 +572,7 @@
                 if (row instanceof FooTable.Row) {
                     row.val(param);
                 } else {
-                    param.id = new Date().GetToday();
+                    param.id = new Date().GetToday() + Math.floor(Math.random() * 100000) + 1;
                     self.$writeReportTableFT.rows.add(param);
                 }
 

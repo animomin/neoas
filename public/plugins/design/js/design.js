@@ -141,7 +141,8 @@ $(document).ready(function () {
             }
         }
 
-        $('#workspace').height($(window).height() - 60 + 'px');
+        var $workspace = $('#workspace');
+        if(!$workspace.hasClass('no-scroll')) $workspace.height($(window).height() - 60 + 'px');
 
     }
 

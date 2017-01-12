@@ -648,10 +648,6 @@
         '{{프로젝트ID}}', 0
       )
 
-      Insert Into NeoAs..N_프로젝트FILE(
-        프로젝트ID, 파일명
-      )
-      Values
       {{첨부파일}}
 
       Select 0 As Status, 'SUCCESS' as Message 
@@ -662,15 +658,45 @@
   </_SaveNewProject>  
   <_ProjectList>
     Select P.인덱스, P.프로젝트ID, P.프로젝트명, P.프로그램, ISNULL(P.요청거래처, '') AS 요청거래처, 
-           P.상세내용, P.기대효과, P.등록자, CONVERT(varchar, P.등록일자, 120) AS 등록일자, CONVERT(varchar, P.수정일자, 120) AS 수정일자,
-           I.상태, ISNULL(I.개발자, '') AS 개발자, I.개발시작일, I.개발종료일
+           P.상세내용, P.기대효과, P.등록자, CONVERT(varchar(10), P.등록일자, 120) AS 등록일자, CONVERT(varchar, P.수정일자, 120) AS 수정일자,
+           I.상태, I.개발시작일, I.개발종료일, ISNULL(I.개발비용 , 0) AS 개발비용
     From NeoAS..N_프로젝트 AS P
     Inner Join NeoAs..N_프로젝트INFO AS I
     ON P.프로젝트ID = I.프로젝트ID
     Where P.삭제 = 0
     {{검색조건}}
-    Order By 인덱스 DESC 
+    Order By 인덱스 DESC;
+
+    Select D.프로젝트ID, D.개발자 
+    From NeoAS..N_프로젝트DEV AS D
+    INNER JOIN NeoAS..N_프로젝트 AS P
+    ON D.프로젝트ID = P.프로젝트ID 
+    Where P.삭제 = 0
+    Group By D.프로젝트ID, D.개발자
+    Order By D.프로젝트ID;
+
   </_ProjectList>
   <_ProjectDetail>
+    Select P.인덱스, P.프로젝트ID, P.프로젝트명, P.프로그램, ISNULL(P.요청거래처, '') AS 요청거래처,
+		P.상세내용, P.기대효과, P.등록자, CONVERT(varchar(10), P.등록일자, 120) AS 등록일자, CONVERT(varchar, P.수정일자, 120) AS 수정일자,
+		I.상태, I.개발시작일, I.개발종료일, ISNULL(I.개발비용 , 0) AS 개발비용		
+    From N_프로젝트 AS P 
+    INNER JOIN N_프로젝트INFO AS I
+    ON P.프로젝트ID = I.프로젝트ID
+    WHERE P.프로젝트ID = '{{프로젝트ID}}';
+
+    Select 프로젝트ID, 개발자 
+    From NeoAS..N_프로젝트DEV
+    Where 프로젝트ID = '{{프로젝트ID}}';
+
+    Select 프로젝트ID, 파일명
+    From NeoAS..N_프로젝트FILE
+    Where 프로젝트ID = '{{프로젝트ID}}';
+
+    Select 프로젝트ID, 구분, 내용, 작성자, CONVERT(varchar, 작성일자, 120) AS 작성일자
+    From NeoAs..N_프로젝트HIS
+    Where 프로젝트ID = '{{프로젝트ID}}'
+    Order By 프로젝트ID, 작성일자 DESC;
+
   </_ProjectDetail>
 </query>
