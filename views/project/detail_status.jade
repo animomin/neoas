@@ -1,5 +1,6 @@
--var project_default = project[0][0], project_dev = project[1];
+-var project_default = project[0][0], project_dev = project[1], project_manager = null;
 - var projectPercent = 0, barStatus = '', projectStatus = '', barActive = 'active';
+
 - if(project_default['상태'] == 0) projectStatus = '접수';
 - if(project_default['상태'] == 1) {projectStatus = '검토'; barStatus = 'progress-bar-primary';}
 - if(project_default['상태'] == 2) {projectStatus = '개발'; barStatus = 'progress-bar-primary';}
@@ -11,56 +12,129 @@
 - if(project_default['상태'] == 10) {projectStatus = '취소'; barStatus = 'progress-bar-danger'; barActive = '';}
 - if(project_default['상태'] > 0 && project_default['상태'] < 6) projectPercent = project_default['상태'] * 16.7;                
 - else if(project_default['상태'] >= 6 ) projectPercent = 100;             
+
+- if(project_dev.length){
+-    project_manager = project_dev.find(function(m){ return m['책임자'] === 1;})
+- }
+
 //- div= JSON.stringify(project_default,null, 4)
-div.wrapper.wrapper-content.animated.fadeInUp
+div.animated.fadeInUp
   div.ibox
     div.ibox-content
       div.row
         div.col-lg-12
           div.m-b-md
-            a.btn.btn-info.btn-sm.pull-right 프로젝트 수정                                     
-            h3 ( #{project_default["프로젝트ID"]} ) #{project_default["프로젝트명"]}
-          dl.dl-horizontal
-            dt 진행상태            
-            dd
-              div(class="progress progress-striped #{barActive}")
-                  div(style='width:#{projectPercent}%;' class="progress-bar #{barStatus}") 
-              | #{projectStatus}     
+            a.btn.btn-info.btn-sm.pull-right(href='/project/new?id=#{project_default["인덱스"]}') 프로젝트 수정                                     
+            h3#project-id(data-projectid=project_default["인덱스"]) (ID : #{project_default["인덱스"]} ) #{project_default["프로젝트명"]}
+          
+      div.hr-line-dashed           
       div.row
-        div.col-lg-5.col-md-6.col-sm-6
-          dl.dl-horizontal
-            dt 등록자
-            dd #{neoMembers.GetUser(project_default["등록자"]).USER_NAME}
-            dt 등록일자
-            dd #{project_default["등록일자"]}
-            dt 프로그램 
-            dd #{project_default["프로그램"] === 0 ? '공통' : emrs[project_default["프로그램"]].name}              
-            dt 요청병원
-            dd #{project_default["요청거래처"] === "" ? '미등록' : project_default["요청거래처"]}
-        div.col-lg-7.col-md-6.col-sm-6
-          dl.dl-horizontal
-            dt 개발 참여자
-            dd 
-              div.team-members
-                - if(!project_dev.length)
-                  button.btn.btn-info.btn-outline.btn-xs 미정
-                - else {
-                -   project_dev.forEach(function(dev){
-                    button.btn.btn-info.btn-outline.btn-xs #{neoMembers.GetUser(dev["개발자"]).USER_NAME}
-                -   });
-                - }              
-            dt 개발기간
-            dd 
-              - if(project_default["개발시작일"] && project_default["개발종료일"]) {
-              -   var startDate = new Date(project_default["개발시작일"]); 
-              -   var endDate = new Date(project_default["개발종료일"]);
-              -   var btMs = endDate.getTime() - startDate.getTime();
-              -   var btDay = btMs / (1000*60*60*24);
-                  #{btDay}
-              - } else
-                  | 미정
-            dt 개발비용
-            dd #{project_default["개발비용"] !== 0 ? project_default["개발비용"] : '미정' }
+        div.col-xs-12.col-sm-6.col-md-3.col-lg-3
+          div.col-xs-6.text-left: span.h5.font-bold 프로그램
+          div.col-xs-6.text-left: span #{project_default["프로그램"] === 0 ? '공통' : emrs[project_default["프로그램"]].name}              
+        div.col-xs-12.col-sm-6.col-md-4.col-lg-4
+          div.col-xs-6.text-left: span.h5.font-bold 요청병원
+          div.col-xs-6.text-left: span #{project_default["요청거래처"] === "" ? '미등록' : project_default["요청거래처"]}     
+        div.col-xs-12.col-sm-6.col-md-2.col-lg-2
+          div.col-xs-6.text-left: span.h5.font-bold 등록자
+          div.col-xs-6.text-left: span #{neoMembers.GetUser(project_default["등록자"]).USER_NAME}       
+        div.col-xs-12.col-sm-6.col-md-3.col-lg-3
+          div.col-xs-6.text-left: span.h5.font-bold 등록일자
+          div.col-xs-6.text-left: span #{project_default["등록일자"]}    
+      div.hr-line-dashed   
+      div.row                
+        div.col-xs-12.m-b-xs
+          div.col-xs-6.col-sm-2.col-md-2.col-lg-1.text-left.m-b-xs: span.h5.font-bold.text-danger 총 책임자
+          div.col-xs-6.col-sm-2.col-md-2.col-lg-1.text-left.m-b-xs
+            - if(project_manager){
+              span.text-success.font-bold.h5 #{neoMembers.GetUser(project_manager["개발자"]).USER_NAME}
+            - }else{
+              div.input-group.input-group-sm
+                select.selectpicker#project-dev-manager(title='총책임자', data-width='fit', data-size='5', data-live-search="true")              
+                  - neoMembers.forEach(function(member){
+                      option(value= member['USER_ID']) #{member['USER_NAME']}
+                  - })
+                span.input-group-btn: button.btn.btn-danger.project-devinfo-save(data-devinfo='project-manager'): i.fa.fa-floppy-o
+            - }
+          
+
+        div.col-xs-12.col-sm-6.col-md-3.col-lg-3
+          div.col-xs-6.text-left: span.h5.font-bold 개발비용
+          div.col-xs-6.text-left.no-padding
+            - if(project_manager && project_manager['개발자'] === user.USER_ID) {
+              div.form-group
+                div.input-group                  
+                  input.input.input-sm.form-control#project-dev-cost(type='number', placeholder="개발비용", value= project_default['개발비용'])
+                  span.input-group-btn: button.btn.btn-danger.project-devinfo-save.btn-sm(data-devinfo='project-cost'): i.fa.fa-floppy-o
+            - } else {
+              span #{project_default["개발비용"] !== 0 ? project_default["개발비용"] : '미정' }
+            - }            
+        div.col-xs-12.col-sm-6.col-md-4.col-lg-4
+          div.col-xs-4.text-left: span.h5.font-bold 개발기간
+          div.col-xs-8.text-left.no-padding
+            - if(project_manager && project_manager['개발자'] === user.USER_ID) {
+              div.form-group
+                div.input-daterange.input-group
+                  input.input-sm.form-control.project-dev-term#project-dev-startdate(type="text", data-name="start", readonly="readonly", placeholder='시작일자', value= project_default['개발시작일'])
+                  span.input-group-addon ~
+                  input.input-sm.form-control.project-dev-term#project-dev-enddate(type="text", data-name="end", readonly="readonly", placeholder='종료일자', value= project_default['개발종료일'])
+                  span.input-group-btn: button.btn.btn-danger.project-devinfo-save.btn-sm(data-devinfo='project-term'): i.fa.fa-floppy-o
+            - } else if ( project_default['개발시작일'] && project_default['개발종료일']) {              
+              div.form-group
+                div.input-group.input-group-sm
+                  span.input-group-addon.no-padding #{project_default['개발시작일']}
+                  span.input-group-addon.no-padding ~
+                  span.input-group-addon.no-padding #{project_default['개발종료일']}
+            - } else {
+              span 미정
+            - }
+        div.col-xs-12.col-sm-6.col-md-5.col-lg-5
+          div.col-xs-6.col-sm-6.col-md-3.col-md-offset-3.text-left: span.h5.font-bold 개발자
+          div.col-xs-6.text-left.no-padding
+            - if(project_manager && project_manager['개발자'] === user.USER_ID) {
+              div.form-group
+                div.input-group.input-group-sm
+                  select.selectpicker#project-dev-developer(title='개발자', data-width='fit', data-size='5', data-live-search="true", multiple)              
+                    - neoMembers.forEach(function(member){        
+                      - var devSelected = project_dev.find(function(dev){ return dev['개발자'] === member['USER_ID'];});                
+                        option(value= member['USER_ID'],selected=(devSelected), disabled=(project_manager['개발자'] === member['USER_ID']) ) #{member['USER_NAME']}
+                    - })
+                  span.input-group-btn: button.btn.btn-danger.project-devinfo-save(data-devinfo='project-developer'): i.fa.fa-floppy-o
+            - } else {
+              - if(!project_dev.length)
+                  span.text-warning 미정
+              - else {
+              -   project_dev.forEach(function(dev){
+                  //- button.btn.btn-success.btn-outline.btn-xs #{neoMembers.GetUser(dev["개발자"]).USER_NAME}
+                  span.text-success.m-l-xs.m-r-xs #{neoMembers.GetUser(dev["개발자"]).USER_NAME}                
+              -   });
+              - }   
+            - }
+      div.hr-line-dashed   
+      div.row
+        div.col-xs-12.col-sm-12.col-md-1.col-lg-1: h5 진행상황
+        div.col-xs-12.col-sm-12.col-md-11.col-lg-11
+          div(class="progress progress-striped #{barActive} m-b-sm")
+              div(style='width:#{projectPercent}%;' class="progress-bar #{barStatus}") 
+          - if(project_manager && project_manager['개발자'] === user.USER_ID) {
+            div.input-group.input-group-sm.col-md-2            
+              select.selectpicker#project-dev-status(title='진행상태', data-width='fit', data-size='5')              
+                option(value=0, selected=(project_default['상태'] === 0 )) 접수
+                option(value=1, selected=(project_default['상태'] === 1 )) 회의중
+                option(value=2, selected=(project_default['상태'] === 2 )) 개발중
+                option(value=3, selected=(project_default['상태'] === 3 )) 개발테스트
+                option(value=4, selected=(project_default['상태'] === 4 )) 개발완료
+                option(value=5, selected=(project_default['상태'] === 5 )) 사용테스트
+                option(value=6, selected=(project_default['상태'] === 6 )) 완료
+                option(value=7, selected=(project_default['상태'] === 7 )) 보류
+                option(value=10, selected=(project_default['상태'] === 10 )) 취소
+              span.input-group-btn: button.btn.btn-danger.project-devinfo-save(data-devinfo='project-status'): i.fa.fa-floppy-o
+          - } else {
+            | #{projectStatus}          
+          - }
+          
+        
+        
             
       
     div.ibox-footer

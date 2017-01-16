@@ -4,12 +4,12 @@ div.row.wrapper.border-bottom.white-bg.page-heading
           div.form-group
             div.input-group
               span.input-group-btn
-                select.selectpicker(title='프로그램', data-width='fit')
-                  option 전체
-                  option 공통              
-                  option SenseChart
-                  option MediChart
-                  option Eplus
+                select.selectpicker#project-program(title='프로그램', data-width='fit')
+                  option(value='') 전체
+                  option(value='0') 공통              
+                  option(value='20') SenseChart
+                  option(value='8') MediChart
+                  option(value='1') Eplus
               input.input.form-control.hidden#search-keyword(type='search', placeholder="프로젝트 검색")            
               span.input-group-btn
                 a.btn.btn-warning(href='/project/new') 프로젝트 등록      

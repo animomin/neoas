@@ -38,13 +38,18 @@ div.row.border-bottom
           - if(user.user_area.match(/0000|0008|0026|0029|0030/gim))
             li(class=menu==701 ? 'active' : '')
               a.navbar-mngr(href='/worklist', data-as='701') 업무보고
-          - if(user.USER_ID === 89)
-            li(class=menu==801 ? 'active' : '')
-              a.navbar-mngr(href='/project', data-as='801') 프로젝트
+        
+          li(class=menu==801 ? 'active' : '')
+            a.navbar-mngr(href='/project', data-as='801') 프로젝트
         ul.nav.navbar-nav.navbar-right 
-          li
-            a(href='/download/webpage?fdr=help&fle=neoas.pdf') 도움말
-          li
-            a#sign-out(href='/users/logout',onClick='localStorage.clear();')
-              i.fa.fa-sign-out
-              | 로그아웃
+          
+          li.dropdown
+            a(href='#', data-toggle="dropdown")
+              span: i.fa.fa-gear          
+            ul.dropdown-menu
+              li
+                a(href='/download/webpage?fdr=help&fle=neoas.pdf') 도움말
+              li
+                a#sign-out(href='/users/logout',onClick='localStorage.clear();')
+                  i.fa.fa-sign-out
+                  | 로그아웃 

@@ -1,67 +1,89 @@
-- var project_default = project[0][0], project_his = project[3]
+- var project_default = project[0][0], project_his = project[2]
 - var comments = project_his.filter(function(element){return element['구분'] === 0;})
 - var meeting = project_his.filter(function(element){return element['구분'] === 1;})
 - var devlog = project_his.filter(function(element){return element['구분'] === 2;})
-//- div= JSON.stringify(devlog)
+//- div= JSON.stringify(commenttype)
 div.row.m-t-sm
   div.col-lg-12.no-padding
     div.panel.panel-blank
       div.panel-heading
         div.panel-options
           ul.nav.nav-tabs
-            li.active: a(data-toggle='tab', data-target='#tab-1') 메세지 #{comments.length ?  comments.length : ''}
-            li: a(data-toggle='tab', data-target='#tab-2') 진행내용 #{meeting.length + devlog.length > 0 ?  meeting.length + devlog.length : ''}
+            li(class= (commenttype == 0 ? 'active' : "")): a(data-toggle='tab', data-target='#tab-1') 메세지 #{comments.length ?  comments.length : ''}
+            li(class= (commenttype > 0 ? 'active' : "")): a(data-toggle='tab', data-target='#tab-2') 진행내용 #{meeting.length + devlog.length > 0 ?  meeting.length + devlog.length : ''}
 
       div.panel-body
         div.tab-content
-          div#tab-1.tab-pane.fade.in.active
-            div.feed-activity-list
+          div#tab-1(class="tab-pane fade " + (commenttype == 0 ? 'in active' : ""))
+            div.feed-activity-list#project-comment-list
               - if(comments.length){
                   - comments.forEach(function(comment){
                       div.feed-element
                         div.media-body
+                          span.pull-right
+                            - if(comment["작성자"] === user.USER_ID)
+                                button.btn.btn-link.btn-sm.btn-outline.fa.fa-edit.project-comment-edit(data-commentid="#{comment['인덱스']}", data-projectid="#{project_default['인덱스']}")
+                                button.btn.btn-link.btn-sm.btn-outline.fa.fa-trash.project-comment-delete(data-commentid="#{comment['인덱스']}", data-projectid="#{project_default['인덱스']}")
                           strong.text-success #{neoMembers.GetUser(comment["작성자"]).USER_NAME}
                           | 님이 댓글을 등록하셨습니다.
                           br
                           small.text-muted #{comment["작성일자"]}
-                          div.well #{comment["내용"]}
+                          div.well !{comment["내용"].replace(/\r?\n/g, '<br />')}
                   - });
               - }
               div.feed-element
                 i.fa.fa-user-circle-o.pull-left.fa-2x.text-success
-                div.media-body         
-                  div.input-group
-                    textarea.form-control.custom-control#project-comment(placeholder="메세지를 입력하세요...", data-projectid="#{project_default['프로젝트ID']}" style="resize:none;")
-                    span.input-group-addon.btn.btn-primary#project-comment-write 등록
-          div#tab-2.tab-pane.fade
-            div.table-responsive
-              table.table.table-hover.table-striped
-                thead
-                  tr 
-                    th.text-center 구분
-                    th.text-center 내용
-                    th.text-center 작성자
-                    th.text-center 작성일자                
-                tbody                  
-                  - if(meeting.length + devlog.length > 0){
-                    - project_his.forEach(function(his){
-                        - if(his['구분'] > 0){
-                            tr
-                              td.text-center: label.label(class="label label-#{his['구분'] === 1 ? 'primary' : 'success'}") #{his['구분'] === 1 ? '회의' : '진행상황'}
-                              td 
-                                p.small #{his['내용']}
-                              td.text-center #{neoMembers.GetUser(his["작성자"]).USER_NAME}
-                              td.text-center #{his["작성일자"]}
-                        - }
-                    - })
-                  - } 
-            div.well
-              div.form-group
-                select.selectpicker(title='구분', data-width='fit')
-                  option(value=1) 회의
-                  option(value=2) 진행상황                    
-                button.btn.btn-primary#project-history-write 저장   
-              div.form-group
-                textarea.form-control                    
-                               
-                        
+                div.media-body        
+                  form.form-horizontal#project-comment-form(method='post', action='/project/comment',role='form',data-toggle="validator") 
+                    input(type='hidden', name='projectid', value='#{project_default["인덱스"]}')
+                    input(type='hidden', name='commentType', value='0')
+                    div.form-group.required      
+                      div.col-sm-12              
+                        div.input-group                          
+                          textarea.form-control.custom-control#project-comment(tabindex="1",placeholder="메세지를 입력하세요...", style="resize:none;",required, name="comment")
+                          span.input-group-addon.btn.btn-primary#project-comment-write(tabindex="2", type='submit') 등록                          
+                          //- button.hidden#project-comment-write(type='submit') 등록
+                        div.help-block.with-errors         
+          div#tab-2(class="tab-pane fade " + (commenttype > 0 ? 'in active' : ""))
+            ul.list-style4.unstyled.no-padding#project-history-list
+              li.row
+                div.col-sm-2: b 구분
+                div.col-sm-10: b 내용
+              - if(meeting.length + devlog.length > 0){
+                - project_his.forEach(function(his){
+                  - if(his['구분'] > 0){
+                    li.row
+                      - if(his["작성자"] === user.USER_ID)
+                        div.col-xs-12.text-right
+                          button.btn.btn-link.btn-sm.btn-outline.fa.fa-edit.project-history-edit(data-historyid="#{his['인덱스']}", data-projectid="#{project_default['인덱스']}", data-commenttype="#{his['구분']}")
+                          button.btn.btn-link.btn-sm.btn-outline.fa.fa-trash.project-history-delete(data-historyid="#{his['인덱스']}", data-projectid="#{project_default['인덱스']}", data-commenttype="#{his['구분']}")
+                      div.col-sm-1
+                        //- label.label(class="label label-#{his['구분'] === 1 ? 'primary' : 'success'}") #{his['구분'] === 1 ? '회의' : '진행상황'}
+                        span(class="badge m-b-md badge-#{his['구분'] === 1 ? 'primary' : 'success'}") #{his['구분'] === 1 ? '회의' : '진행상황'}
+                      div.col-sm-11                        
+                        p.history-well !{his['내용'].replace(/\r?\n/g, '<br />')}
+                        span.small.text-muted.pull-right
+                          b #{neoMembers.GetUser(his["작성자"]).USER_NAME}
+                          |  #{his["작성일자"]}
+                  - }
+                - })
+              - } 
+              
+              li.row
+                form.form-horizontal#project-history-form(method='post', action='/project/comment',role='form',data-toggle="validator")  
+                  input(type='hidden', name='projectid', value="#{project_default['인덱스']}")          
+                  div.col-sm-1
+                    div.form-group.required
+                      div.input-group
+                        select.selectpicker#project-history-type(title='구분', data-width='fit', name='commentType', required)
+                          option(value=1) 회의
+                          option(value=2) 진행상황           
+                      div.help-block.with-errors.small                     
+                  div.col-sm-11
+                    div.form-group
+                      div.input-group                          
+                        textarea.form-control.auto-height#project-history-comment(tabindex="1",placeholder='상세하게 작성해주세요', name='comment', rows="10%", required, style="resize:none;")
+                        span.input-group-addon.btn.btn-primary#project-history-write(tabindex="2", type='submit') 등록     
+                      div.help-block.with-errors            
+           
+                          

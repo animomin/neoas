@@ -629,74 +629,163 @@
     END CATCH   
   </_DailyReportDelete>
   <_ProjectID>
-    Select ISNULL(MAX(인덱스),0) + 1 AS ID 
+    Select ISNULL(MAX(인덱스),0) AS ID 
     From NeoAS..N_프로젝트
   </_ProjectID>
   <_SaveNewProject>
     Begin Try
       Insert Into NeoAs..N_프로젝트(
-        프로젝트ID, 프로젝트명, 프로그램, 요청거래처, 상세내용, 기대효과, 등록자, 등록일자, 수정일자, 삭제
+        프로젝트명, 프로그램, 요청거래처, 상세내용, 기대효과, 등록자, 등록일자, 수정일자, 삭제
       )
       Values (
-        '{{프로젝트ID}}', '{{프로젝트명}}', {{프로그램}}, '{{요청거래처}}', '{{상세내용}}', '{{기대효과}}', {{등록자}}, GETDATE(), GETDATE(), 0
+        '{{프로젝트명}}', {{프로그램}}, '{{요청거래처}}', '{{상세내용}}', '{{기대효과}}', {{등록자}}, GETDATE(), GETDATE(), 0
       )
-
-      Insert Into NeoAs..N_프로젝트INFO(
-        프로젝트ID, 상태
-      )
-      values (
-        '{{프로젝트ID}}', 0
-      )
-
-      {{첨부파일}}
-
       Select 0 As Status, 'SUCCESS' as Message 
     End Try
     Begin CATCH
       SELECT ERROR_NUMBER() AS Status, ERROR_MESSAGE() AS Message;
     END CATCH
   </_SaveNewProject>  
+  <_UpdateProject>
+    Begin Try
+      Update NeoAS..N_프로젝트
+      Set 프로젝트명 = '{{프로젝트명}}',
+          프로그램 = {{프로그램}},
+          요청거래처 = '{{요청거래처}}',          
+          상세내용 = '{{상세내용}}',
+          기대효과 = '{{기대효과}}',          
+          수정일자 = GETDATE(),
+          삭제 = 0
+      Where 인덱스 = {{프로젝트ID}}          
+
+      Select 0 As Status, 'SUCCESS' as Message 
+    End Try
+    Begin CATCH
+      SELECT ERROR_NUMBER() AS Status, ERROR_MESSAGE() AS Message;
+    END CATCH
+  </_UpdateProject>
+  <_UpdateProjectDevInfo>
+    Begin Try
+      Update NeoAS..N_프로젝트
+      {{프로젝트업데이트}}
+      Where 인덱스 = {{프로젝트ID}}         
+
+      Select 0 As Status, 'SUCCESS' as Message 
+    End Try
+    Begin CATCH
+      SELECT ERROR_NUMBER() AS Status, ERROR_MESSAGE() AS Message;
+    END CATCH
+  </_UpdateProjectDevInfo>
+  <_UpdateProjectManager>
+    Begin Try
+      Update NeoAS..N_프로젝트DEV
+      Set 책임자 = 0
+      Where 프로젝트ID = {{프로젝트ID}}
+      IF EXISTS(Select 개발자 From NeoAs..N_프로젝트DEV Where 개발자 = {{개발자}} AND 프로젝트ID = {{프로젝트ID}})      
+        BEGIN
+          Update NeoAS..N_프로젝트DEV
+          Set 책임자 = 1
+          Where 프로젝트ID = {{프로젝트ID}}
+          AND 개발자 = {{개발자}}
+        END 
+      ELSE
+        BEGIN
+          INSERT INTO NeoAs..N_프로젝트DEV ( 프로젝트ID , 개발자, 책임자 )
+          VALUES( {{프로젝트ID}}, {{개발자}}, 1) 
+        END 
+      
+      Select 0 As Status, 'SUCCESS' as Message 
+    End Try
+    Begin CATCH
+      SELECT ERROR_NUMBER() AS Status, ERROR_MESSAGE() AS Message;
+    END CATCH
+  </_UpdateProjectManager>
+  <_UpdateProjectDeveloper>
+    Begin Try
+      Delete From NeoAs..N_프로젝트DEV
+      Where 프로젝트ID = {{프로젝트ID}}
+      AND 책임자 = 0
+      
+      INSERT INTO NeoAs..N_프로젝트DEV ( 프로젝트ID , 개발자, 책임자 )
+      VALUES {{개발자}}  
+      
+      Select 0 As Status, 'SUCCESS' as Message 
+    End Try
+    Begin CATCH
+      SELECT ERROR_NUMBER() AS Status, ERROR_MESSAGE() AS Message;
+    END CATCH
+  </_UpdateProjectDeveloper>
   <_ProjectList>
-    Select P.인덱스, P.프로젝트ID, P.프로젝트명, P.프로그램, ISNULL(P.요청거래처, '') AS 요청거래처, 
-           P.상세내용, P.기대효과, P.등록자, CONVERT(varchar(10), P.등록일자, 120) AS 등록일자, CONVERT(varchar, P.수정일자, 120) AS 수정일자,
-           I.상태, I.개발시작일, I.개발종료일, ISNULL(I.개발비용 , 0) AS 개발비용
-    From NeoAS..N_프로젝트 AS P
-    Inner Join NeoAs..N_프로젝트INFO AS I
-    ON P.프로젝트ID = I.프로젝트ID
-    Where P.삭제 = 0
+    Select 인덱스, 프로젝트명, 프로그램, ISNULL(요청거래처, '') AS 요청거래처, 
+           상세내용, 기대효과, 등록자, CONVERT(varchar(10), 등록일자, 120) AS 등록일자, CONVERT(varchar, 수정일자, 120) AS 수정일자,
+           상태, 개발시작일, 개발종료일, 개발비용
+    From NeoAS..N_프로젝트
+    Where 삭제 = 0
     {{검색조건}}
     Order By 인덱스 DESC;
 
-    Select D.프로젝트ID, D.개발자 
+    Select D.프로젝트ID, D.개발자, D.책임자 
     From NeoAS..N_프로젝트DEV AS D
     INNER JOIN NeoAS..N_프로젝트 AS P
-    ON D.프로젝트ID = P.프로젝트ID 
+    ON D.프로젝트ID = P.인덱스
     Where P.삭제 = 0
-    Group By D.프로젝트ID, D.개발자
+    Group By D.프로젝트ID, D.개발자, D.책임자
     Order By D.프로젝트ID;
 
   </_ProjectList>
   <_ProjectDetail>
-    Select P.인덱스, P.프로젝트ID, P.프로젝트명, P.프로그램, ISNULL(P.요청거래처, '') AS 요청거래처,
-		P.상세내용, P.기대효과, P.등록자, CONVERT(varchar(10), P.등록일자, 120) AS 등록일자, CONVERT(varchar, P.수정일자, 120) AS 수정일자,
-		I.상태, I.개발시작일, I.개발종료일, ISNULL(I.개발비용 , 0) AS 개발비용		
-    From N_프로젝트 AS P 
-    INNER JOIN N_프로젝트INFO AS I
-    ON P.프로젝트ID = I.프로젝트ID
-    WHERE P.프로젝트ID = '{{프로젝트ID}}';
+    Select 인덱스, 프로젝트명, 프로그램, ISNULL(요청거래처, '') AS 요청거래처,
+		상세내용, 기대효과, 등록자, CONVERT(varchar(10), 등록일자, 120) AS 등록일자, CONVERT(varchar, 수정일자, 120) AS 수정일자,
+		상태, CONVERT(varchar(10), 개발시작일, 120) AS 개발시작일, CONVERT(varchar(10), 개발종료일, 120) AS 개발종료일, ISNULL(개발비용 , 0) AS 개발비용		
+    From N_프로젝트     
+    WHERE 인덱스 = {{인덱스}};
 
-    Select 프로젝트ID, 개발자 
+    Select 프로젝트ID, 개발자, 책임자
     From NeoAS..N_프로젝트DEV
-    Where 프로젝트ID = '{{프로젝트ID}}';
+    Where 프로젝트ID = {{인덱스}}
+    Order By 책임자 DESC;
 
-    Select 프로젝트ID, 파일명
-    From NeoAS..N_프로젝트FILE
-    Where 프로젝트ID = '{{프로젝트ID}}';
-
-    Select 프로젝트ID, 구분, 내용, 작성자, CONVERT(varchar, 작성일자, 120) AS 작성일자
+    Select 인덱스, 프로젝트ID, 구분, 내용, 작성자, CONVERT(varchar, 작성일자, 120) AS 작성일자
     From NeoAs..N_프로젝트HIS
-    Where 프로젝트ID = '{{프로젝트ID}}'
-    Order By 프로젝트ID, 작성일자 DESC;
+    Where 프로젝트ID = {{인덱스}}
+    Order By 프로젝트ID, 인덱스 ASC;
 
   </_ProjectDetail>
+  <_AddProjectComment>
+    Begin Try
+      Insert Into NeoAs..N_프로젝트HIS ( 프로젝트ID , 구분, 내용, 작성자, 작성일자 )
+      Values (
+        {{프로젝트ID}} , {{구분}}, '{{내용}}', {{작성자}}, GETDATE()
+      )
+
+      Select 0 As Status, 'SUCCESS' as Message 
+    End Try
+    Begin CATCH
+      SELECT ERROR_NUMBER() AS Status, ERROR_MESSAGE() AS Message;
+    END CATCH
+  </_AddProjectComment>
+  <_EditProjectComment>
+    Begin Try
+      Update NeoAs..N_프로젝트HIS
+      Set 내용 = '{{내용}}',
+      작성일자 = GETDATE()
+      Where 인덱스 = {{인덱스}}      
+      Select 0 As Status, 'SUCCESS' as Message 
+    End Try
+    Begin CATCH
+      SELECT ERROR_NUMBER() AS Status, ERROR_MESSAGE() AS Message;
+    END CATCH
+  </_EditProjectComment>
+  <_DeleteProjectComment>
+    Begin Try
+      Delete From NeoAs..N_프로젝트HIS
+      Where 인덱스 = {{인덱스}}
+
+      Select 0 As Status, 'SUCCESS' as Message 
+    End Try
+    Begin CATCH
+      SELECT ERROR_NUMBER() AS Status, ERROR_MESSAGE() AS Message;
+    END CATCH
+  </_DeleteProjectComment>
+
 </query>

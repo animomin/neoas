@@ -23,14 +23,14 @@
       item.use_areaName = area[item.user_area];
     });
 
-    neoMembers.GetUser = function(id){
-      var item = neoMembers.find(function(_item){
+    neoMembers.GetUser = function (id) {
+      var item = neoMembers.find(function (_item) {
         return parseInt(_item.USER_ID) === parseInt(id);
       });
       return item || {
-          USER_ID : 0,
-          USER_NAME : '',
-          user_area : ''
+        USER_ID: 0,
+        USER_NAME: '',
+        user_area: ''
       };
     };
 
@@ -42,7 +42,7 @@
     query = util.format(querys22.UserInfo, id, pwd);
     logger.info('Member login :: ' + JSON.stringify(req.query));
     logger.info('Query :: ' + query);
-    
+
     if (server22.connection.connected) {
       server22.RecordSet(query, function (err, records) {
         if (err) {
@@ -744,6 +744,7 @@
       function (callback) {
         if (server16.connection.connected) {
           server16.RecordSet(query, function (err, records) {
+            console.log(JSON.stringify(records, null, 4));
             callback(err, records);
           });
         }
@@ -772,7 +773,9 @@
         if (!params.program && !params.keyword) {
           query = query.replace('{{검색조건}}', '');
         } else {
-
+          if(params.program){
+            query = query.replace('{{검색조건}}', ' AND 프로그램 = ' + params.program);
+          }
         }
 
         console.log(query);
@@ -801,36 +804,168 @@
     });
   };
 
-  exports.SaveNewProject = function(req, _callback){
+  exports.SaveNewProject = function (req, _callback) {
     var params = req.body;
     query = querys16._SaveNewProject;
 
     async.waterfall([
       function (callback) {
-        try{
+
+        query = query.replace(/{{프로젝트ID}}/gim, params['project-id']);
+        query = query.replace(/{{프로젝트명}}/gim, params['project-name']);
+        query = query.replace(/{{프로그램}}/gim, params['project-program']);
+        query = query.replace(/{{요청거래처}}/gim, params['project-clients']);
+        query = query.replace(/{{상세내용}}/gim, params['project-detail']);
+        query = query.replace(/{{기대효과}}/gim, params['project-effect']);
+        query = query.replace(/{{등록자}}/gim, params['project-writer']);
+
+        console.log(query);
+        callback(null);
+      },
+      function (callback) {
+        if (server16.connection.connected) {
+          server16.execute(query, function (err, records) {
+            return callback(err, records);
+          });
+        }
+      }
+
+    ], function (err, records) {
+      if (err) {
+        logger.error(err);
+        data.err = err;
+        data.data = null;
+      } else if (!records || records.length <= 0) {
+        data.err = 'NODATA';
+        data.data = null;
+      } else {
+        data.err = null;
+        data.data = records;
+      }
+      _callback(data);
+    });
+
+  };
+
+  exports.UpdateProject = function (req, _callback) {
+    var params = req.body;
+
+    console.log(JSON.stringify(params, null, 4));
+    async.waterfall([
+      function (callback) {
+
+        if (params.devinfotype) {
+          var fieldName = '';
+          query = querys16._UpdateProjectDevInfo;
+          switch (params.devinfotype.toLowerCase()) {
+            case "manager":
+              query = querys16._UpdateProjectManager;
+              /* 프로젝트ID 개발자 */
+              query = query.replace(/{{개발자}}/gim, params.value);
+              break;
+            case "cost":
+              query = query.replace('{{프로젝트업데이트}}', ' Set 개발비용 = ' + params.value);              
+              break;
+            case "term":
+              query = query.replace('{{프로젝트업데이트}}', " Set 개발시작일 = '" + params['value[startdate]'] + "', 개발종료일 = '" + params['value[enddate]'] + "' ");              
+              break;
+            case "developer":
+              query = querys16._UpdateProjectDeveloper;
+              var developers = '';
+              params['value[]'] = typeof params['value[]'] === 'string' ? [params['value[]']] : params['value[]'];
+              params['value[]'].forEach(function(dev){
+                developers += developers !== "" ? " , " : "";
+                developers += "(" + params['project-id'] + ", " + dev + ", 0)";
+              });
+              query = query.replace('{{개발자}}', developers);
+              break;
+            case "status":
+              query = query.replace('{{프로젝트업데이트}}', ' Set 상태 = ' + params.value);              
+              break;
+          }
+          query = query.replace(/{{프로젝트ID}}/gim, params['project-id']);
+
+        } else {
+          query = querys16._UpdateProject;
           query = query.replace(/{{프로젝트ID}}/gim, params['project-id']);
           query = query.replace(/{{프로젝트명}}/gim, params['project-name']);
           query = query.replace(/{{프로그램}}/gim, params['project-program']);
           query = query.replace(/{{요청거래처}}/gim, params['project-clients']);
           query = query.replace(/{{상세내용}}/gim, params['project-detail']);
           query = query.replace(/{{기대효과}}/gim, params['project-effect']);
-          query = query.replace(/{{등록자}}/gim, params['project-writer']);
-          
-          var insert = '', values = '' ;
-          if(params['project-uploaded-file']){
-            insert = 'Insert Into NeoAs..N_프로젝트FILE(' +
-            '               프로젝트ID, 파일명 ' +
-            '             ) values {{첨부파일}} ';
-            var uploadFiles = typeof params['project-uploaded-file'] === 'object' ? params['project-uploaded-file'] : [params['project-uploaded-file']];
-            
-            uploadFiles.forEach(function(file){
-              if(values !== '') values += ',';
-              values += "('" + params['project-id'] + "','" + file + "')";
-            });
-            insert = insert.replace('{{첨부파일}}', values);
-          }
-          query = query.replace('{{첨부파일}}', insert);
-        }catch(e){
+        }
+        console.log(query);
+        callback(null);
+      },
+      function (callback) {
+        if (server16.connection.connected) {
+          server16.execute(query, function (err, records) {
+            return callback(err, records);
+          });
+        }
+      }
+
+    ], function (err, records) {
+      if (err) {
+        logger.error(err);
+        data.err = err;
+        data.data = null;
+      } else if (!records || records.length <= 0) {
+        data.err = 'NODATA';
+        data.data = null;
+      } else {
+        data.err = null;
+        data.data = records;
+      }
+      _callback(data);
+    });
+  };
+
+  exports.GetProjectDetail = function (req, _callback) {
+    var params = req.params;
+    params.projectid = params.projectid || req.query.id;
+    async.waterfall([
+      function (callback) {
+        query = querys16._ProjectDetail;
+        query = query.replace(/{{인덱스}}/gim, params.projectid);
+        console.log(query);
+        callback(null);
+      },
+      function (callback) {
+        if (server16.connection.connected) {
+          server16.RecordSet(query, function (err, records) {
+            callback(err, records);
+          });
+        }
+      }
+    ], function (err, records) {
+      if (err) {
+        logger.error(err);
+        data.err = err;
+        data.data = null;
+      } else if (!records || records.length <= 0) {
+        data.err = 'NODATA';
+        data.data = null;
+      } else {
+        data.err = null;
+        data.data = records;
+      }
+      _callback(data);
+    });
+  };
+
+  exports.AddProjectComment = function (req, _callback) {
+    var params = req.body;
+    query = querys16._AddProjectComment;
+
+    async.waterfall([
+      function (callback) {
+        try {
+          query = query.replace('{{프로젝트ID}}', params.projectid);
+          query = query.replace('{{구분}}', params.commentType);
+          query = query.replace('{{내용}}', params.comment);
+          query = query.replace('{{작성자}}', req.session.user.USER_ID);
+        } catch (e) {
           console.log(e);
         }
         console.log(query);
@@ -861,19 +996,60 @@
 
   };
 
-  exports.GetProjectDetail = function(req, _callback){
-    var params = req.params;    
+  exports.EditProjectComment = function (req, _callback) {
+    var params = req.body;
+    query = querys16._EditProjectComment;
+
     async.waterfall([
       function (callback) {
-        query = querys16._ProjectDetail;
-        query = query.replace(/{{프로젝트ID}}/gim, params.projectid);
+        try {
+          query = query.replace('{{인덱스}}', params.commentid);
+          query = query.replace('{{내용}}', params.comment);
+
+        } catch (e) {
+          console.log(e);
+        }
         console.log(query);
         callback(null);
       },
       function (callback) {
         if (server16.connection.connected) {
-          server16.RecordSet(query, function (err, records) {
-            callback(err, records);
+          server16.execute(query, function (err, records) {
+            return callback(err, records);
+          });
+        }
+      }
+
+    ], function (err, records) {
+      if (err) {
+        logger.error(err);
+        data.err = err;
+        data.data = null;
+      } else if (!records || records.length <= 0) {
+        data.err = 'NODATA';
+        data.data = null;
+      } else {
+        data.err = null;
+        data.data = records;
+      }
+      _callback(data);
+    });
+  };
+
+  exports.DelProjectComment = function (req, _callback) {
+    var params = req.body;
+    async.waterfall([
+      function (callback) {
+
+        query = querys16._DeleteProjectComment;
+        query = query.replace('{{인덱스}}', params.commentid);
+        console.log(query);
+        callback(null);
+      },
+      function (callback) {
+        if (server16.connection.connected) {
+          server16.execute(query, function (err, records) {
+            return callback(err, records);
           });
         }
       }

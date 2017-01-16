@@ -19,43 +19,51 @@
     View.prototype.init = function () {
         var self = this;
         this.$writeForm.validator();
-        this.$uploadFile.fileupload({
-            url: '/project/upload',
-            dataType: 'json',
-            send: function (e, data) {
-                console.log('send');
-                self.$uploadedFile.find('span').addClass('hidden');
-            },
-            done: function (e, data) {
-                console.log('done');
-                $.each(data.result.files, function (index, file) {
-                    if (!self.$uploadedFile.find('div.chip[data-filename="' + file.originalFilename + '"]').length) {
-                        self.$uploadedFile.append(self.template.insertUploadedFile(file));
-                    }
-                    // if(!self.$uploadedFile.find('div.chip[data-filename="'+file.originalFilename+'"]').length){
-                    //     var $file = $('<p/>');
-                    //         $file.text(file.originalFilename).appendTo(self.$uploadedFile);                    
-                    //         $file.attr('data-filename', file.originalFilename);                        
-                    // }
-                });
+        this.$uploadFile.filer({            
+            maxSize : 10,
+            fileMaxSize: 5,
+            addMore: true,
+            // extensions: ["jpg", "png", "gif"],
+            showThumbs: true
+        });
+        // this.$uploadFile.fileupload({
+        //     formData : { projectid : self.$writeForm.data('projectid')},
+        //     url: '/project/upload',
+        //     dataType: 'json',
+        //     send: function (e, data) {
+        //         console.log('send');
+        //         self.$uploadedFile.find('span').addClass('hidden');
+        //     },
+        //     done: function (e, data) {
+        //         console.log('done');
+        //         $.each(data.result.files, function (index, file) {
+        //             if (!self.$uploadedFile.find('div.chip[data-filename="' + file.originalFilename + '"]').length) {
+        //                 self.$uploadedFile.append(self.template.insertUploadedFile(file));
+        //             }
+        //             // if(!self.$uploadedFile.find('div.chip[data-filename="'+file.originalFilename+'"]').length){
+        //             //     var $file = $('<p/>');
+        //             //         $file.text(file.originalFilename).appendTo(self.$uploadedFile);                    
+        //             //         $file.attr('data-filename', file.originalFilename);                        
+        //             // }
+        //         });
 
-                self.$uploadProgress.find('.progress-bar').removeClass('active progress-bar-danger progress-bar-warning').addClass('progress-bar-success');
+        //         self.$uploadProgress.find('.progress-bar').removeClass('active progress-bar-danger progress-bar-warning').addClass('progress-bar-success');
 
-            },
-            progressall: function (e, data) {
-                var progress = parseInt(data.loaded / data.total * 100, 10);
-                self.$uploadProgress.find('.progress-bar').removeClass('progress-bar-success progress-bar-danger').addClass('active progress-bar-warning').css(
-                    'width',
-                    progress + '%'
-                );
-            },
-            fail: function (e, data) {
-                console.log('fail');
-                self.$uploadProgress.find('.progress-bar').removeClass('active').removeClass('progress-bar-success progress-bar-warning').addClass('progress-bar-danger');
-                self.$uploadProgress.find('.progress-bar').text('업로드 실패 / ' + data.errorThrown);
-            }
-        }).prop('disabled', !$.support.fileInput)
-            .parent().addClass($.support.fileInput ? undefined : 'disabled');
+        //     },
+        //     progressall: function (e, data) {
+        //         var progress = parseInt(data.loaded / data.total * 100, 10);
+        //         self.$uploadProgress.find('.progress-bar').removeClass('progress-bar-success progress-bar-danger').addClass('active progress-bar-warning').css(
+        //             'width',
+        //             progress + '%'
+        //         );
+        //     },
+        //     fail: function (e, data) {
+        //         console.log('fail');
+        //         self.$uploadProgress.find('.progress-bar').removeClass('active').removeClass('progress-bar-success progress-bar-warning').addClass('progress-bar-danger');
+        //         self.$uploadProgress.find('.progress-bar').text('업로드 실패 / ' + data.errorThrown);
+        //     }
+        // }).prop('disabled', !$.support.fileInput)
+        //     .parent().addClass($.support.fileInput ? undefined : 'disabled');
 
     };
 
@@ -92,8 +100,7 @@
                 } else {
                     console.log('good');                    
                 }
-            });
-            $temp = null;
+            });         
         }
         else if (event === 'RemoveUploadedFile') {
             $temp = self.$uploadedFile;
@@ -103,7 +110,15 @@
                     if($target.hasClass('chip-close')){
                         $target.parent().fadeOut('fast', function(){
                             $target.parent().remove();
-                            handler({removeFile : $target.parent().data('filename')});
+                            // if(self.$writeForm.data('isnew')){
+                            //     handler({removeFile : $target.parent().data('filename')});
+                            // }else{
+                                handler({
+                                    removeFile : $target.parent().data('filename'),
+                                    projectid : self.$writeForm.data('projectid')
+                                });
+                            // }
+                            
                         });
                     }
                 }

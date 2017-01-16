@@ -2,7 +2,8 @@ extends ../layout_member
 block styles
   include ./includes/style.jade
   -if(menu === 8011)
-    link(rel='stylesheet', href='/plugins/fileupload/css/jquery.fileupload.css')
+    //- link(rel='stylesheet', href='/plugins/fileupload/css/jquery.fileupload.css')
+    link(rel='stylesheet', href='/plugins/jQuery.filer-1.3.0/css/jquery.filer.css')
     //- link(rel='stylesheet', href='/plugins/fileupload/css/style.css')
 block content
   div#wrapper
@@ -22,10 +23,10 @@ block content
 block scripts
   include ./includes/script.jade  
   -if(menu === 8011)
-    script(src='/plugins/fileupload/js/vendor/jquery.ui.widget.js')
-    script(src='/plugins/fileupload/js/jquery.iframe-transport.js')    
-    script(src='/plugins/fileupload/js/jquery.fileupload.js') 
-    script(src='/plugins/bootstrap-validator/dist/validator.min.js')
+    //- script(src='/plugins/fileupload/js/vendor/jquery.ui.widget.js')
+    //- script(src='/plugins/fileupload/js/jquery.iframe-transport.js')    
+    //- script(src='/plugins/fileupload/js/jquery.fileupload.js') 
+    script(src='/plugins/jQuery.filer-1.3.0/js/jquery.filer.min.js') 
 
   - var folder = ''
   - folder = menu === 801 ? 'list' : menu === 8011 ? 'write' : menu === 8012 ? 'detail' : '';

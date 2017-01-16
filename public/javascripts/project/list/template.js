@@ -13,7 +13,7 @@
             6 : '완료',
             7 : '보류',
             10 : '취소'
-        }
+        };
         
 
         this.defaultSpinner = '' +
@@ -44,20 +44,22 @@
             '<div class="col-lg-3 col-md-4 col-sm-6">' +
             '    <div class="ibox" data-projectid={{프로젝트ID}} data-projectindex={{INDEX}}>' +
             '        <div class="ibox-title">' +
-            '            <h5>({{프로젝트ID}}) {{프로젝트명}}</h5>' +
-            '            <div class="ibox-tools"><a style="color:#FFF;" class="btn btn-xs btn-primary" href="/project/detail/{{프로젝트ID}}">상세보기</a></div>' +
+            '            <h5>(ID: {{INDEX}}) {{프로젝트명}}</h5>' +
+            '            <div class="ibox-tools"><a style="color:#FFF;" class="btn btn-xs btn-primary" href="/project/detail/{{INDEX}}">상세보기</a></div>' +
             '        </div>' +
-            '        <div class="ibox-content"><small class="pull-right text-muted">마지막 수정일자 : {{수정일자}}</small>' +            
-            '            <div class="developers">' +
-            '                <p class="font-bold">참여 개발자</p>{{개발자}}' +
+            '        <div class="ibox-content p-xs"><small class="pull-right text-muted">마지막 수정일자 : {{수정일자}}</small>' +            
+            '            <div class="developers" style="display:none;">' +
+            '                <p class="font-bold">개발자</p>{{개발자}}' +
             '            </div>' +
-            '            <div class="ellipsis"><div><p>{{상세내용}}</p></div></div>' +
+            '            <div class="ellipsis"><div><p><strong class="text-muted">DETAIL...</strong><br/>{{상세내용}}</p></div></div>' +
+            '            <div class="hr-line-dashed"></div>' +
+            '            <div class="ellipsis"><div><p><strong class="text-muted">EFFECT...</strong><br/>{{기대효과}}</p></div></div>' +
             '            <div>' +
             '               <span class="font-bold">프로젝트 진행 상태</span>' +
-            '               <div class="stat-percent">{{상태명}}</div>'+
-            '               <div class="progress">' +
-            '                   <div class="progress progress-bar-striped active" style="width: {{상태}}%;">{{상태명}}</div>' +
-            '               </div>' +
+            '               <div class="stat-percent font-bold">{{상태명}}</div>'+
+            '               <div class="progress progress-striped {{상태바}}">' +
+            '                   <div class="progress-bar {{상태바상태}}" style="width: {{상태}}%;">{{상태명}}</div>' +
+            '               </div>' +            
             '            </div>' +
             '            <div class="row m-t-sm">' +
             '                <div class="col-xs-4">' +
@@ -81,13 +83,15 @@
         var view = '';        
         if (jsonData.err === 'NODATA' || jsonData.err) {
             return this.defaultNoProject;
+        } else if (!jsonData.data[0].length){
+            return this.defaultNoProject;
         } else {
             var projects = jsonData.data[0];
             var developers = jsonData.data[1];
             projects.forEach(function(project){
                 var template = self.defaultProjectItem;
                 template = template.replace(/{{INDEX}}/gim, project['인덱스']);
-                template = template.replace(/{{프로젝트ID}}/gim, project['프로젝트ID']);                
+                // template = template.replace(/{{프로젝트ID}}/gim, project['프로젝트ID']);                
                 template = template.replace(/{{프로젝트명}}/gim, project['프로젝트명']);
                 template = template.replace(/{{수정일자}}/gim, project['수정일자']);
 
@@ -95,14 +99,24 @@
 
                 template = template.replace(/{{개발자}}/gim, self.insertProjectDevelopers(project['프로젝트ID'], developers));
                 template = template.replace(/{{상세내용}}/gim, project['상세내용'].replace(/\r?\n/g, '<br />'));
+                template = template.replace(/{{기대효과}}/gim, project['기대효과'].replace(/\r?\n/g, '<br />'));
                 template = template.replace(/{{프로그램}}/gim, project['프로그램'] === 0 ? '공통' :  neo.emrs[project['프로그램']].name);
                 template = template.replace(/{{등록자}}/gim, neo.users.GetUserName(project['등록자']).USER_NAME);
                 template = template.replace(/{{등록일자}}/gim, project['등록일자']);
-                var percent = 0;
-                if(project['상태'] > 0 && project['상태'] < 6) percent = project['상태'] * 16.7;
-                else if(project['상태'] >= 6 ) percent = 100;
-
-                template = template.replace(/{{상태}}/gim, percent);                
+                var projectPercent = 0, barStatus = '', barActive = 'active';                
+                if(project['상태'] == 1) { barStatus = 'progress-bar-primary';}
+                if(project['상태'] == 2) { barStatus = 'progress-bar-primary';}
+                if(project['상태'] == 3) { barStatus = 'progress-bar-primary';}
+                if(project['상태'] == 4) { barStatus = 'progress-bar-primary';}
+                if(project['상태'] == 5) { barStatus = 'progress-bar-primary';}
+                if(project['상태'] == 6) { barStatus = 'progress-bar-success'; barActive = '';}
+                if(project['상태'] == 7) { barStatus = 'progress-bar-warning'; barActive = '';}
+                if(project['상태'] == 10) { barStatus = 'progress-bar-danger'; barActive = '';}
+                if(project['상태'] > 0 && project['상태'] < 6) projectPercent = project['상태'] * 16.7;                
+                else if(project['상태'] >= 6 ) projectPercent = 100;    
+                template = template.replace(/{{상태바}}/gim, barActive);
+                template = template.replace(/{{상태바상태}}/gim, barStatus);
+                template = template.replace(/{{상태}}/gim, projectPercent);                
                 template = template.replace(/{{상태명}}/gim, self.projectStatus[project['상태']]);
 
 
@@ -133,7 +147,7 @@
         }
 
         return view;
-    }
+    };
 
     exports.project = exports.project || {};
     exports.project.Template = Template;

@@ -345,3 +345,9 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAABCAMA
 
 
 }
+
+.list-style4 li {
+    margin: 0;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}

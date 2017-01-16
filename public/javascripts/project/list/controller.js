@@ -3,8 +3,13 @@
 
     function Controller(model, view) {
         console.log('Controller created');
+        var self = this;
         this.model = model;
         this.view = view;
+
+        this.view.bind('projectProgram', function(program){
+            self.showProjectList(program);
+        });
 
         this.showProjectList();
     }

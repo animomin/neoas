@@ -1,4 +1,4 @@
--var project_default = project[0][0], project_file = project[2]
+-var project_default = project[0][0]
 div.wrapper.wrapper-content.project-manager    
     h4 프로젝트 설명
     div.hr-line-dashed  
@@ -9,18 +9,18 @@ div.wrapper.wrapper-content.project-manager
     p !{project_default["기대효과"].replace(/\r?\n/g, '<br />')}
     div.hr-line-dashed
     h5 프로젝트 파일
-    - if(project_file.length)
+    - if(projectFiles.length)
         ul.list-unstyled.project-files            
-            - project_file.forEach(function(file){
-            -   var extension = file['파일명'].split('.');
+            - projectFiles.forEach(function(file){
+            -   var extension = file.split('.');
             -       extension = extension[extension.length-1];
-            -   var url = '/project/' + project_default['프로젝트ID'] + '/' + file['파일명'];
+            -   var url = '/project/' + project_default['인덱스'] + '/' + file;
                 li
                     a.btn.btn-link.btn-xs(href='#{url}')
                         -   if(extension.toLowerCase().match(/jpg|jpeg|png|bmp|gif/))
                                     i.fa.fa-picture-o
                         -   else
                                     i.fa.fa-file
-                        |  #{file["파일명"]}
+                        |  #{file}
             - })        
   

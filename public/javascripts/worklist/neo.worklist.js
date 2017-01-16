@@ -660,9 +660,12 @@
             console.log('View.bind.saveNewWorkList execute!');
             var temp = self.$writeReportSave;
             temp.unbind('click').bind('click', function () {
-                self.$writeReport.fadeOut('fast');
+                
                 self._ParseWorkListData(function (params) {
-                    if (params) handler(params, temp);
+                    if (params){
+                        self.$writeReport.fadeOut('fast');
+                        handler(params, temp);
+                    }                     
                 });
             });
         }
@@ -928,14 +931,14 @@
                 title: '부서를 선택해주세요!'
             }).tooltip('show')
             self.$writePositionKind.focus();
-            return null;
+            return callback(null);
         } else if ((parseInt(params.position_kind) === 0 || parseInt(params.position_kind) === 1 ) && params.position_name === '') {
             self.$writePositionName.tooltip({
                 placement: 'top',
                 title: '부서명을 입력해주세요!'
             }).tooltip('show')
             self.$writePositionName.focus();
-            return null;
+            return callback(null);
         }
 
         self.$writeReportTableFT.rows.all.forEach(function (row) {
