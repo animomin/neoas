@@ -32,6 +32,10 @@
             self.model.updateProjectDevInfo(devinfo);
         });
 
+        this.view.bind('projectdelete', function(project){
+            self.model.deleteProject(project);
+        });
+
     }
 
 

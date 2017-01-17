@@ -24,7 +24,10 @@ div.animated.fadeInUp
       div.row
         div.col-lg-12
           div.m-b-md
-            a.btn.btn-info.btn-sm.pull-right(href='/project/new?id=#{project_default["인덱스"]}') 프로젝트 수정                                     
+            div.btn-group.pull-right                                       
+              -if(project_default["등록자"] === user.USER_ID || project_manager['개발자'] === user.USER_ID)
+                button.btn.btn-info.btn-sm(href='/project/new?id=#{project_default["인덱스"]}') 프로젝트 수정            
+                button.btn.btn-danger.btn-sm#project-delete(data-projectid=project_default["인덱스"]): i.fa.fa-trash
             h3#project-id(data-projectid=project_default["인덱스"]) (ID : #{project_default["인덱스"]} ) #{project_default["프로젝트명"]}
           
       div.hr-line-dashed           

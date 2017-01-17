@@ -27,6 +27,8 @@
 
         this.$projectTerm = $('input.project-dev-term');
 
+        this.$projectDelete = $('button#project-delete');
+
         $('form').validator();
         this.$projectTerm.datepicker({
             format: 'yyyy-mm-dd',
@@ -241,6 +243,25 @@
 
                 handler({ 'project-id': self.$projectid.data('projectid'), devinfotype: type, value: value });
 
+            });
+        }
+        else if (event === 'projectdelete') {
+            $temp = self.$projectDelete;
+            $temp.bind('click', function (e) {
+                var $this = $(this)
+                swal({
+                    title: '프로젝트를 삭제하시겠습니까?',                    
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    cancelButtonText : '아니요',
+                    confirmButtonText: '네, 삭제합니다',
+                    showLoaderOnConfirm : true
+                }).then(function () {
+                    handler({ 'project-id': $this.data('projectid') });
+                })  
+                
             });
         }
     }

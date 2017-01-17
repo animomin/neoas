@@ -141,7 +141,12 @@ router.get('/detail/:projectid', function (req, res, next) {
 
 router.put('/detail/:projectid', function(req, res, next){
   member.UpdateProject(req, function(result){
-    console.log(JSON.stringify(result,null,4));
+    res.send(result);
+  });
+});
+
+router.delete('/detail/:projectid', function(req, res, next){
+  member.DeleteProject(req, function(result){
     res.send(result);
   });
 });

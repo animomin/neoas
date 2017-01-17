@@ -1068,4 +1068,37 @@
       _callback(data);
     });
   };
+
+  exports.DeleteProject = function(req, _callback){
+    var params = req.params;
+    console.log(req);
+    async.waterfall([
+      function (callback) {
+        query = querys16._DeleteProject;
+        query = query.replace('{{인덱스}}', params['projectid']);
+        console.log(query);
+        callback(null);
+      },
+      function (callback) {
+        if (server16.connection.connected) {
+          server16.execute(query, function (err, records) {
+            return callback(err, records);
+          });
+        }
+      }
+    ], function (err, records) {
+      if (err) {
+        logger.error(err);
+        data.err = err;
+        data.data = null;
+      } else if (!records || records.length <= 0) {
+        data.err = 'NODATA';
+        data.data = null;
+      } else {
+        data.err = null;
+        data.data = records;
+      }
+      _callback(data);
+    });
+  };
 })();

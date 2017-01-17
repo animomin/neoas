@@ -751,6 +751,18 @@
     Order By 프로젝트ID, 인덱스 ASC;
 
   </_ProjectDetail>
+  <_DeleteProject>
+    Begin Try
+      Update NeoAs..N_프로젝트
+      Set 삭제 = 1,
+      수정일자 = GETDATE()
+      Where 인덱스 = {{인덱스}}      
+      Select 0 As Status, 'SUCCESS' as Message 
+    End Try
+    Begin CATCH
+      SELECT ERROR_NUMBER() AS Status, ERROR_MESSAGE() AS Message;
+    END CATCH
+  </_DeleteProject>
   <_AddProjectComment>
     Begin Try
       Insert Into NeoAs..N_프로젝트HIS ( 프로젝트ID , 구분, 내용, 작성자, 작성일자 )
