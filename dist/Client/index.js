@@ -371,6 +371,7 @@
                 }
                 query = util.format(query, where, orderby);
                 logger.info(query);
+                console.log(query);
                 return callback2();
             },
             function (callback2) {

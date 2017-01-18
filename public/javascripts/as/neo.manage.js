@@ -147,8 +147,9 @@
       'name': '접수일자', 'title': '접수일', 'type': 'date', 'formatString': 'YYYY-MM-DD', 'breakpoints': 'md sm xs',
       formatter: function (value) {
         if (value === '' || typeof value === 'undefined') return '';
-        var temp = value.split(' ');
-        return temp[0];
+        // var temp = value.format('YYYY-MM-DD');//value.split(' ');
+        // return temp[0];
+        return value.format('YYYY-MM-DD');
       }
     },
     { 'name': '확인자', 'title': '확인자', 'breakpoints': 'md sm xs' },
@@ -156,8 +157,9 @@
       'name': '확인일자', 'title': '확인일', 'type': 'date', 'formatString': 'YYYY-MM-DD', 'breakpoints': 'md sm xs',
       formatter: function (value) {
         if (value === '' || typeof value === 'undefined') return '';
-        var temp = value.split(' ');
-        return temp[0];
+        // var temp = value.format('YYYY-MM-DD');//value.split(' ');
+        // return temp[0];
+        return value.format('YYYY-MM-DD');
       }
     },
     { 'name': '인계자', 'title': '인계자', 'breakpoints': 'md sm xs' },
@@ -165,8 +167,9 @@
       'name': '인계일자', 'title': '인계일', 'type': 'date', 'formatString': 'YYYY-MM-DD', 'breakpoints': 'md sm xs',
       formatter: function (value) {
         if (value === '' || typeof value === 'undefined') return '';
-        var temp = value.split(' ');
-        return temp[0];
+        // var temp = value.format('YYYY-MM-DD');//value.split(' ');
+        // return temp[0];
+        return value.format('YYYY-MM-DD');
       }
     },
     { 'name': '처리자', 'title': '처리자', 'breakpoints': 'md sm xs' },
@@ -174,8 +177,9 @@
       'name': '처리일자', 'title': '처리일', 'type': 'date', 'formatString': 'YYYY-MM-DD', 'breakpoints': 'md sm xs',
       formatter: function (value) {
         if (value === '' || typeof value === 'undefined') return '';
-        var temp = value.split(' ');
-        return temp[0];
+        // var temp = value.format('YYYY-MM-DD');//value.split(' ');
+        // return temp[0];
+        return value.format('YYYY-MM-DD');
       }
     },
     { 'name': '출력', 'title': '', 'breakpoints': 'all' },
