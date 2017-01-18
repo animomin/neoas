@@ -342,12 +342,18 @@ background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAABCAMA
 	background: -ms-linear-gradient(to right, rgba(255, 255, 255, 0), white 50%, white);
 	background: linear-gradient(to right, rgba(255, 255, 255, 0), white 50%, white);
 
-
-
 }
 
 .list-style4 li {
     margin: 0;
     padding: 10px 0;
     border-bottom: 1px solid #eee;
+}
+
+.project-comments-info .label {
+    line-height: 12px;
+    padding: 2px 5px;
+    position: absolute;
+    right: 62px;
+    top: -5px;
 }

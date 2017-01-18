@@ -164,13 +164,13 @@
         mainData.forEach(function (_item) {
             var template = self.defaultPositionKindTag;
             var positionName = (function () {
-                switch (parseInt(_item['부서'])) {                    
+                switch (parseInt(_item['부서'])) {
                     case 0: return '기타';
                     case 1: return '개발실';
                     case 2: return '영업팀';
                     case 3: return 'QC';
                     case 4: return '부가서비스';
-                    case 5: return '총무과';                 
+                    case 5: return '총무과';
                 }
             })();
             template = template.replace('{{부서ID}}', _item['부서']);
@@ -210,10 +210,10 @@
 
         for (var i = 0; i < mainData.length; i++) {
             var template = this.defaultDailyReport;
-            
+
             template = template.replace(/{{보고일자}}/gim, new Date(mainData[i]['보고일자']).GetDate_CustomFormat('YYYY년 MM월 DD일'));
             template = template.replace('{{작성자이름}}', neo.users.GetUserName(mainData[i]['작성자']).USER_NAME);
-            template = template.replace('{{작성일자}}', mainData[i]['작성일자']);
+            template = template.replace('{{작성일자}}', moment(mainData[i]['작성일자']).format('YYYY MMMM Do, a h:mm:ss'));
             // template = template.replace('{{방문일지}}', this.insertWorkHistoryTags(0, { err : null, data : [visitData]}));
             // template = template.replace('{{전화일지}}', this.insertWorkHistoryTags(1, { err : null, data : [null,telData]}));
             // template = template.replace('{{AS일지}}', this.insertWorkHistoryTags(2, { err : null, data : [null,null,asData]}));
@@ -250,7 +250,7 @@
             var item = '';
             if (!data.length) return self.defaultNoWorklist;
             for (var i = 0; i < data.length; i++) {
-                if(data[i]['작성자'] === writer){
+                if (data[i]['작성자'] === writer) {
                     var temp = '' +
                         '   <tr data-target="#work-{{KIND}}{{ID}}{{INDEX}}" class="accordion-toggle collapsed">' +
                         '        <td>{{기관명칭}} <label class="label">{{기관코드}}</label> {{프로그램}}</td>' +
@@ -390,6 +390,7 @@
         // this.$writeASTags = $('span#as-history');
         // this.$writeASContent = $('li#as-history-content');
         this.$writeReportSave = $('button#writeReportSave');
+        this.$listYesterDay = $('button#worklist-date-yesterday')
 
     }
 
@@ -404,10 +405,10 @@
             todayHighlight: true,
             todayBtn: 'linked'
         });
-        this.$datepickers.each(function(){
+        this.$datepickers.each(function () {
             var tagName = $(this)[0].tagName;
             console.log(tagName);
-            if(tagName.toLowerCase() === 'input'){
+            if (tagName.toLowerCase() === 'input') {
                 $(this).attr('readonly', true);
             }
         });
@@ -430,8 +431,8 @@
 
         this.ReportTableInit();
 
-        
-        $('#wrapper').scroll(function(){
+
+        $('#wrapper').scroll(function () {
             if ($(this).scrollTop() > 50) {
                 self.$listScrollTop.fadeIn();
             } else {
@@ -439,12 +440,12 @@
             }
         });
         // scroll body to 0px on click
-        this.$listScrollTop.click(function () {                        
-            $('#wrapper').animate({scrollTop: self.$writeReport.position().top +'px'}, 800);   
+        this.$listScrollTop.click(function () {
+            $('#wrapper').animate({ scrollTop: self.$writeReport.position().top + 'px' }, 800);
             return false;
         });
-        
-        
+
+
 
         callback();
     };
@@ -452,7 +453,7 @@
         var self = this;
         if (!this.$writeReportTableFT) {
             this.$writeReportTableFT = FooTable.init('#' + this.$writeReportTable.attr('id'),
-                {                    
+                {
                     editing: {
                         enabled: true,
                         addRow: function () {
@@ -460,8 +461,8 @@
                             self.$writeReportAddForm[0].reset();
                             self.$writeReportAdd.modal('show').on('shown.bs.modal', function () {
                                 self.$writeReportAdd.find('input#report-add-kind').focus();
-                            }).on('hidden.bs.modal',function(){
-                                if(window.addContinue){
+                            }).on('hidden.bs.modal', function () {
+                                if (window.addContinue) {
                                     window.addContinue = false;
                                     self.$writeReportAddForm[0].reset();
                                     self.$writeReportAdd.modal('show');
@@ -480,8 +481,8 @@
                             self.$writeReportAdd.data('row', row);
                             self.$writeReportAdd.modal('show').on('shown.bs.modal', function () {
                                 self.$writeReportAdd.find('input#report-add-kind').focus();
-                            }).on('hidden.bs.modal',function(){
-                                if(window.addContinue){
+                            }).on('hidden.bs.modal', function () {
+                                if (window.addContinue) {
                                     window.addContinue = false;
                                     self.$writeReportAddForm[0].reset();
                                     self.$writeReportAdd.modal('show');
@@ -497,15 +498,15 @@
             );
         } else {
             if (this.$writeReportTableFT.rows.all.length) {
-                var rows = this.$writeReportTableFT.rows.all;                
+                var rows = this.$writeReportTableFT.rows.all;
                 // rows.forEach(function (row) {
                 //     row.delete();
                 // });
-                for(var i = rows.length -1; i >= 0 ; i--){
+                for (var i = rows.length - 1; i >= 0; i--) {
                     rows[i].delete();
                 }
             }
-            callback = callback || function(){};
+            callback = callback || function () { };
             callback();
         }
     };
@@ -576,12 +577,12 @@
                     self.$writeReportTableFT.rows.add(param);
                 }
 
-                self.$writeReportAdd.modal('hide');                
+                self.$writeReportAdd.modal('hide');
                 // handler(param);
             });
 
             var temp = temp.find('button[data-name="reportAddSaveContinue"]');
-            temp.unbind('click').bind('click', function(e){
+            temp.unbind('click').bind('click', function (e) {
                 window.addContinue = true;
             });
         }
@@ -660,12 +661,12 @@
             console.log('View.bind.saveNewWorkList execute!');
             var temp = self.$writeReportSave;
             temp.unbind('click').bind('click', function () {
-                
+
                 self._ParseWorkListData(function (params) {
-                    if (params){
+                    if (params) {
                         self.$writeReport.fadeOut('fast');
                         handler(params, temp);
-                    }                     
+                    }
                 });
             });
         }
@@ -803,6 +804,12 @@
                 }
             });
         }
+        else if (event === 'listyesterday') {
+            var temp = self.$listYesterDay;
+            temp.bind('click', function (e) {
+                self.$listCalendar.datepicker('setDate', moment().add(-1, 'day').format('YYYY-MM-DD'));
+            });
+        }
     };
 
     View.prototype.render = function (viewCmd, data) {
@@ -847,8 +854,8 @@
                     jsonData = JSON.parse(jsonData);
 
                     var ids = [], filteredData = [];
-                    jsonData.forEach(function(item, index){
-                        if($.inArray(item.id, ids) === -1){
+                    jsonData.forEach(function (item, index) {
+                        if ($.inArray(item.id, ids) === -1) {
                             ids.push(item.id);
                             filteredData.push(item);
                         }
@@ -871,7 +878,7 @@
                 } else {
                     self.$writeReport.removeClass('hidden');
                     self.$writeReport.find('h5#worklist-write-writer').text(
-                        '작성자:' + neo.user.USER_NAME + ' / 작성일자: ' + new Date().GetToday('YYYY년 MM월 DD일 오전/오후 HH:MM:SS')
+                        '작성자:' + neo.user.USER_NAME + ' / 작성일자: ' + moment().format('YYYY MMMM Do, a h:mm:ss')
                     );
                     self.$writePositionKind.selectpicker('val', '');
                     self.$writePositionName.val('');
@@ -880,29 +887,29 @@
 
                 self.$writeReport.fadeIn('fast');
             },
-            editReport : function(){
+            editReport: function () {
                 var report_index = data['인덱스'];
                 var jsData = JSON.parse(data['기타업무']);
-                (function(callback){
+                (function (callback) {
                     self.$writeReport.removeData('reportindex').data('reportindex', report_index);
-                    self.$listDailyReports.find('.dailyReports[data-reportindex="'+report_index+'"]').fadeOut();
+                    self.$listDailyReports.find('.dailyReports[data-reportindex="' + report_index + '"]').fadeOut();
                     self.$writeReport.find('h5#worklist-write-writer').text(
-                        '작성자:' + neo.user.USER_NAME + ' / 작성일자: ' + new Date().GetToday('YYYY년 MM월 DD일 오전/오후 HH:MM:SS')
+                        '작성자:' + neo.user.USER_NAME + ' / 작성일자: ' + moment().format('YYYY MMMM Do, a h:mm:ss')
                     );
                     self.$writePositionKind.selectpicker('val', data['부서']);
                     self.$writePositionName.val(data['부서명']);
-                    self.ReportTableInit(function(){
-                        jsData.forEach(function(item){
+                    self.ReportTableInit(function () {
+                        jsData.forEach(function (item) {
                             self.$writeReportTableFT.rows.add(item);
                         });
                     });
-                    setTimeout(function(){
+                    setTimeout(function () {
                         callback();
-                    }, 800);                    
-                })(function(){
+                    }, 800);
+                })(function () {
                     self.$writeReport.removeClass('hidden');
-                    $('#wrapper').animate({scrollTop: self.$writeReport.position().top +'px'}, 1000);                    
-                });                
+                    $('#wrapper').animate({ scrollTop: self.$writeReport.position().top + 'px' }, 1000);
+                });
             }
         };
         viewCommands[viewCmd]();
@@ -910,7 +917,7 @@
 
     View.prototype._ParseWorkListData = function (callback) {
         var self = this;
-        var params = {            
+        var params = {
             report_date: self.$listCalendar.datepicker('getDate').GetDate_CustomFormat('YYYY-MM-DD'),
             position_kind: self.$writePositionKind.selectpicker('val'),
             position_name: self.$writePositionName.val().trim(),
@@ -920,7 +927,7 @@
         };
 
         var report_index = self.$writeReport.data('reportindex');
-        if(report_index){
+        if (report_index) {
             params.report_index = report_index;
             self.$writeReport.removeData('reportindex');
         }
@@ -932,7 +939,7 @@
             }).tooltip('show')
             self.$writePositionKind.focus();
             return callback(null);
-        } else if ((parseInt(params.position_kind) === 0 || parseInt(params.position_kind) === 1 ) && params.position_name === '') {
+        } else if ((parseInt(params.position_kind) === 0 || parseInt(params.position_kind) === 1) && params.position_name === '') {
             self.$writePositionName.tooltip({
                 placement: 'top',
                 title: '부서명을 입력해주세요!'
@@ -1011,7 +1018,7 @@
         //////////////////////////////////////////////////////////////////////////////////////////////////
         this.view.bind('switchDate', function (param) {
             window.worklistDateChange = false;
-            if(window.worklistLoad) self.showDailyReportsList(param);
+            if (window.worklistLoad) self.showDailyReportsList(param);
         });
 
         this.view.bind('searchDailyReports');
@@ -1027,6 +1034,8 @@
         this.view.bind('reportEdit', function (param) {
             self.editReport(param);
         });
+
+        this.view.bind('listyesterday');
 
         //////////////////////////////////////////////////////////////////////////////////////////////////
 

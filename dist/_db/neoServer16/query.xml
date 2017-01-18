@@ -530,7 +530,7 @@
         기타업무, 작성자, 작성일자, 보고일자, 부서, 부서명, 삭제
       )
       Values (
-        '{{기타업무}}', {{작성자}}, '{{작성일자}}', '{{보고일자}}', {{부서}}, '{{부서명}}', 0
+        '{{기타업무}}', {{작성자}}, GETDATE(), '{{보고일자}}', {{부서}}, '{{부서명}}', 0
       )
       Select 0 As Status, 'SUCCESS' as Message, max(인덱스) as 'index'  From NeoAs..N_업무보고
     End Try
@@ -543,7 +543,7 @@
       Update NeoAS..N_업무보고
       SET 기타업무 = '{{기타업무}}',
       작성자 = {{작성자}},
-      작성일자 = '{{작성일자}}',
+      작성일자 = GETDATE(),
       보고일자 = '{{보고일자}}',
       부서 = {{부서}},
       부서명 = '{{부서명}}'
@@ -731,6 +731,10 @@
     Where P.삭제 = 0
     Group By D.프로젝트ID, D.개발자, D.책임자
     Order By D.프로젝트ID;
+
+    Select 인덱스, 프로젝트ID, 구분, 내용, 작성자, CONVERT(varchar, 작성일자, 120) AS 작성일자
+    From NeoAs..N_프로젝트HIS    
+    Order By 프로젝트ID, 인덱스 ASC;
 
   </_ProjectList>
   <_ProjectDetail>
