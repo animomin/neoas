@@ -2039,7 +2039,7 @@ div.dt-button-info {
     text-transform: uppercase;
 }
 
-.pace {
+/*.pace {
     -moz-user-select: none;
     pointer-events: none;
 }
@@ -2060,7 +2060,7 @@ div.dt-button-info {
 
 .pace-inactive {
     display: none;
-}
+}*/
 
 .widget {
     border-radius: 5px;
@@ -7385,7 +7385,7 @@ body.body-small .vote-icon {
     }
 }
 
-.landing-page.pace .pace-progress {
+/*.landing-page.pace .pace-progress {
     background: #fff none repeat scroll 0 0;
     height: 2px;
     left: 0;
@@ -7397,7 +7397,7 @@ body.body-small .vote-icon {
 
 .pace-inactive {
     display: none;
-}
+}*/
 
 body.landing-page {
     background-color: #fff;

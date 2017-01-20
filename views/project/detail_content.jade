@@ -16,7 +16,7 @@ div.wrapper.wrapper-content.project-manager
             -       extension = extension[extension.length-1];
             -   var url = '/project/' + project_default['인덱스'] + '/' + file;
                 li
-                    a.btn.btn-link.btn-xs(href='#{url}')
+                    a.btn.btn-link.btn-xs(href='#{url}', download)
                         -   if(extension.toLowerCase().match(/jpg|jpeg|png|bmp|gif/))
                                     i.fa.fa-picture-o
                         -   else

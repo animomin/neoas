@@ -140,8 +140,8 @@
                 if ($target.hasClass('project-history-edit')) {
                     var $container = $target.parent().parent();
                     $target.fadeOut('fast');
-                    $container.find('div.col-sm-2').fadeOut('fast');
-                    $container.find('div.col-sm-10').fadeOut('fast', function () {
+                    $container.find('div.col-sm-1').fadeOut('fast');
+                    $container.find('div.col-sm-11').fadeOut('fast', function () {
                         var historyEditTemplate = self.template.historyEditForm;
                         historyEditTemplate = historyEditTemplate.replace('{{인덱스}}', $target.data('projectid'));
                         historyEditTemplate = historyEditTemplate.replace('{{COMMENTID}}', $target.data('historyid'));

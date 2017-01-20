@@ -303,7 +303,7 @@
           },
           dataType: 'json',
           method: 'GET',
-          async: false,
+          async: true,
           beforeSend: function () {
             _this.data = null;
             $('h1.total_as').text('0 건');
@@ -344,7 +344,7 @@
           },
           dataType: 'json',
           method: 'GET',
-          async: false,
+          async: true,
           beforeSend: function () {
             // 지사별 AS건수 AREA LOADING SHOW
             _this.area = {};
@@ -523,7 +523,7 @@
           },
           dataType: 'json',
           method: 'GET',
-          async: false,
+          async: true,
           beforeSend: function () {
             // 직원별 AS건수 AREA LOADING SHOW
             _this.data = null;
@@ -661,7 +661,7 @@
           },
           dataType: 'json',
           method: 'GET',
-          async: false,
+          async: true,
           beforeSend: function () {
             _this.data = null;
             if (window.memberAllChart_day) {
@@ -759,7 +759,7 @@
           },
           dataType: 'json',
           method: 'GET',
-          async: false,
+          async: true,
           success: function (opts, result) {
             console.log(result);
             var $table = $('<table/>');

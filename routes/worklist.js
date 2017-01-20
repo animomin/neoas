@@ -42,4 +42,10 @@ router.delete('/list', function (req, res, next) {
   });
 });
 
+router.get('/detail', function(req, res, next){
+  member.GetDailyReportDetail(req, function(result){
+    res.send(result);
+  });
+});
+
 module.exports = router;

@@ -1348,7 +1348,7 @@
       },
       dataType: 'json',
       method: 'GET',
-      async: true,
+      async: false,
       beforeSend: function () { },
       success: function (result) {
         _callback(result);
@@ -1419,7 +1419,7 @@
       data: _data,
       dataType: 'json',
       method: 'PUT',
-      async: true,
+      async: false,
       beforeSend: function () { },
       success: function (result) {
         _callback(result);
@@ -1438,7 +1438,7 @@
       data: _data,
       dataType: 'json',
       method: 'POST',
-      async: true,
+      async: false,
       beforeSend: function () {
         if (_loader) {
           if (!_loader.find('i').length) {
@@ -1475,7 +1475,7 @@
       data: _item,
       dataType: 'json',
       method: 'GET',
-      async: true,
+      async: false,
       beforeSend: function () {
         if (self.storage) {
           self.storage.removeData('historyList');
@@ -1518,7 +1518,7 @@
       data: _item,
       dataType: 'json',
       method: 'GET',
-      async: true,
+      async: false,
       beforeSend: function () {
         if (self.storage) {
           self.storage.removeData('historyListWriters');
@@ -1546,7 +1546,7 @@
       data: _item,
       dataType: 'json',
       method: 'GET',
-      async: true,
+      async: false,
       beforeSend: function () {
       },
       success: function (result) {

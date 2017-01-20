@@ -735,6 +735,47 @@
     });
   };
 
+  exports.GetDailyReportDetail = function(req, _callback){
+    var params = req.query;
+    
+    async.waterfall([
+      function (callback) {
+        query = querys16._DailyReportDetail;
+        if(parseInt(params.kind) === 5){  //AS일지 
+          query = query.replace('{{내용}}', '문의내용 AS 내용');
+          query = query.replace('{{테이블}}', 'N_Service');          
+        }else{  // 전화, 방문일지
+          query = query.replace('{{내용}}', '내용');
+          query = query.replace('{{테이블}}', 'N_병원일지');
+        }
+
+        query = query.replace('{{인덱스}}', params.index);
+        console.log(query);
+        callback(null);
+      },
+      function (callback) {
+        if (server16.connection.connected) {
+          server16.RecordSet(query, function (err, records) {
+            callback(err, records);
+          });
+        }
+      }
+    ], function (err, records) {
+      if (err) {
+        logger.error(err);
+        data.err = err;
+        data.data = null;
+      } else if (!records || records.length <= 0) {
+        data.err = 'NODATA';
+        data.data = null;
+      } else {
+        data.err = null;
+        data.data = records;
+      }
+      _callback(data);
+    });  
+  };
+
   exports.GetNewProjectID = function (_callback) {
     async.waterfall([
       function (callback) {

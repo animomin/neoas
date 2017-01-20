@@ -1,4 +1,4 @@
--var project_default = project[0][0], project_dev = project[1], project_manager = null;
+-var project_default = project[0][0], project_dev = project[1], project_manager = {'개발자':0};
 - var projectPercent = 0, barStatus = '', projectStatus = '', barActive = 'active';
 
 - if(project_default['상태'] == 0) projectStatus = '접수';
@@ -16,6 +16,7 @@
 - if(project_dev.length){
 -    project_manager = project_dev.find(function(m){ return m['책임자'] === 1;})
 - }
+
 
 //- div= JSON.stringify(project_default,null, 4)
 div.animated.fadeInUp
