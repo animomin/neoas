@@ -301,6 +301,7 @@
     this.template = template;
 
     this.$areaAll = $('button#area-all');
+    this.$neoAreas = $('select#neoAreas');
     this.$hospSearch = $('input#search');
     this.$hospitalList = $('tbody#hospital-list');
     this.$hospManager = $('select.neoMembers');
@@ -394,15 +395,35 @@
         forceParse: false,
         autoclose: true,
         todayHighlight: true,
-        todayBtn: 'linked'        
+        todayBtn: 'linked'
       }).attr('readonly', true);
     });
 
 
     if (neo.user.user_area !== '0000') {
       var p = this.$areaAll.parent();
-      p.addClass('hidden').siblings().removeClass('hidden');
+      p.addClass('hidden'); //.siblings().removeClass('hidden');
+      //console.log(this.$areaAll.parent().siblings());
+      this.$areaAll.parent().siblings().filter('.input-group-addon').removeClass('hidden');
       p = null;
+    } else {
+      if (neo.user.user_login_id.match(/animomin|president|jaehyukj/gim)) {
+
+        this.$areaAll.parent().addClass('hidden');
+        this.$neoAreas.parent().removeClass('hidden');
+        for (var area in neo.area) {
+          this.$neoAreas.append(
+            '<option value="' + area + '">' + neo.area[area] + '</option>'
+          );
+        }
+        this.$neoAreas.selectpicker({
+          width: 'fit',
+          liveSearch: true,
+          size: 5,
+          title: '지사선택'
+        });
+
+      }
     }
 
   }
@@ -436,6 +457,13 @@
       var temp = self.$hospManager;
       temp.unbind('changed.bs.select').bind('changed.bs.select', function (event) {
         handler(self.$hospSearch.val().trim());
+      });
+    } else if (event === 'area') {
+      console.log('View.bind.area execute!');
+      var temp = self.$neoAreas;
+      temp.unbind('changed.bs.select').bind('changed.bs.select', function (e) {
+        self.$hospManager.selectpicker('deselectAll');
+        handler(self.$neoAreas.selectpicker('val'), self.$hospSearch.val().trim());
       });
 
       /**
@@ -1067,7 +1095,14 @@
       self.model.hospManager = self.view.$hospManager.selectpicker('val');
 
       self.showHospList();
-    })
+    });
+
+    this.view.bind('area', function (area, search) {
+      self.model.hospAreaAll = false;
+      self.model.area = area;
+      self.model.hospSearch = search;
+      self.showHospList();
+    });
 
     this.view.bind('hospClick', function (item) {
 
@@ -1320,6 +1355,7 @@
     console.log('Model');
     this.storage = storage;
     this.hospAreaAll = false;
+    this.area = '';
     this.hospSearch = '';
     this.hospManager = '';
   }
@@ -1342,7 +1378,7 @@
     $.ajax({
       url: '/manage/hosplist',
       data: {
-        area: this.hospAreaAll ? '' : neo.user.user_area,
+        area: this.hospAreaAll ? '' : this.area !== '' ? this.area : neo.user.user_area,
         search: this.hospSearch,
         manager: this.hospManager
       },

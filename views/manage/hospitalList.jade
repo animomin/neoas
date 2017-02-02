@@ -3,6 +3,8 @@ div.panel-heading.no-padding
     div.input-group        
       span.input-group-btn
         button.btn.btn-default#area-all 전체        
+      span.input-group-btn.hidden
+        select.selectpicker#neoAreas(title='지사')
       span.input-group-addon.hidden
         i.fa.fa-search
       span.input-group-btn
@@ -10,7 +12,7 @@ div.panel-heading.no-padding
       input.input.form-control#search(
         type='text',
         placeholder='요양기관검색')                
-    
+      
 div.sidebar-container
   div.scroll-container(data-name='hospital-list')      
     table.table.table-hover.table-condensed.table-bordered.table-responsive
