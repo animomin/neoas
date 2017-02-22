@@ -81,8 +81,7 @@ exports.isConnected = function(){
 Connect(function(){
   var query = querys16._DataBaseUpdate;
   exports.execute(query, function(err,data){
-    logger.info('DATABASE UPDATE ::: ', err, data);
-    console.log('DATABASE UPDATE ::: ', err, data);
+		console.log('Server 16 connected');
   });
 });
 

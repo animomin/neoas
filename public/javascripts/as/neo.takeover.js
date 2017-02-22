@@ -292,6 +292,7 @@
                     $item.find('td.tb-value[data-id="세부화면"]').text(item.세부화면);
 
                     var question = $item.find('div[data-name="문의내용"]');
+                    question.find('img').addClass('img-preview').css('width', '100%');
                     question.find('img.img-preview').bind('click', function() { _me.events.onPopupImage(this); });
 
                     $item.find('a.takeover-option').bind('click', _me.events.onTakeoverOption);
