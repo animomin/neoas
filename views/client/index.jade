@@ -67,71 +67,11 @@ block scripts
   script.
     var tour;
     $(document).ready(function(){
-        $('#astype').val('0'); // 자꾸 1로 들어가서 로드되면 0으로 일단 셋팅
+      $('#astype').val('0'); // 자꾸 1로 들어가서 로드되면 0으로 일단 셋팅
         
-        tour = new Tour({
-        smartPlacement : true,
-        backdrop : true,
-        backdropContainer : '#wrapper',
-        storage: false,
-        keyboard : false,
-        template: "<div class='popover tour' role='tooltip'>" +
-                  "  <div class='arrow'></div>" +
-                  "  <h3 class='popover-title'></h3>" +
-                  "  <div class='popover-content'></div>" +
-                  "  <div class='popover-navigation'>" +
-                  "      <button class='btn btn-default btn-xs' data-role='prev'>« 이전</button>" +
-                  "      <span data-role='separator'>|</span>" +
-                  "      <button class='btn btn-default btn-xs' data-role='next'>다음 »</button>" +
-                  "      <button class='btn btn-default btn-xs' data-role='end'>닫기</button>" +
-                  "  </div>" +                  
-                  "</div>",
-        steps : [
-          {
-            placement: "bottom",
-            element : '#client-easy',
-            title : 'AS예약 간편접수',
-            content : '전달하실 내용이 많거나, 상세내용을 작성할 여유가 없으시면 바로 예약접수할 수 있습니다.'
-          },
-          {
-            placement: "bottom",
-            element : '#client-easy-content',
-            title : 'AS예약 간편접수',
-            content : '접수하시는분의 성함과 연락처를 남겨주세면 담당자가 신속하게 연락드릴 수 있습니다.(선택사항)'
-          },
-          {
-            placement: "top",
-            element : '#client-detail',
-            title : 'AS예약 상세접수',
-            content : '담당자에게 전달할 내용이 있으시면 상세내용을 작성할수 있습니다.'
-          },
-          {
-            placement: "bottom",
-            element : '.note-mybutton',
-            title : 'AS예약 상세접수',
-            content : 'AS예약 접수구분을 선택하여 접수하실 수 있습니다.'            
-          },
-          {
-            placement: "top",
-            element : '#capture',
-            title : 'AS예약 상세접수',
-            content : '현재 사용자의 컴퓨터 화면을 캡쳐해서 같이 보내주실 수 있습니다.'
-          },
-          {
-            placement: "left",
-            element : '#client-history',
-            title : 'AS예약',
-            content : '병원에서 AS접수하셨던 내역을 확인할 수 있으며, 문제가 있는 부분은 리콜을 통해 다시 접수하실 수 있습니다.'
-          },
-          {
-            placement: "left",
-            element : '#client-help',
-            title : 'AS예약',
-            content : '이 도움말을 실행합니다.'
-          }
-        ]
+      $("input#exe").bind("change", function() {
+        $('#wrapper').text($(this).val());
       });
-      tour.init();
       
       
       

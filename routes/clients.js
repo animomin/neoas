@@ -4,15 +4,15 @@ var router = express.Router();
 /* GET users listing. */
 router.get('/', function(req, res, next) {
   // res.send('respond with a resource');
-  var ip =  req.headers["X-Forwarded-For"] || req.headers["x-forwarded-for"] || req.client.remoteAddress;
-  console.log(ip);
-  if(ip.indexOf('211.238.39.148') >= 0 || ip.indexOf('::1') >= 0 ){
-     res.render('client', params.GetASClientParams(req));
+  // var ip =  req.headers["X-Forwarded-For"] || req.headers["x-forwarded-for"] || req.client.remoteAddress;
+  // console.log(ip);
+  // if(ip.indexOf('211.238.39.148') >= 0 || ip.indexOf('::1') >= 0 ){
+  //    res.render('client', params.GetASClientParams(req));
      //res.render('client/accept');
     // res.render('client/client_index');
-  }else{
+  // }else{
    res.render('client/main', params.GetASClientParams(req));
-  }
+  // }
 
 });
 
@@ -31,6 +31,10 @@ router.get('/index', function(req, res, next){
   }else{
    //res.render('client/main', params.GetASClientParams(req));
   }
+});
+
+router.get('/chat', function(req, res, next){
+  res.render('client/chat');
 });
 
 

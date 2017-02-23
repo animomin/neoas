@@ -1,0 +1,76 @@
+extends ./chat_layout
+
+block content
+    div.container-fluid.no-padding
+        div.row
+            div.col-xs-12
+                form(role='form',method='post',action='/clients/chat', enctype='multipart/form-data')                 
+                    div.ibox.m-b-none#client-detail
+                        div.ibox-title
+                            h5 AS 예약 접수   
+                            //- div.ibox-tools
+                            //-   button.btn.btn-warning.btn-xs.btn-outline#client-history 접수내역
+                            //-   button.btn.btn-warning.btn-xs.btn-outline#client-help 도움말
+                        div.ibox-content
+                            p 불편사항을 미리적어주시면 빠르게 도움을 드릴 수 있습니다.
+                            p 아래의 접수자 정보를 확인하시고 예약하기 버튼을 클릭해주세요.                               
+                            div.form-group                                
+                                input.form-control(type='text',id='client_name',name='client_name',placeholder='이름')
+                            div.input-group
+                                span.input-group-addon 연락처
+                                input.form-control.input.input-block.block(type='text',id='client_contact',name='client_contact')
+                                span.input-group-addon(style='border-left:0;border-right:0;') 내선번호
+                                input.form-control.input.input-block.block(type='text',id='client_contact2',name='client_contact2')                            
+                        div.ibox-content    
+                            div.form-group
+                                label.control-label 접수분류: 
+                                div.btn-group
+                                    button.btn.btn-md.btn-primary.btn-outline.btn-astype(type='button', data-astype="1") 프로그램장애
+                                    button.btn.btn-md.btn-primary.btn-outline.btn-astype(type='button', data-astype="2") 사용법문의
+                            div.form-group
+                                label.control-label 문의내용
+                                div#comment-placeholder.hidden
+                                textarea.form-control.summernote(id='comment',name='comment',rows='10')              
+                            div.row.m-b-md#captureImages
+                            div.row
+                                div.col-xs-6
+                                    input.btn-primary(type='file', accept='image/*', name='uploadimage', id='uploadimage', multiple, title="이미지 첨부",data-filename-placement='inside')
+                                    //- label.btn.btn-primary.btn-block.full-width.m-b(title='사진첨부', for='uploadimage')
+                                    //-     input.hide(type='file',accept='image/*' name='uploadimage', id='uploadimage')
+                                    //-     span.small 사진첨부
+                                div.col-xs-6                             
+                                    button.btn.btn-primary.btn-block.full-width.m-b(type='button', id='capture') 캡쳐
+                                div.col-xs-12
+                                    button.btn.btn-success.block.full-width.m-b(type='submit') 예약하기   
+                            
+                        
+                        input(type='hidden', id='hospnum', name='hospnum')
+                        input(type='hidden', id='hospname', name='hospname')
+                        input(type='hidden', id='area', name='area')
+                        input(type='hidden', id='program', name='program')
+                        input(type='hidden', id='exe', name='exe')
+                        input(type='hidden', id='pcinfo', name='pcinfo')  
+                        input(type='hidden', id='curversion', name='curversion')      
+                        input(type='hidden', id='bohum', name='bohum')
+                        input(type='hidden', id='hosp_contact', name='hosp_contact')
+                        input(type='hidden', id='pacs', name='pacs')
+                        input(type='hidden', id='servername', name='servername')
+                        input(type='hidden', id='serverid', name='serverid')
+                        input(type='hidden', id='serverpw', name='serverpw')
+                        input(type='hidden', id='dbname', name='dbname')
+                        input(type='hidden', id='certpw', name='certpw')
+                        input(type='hidden', id='openperson', name='openperson')
+                        input(type='hidden', id='sutak', name='sutak')             
+                        input(type='hidden', id='os', name='os')             
+                        input(type='hidden', id='sqlversion', name='sqlversion')       
+                        input(type='hidden', id='astype', name='astype', value=0)    
+                        input(type='hidden', id='masterSuga', name='masterSuga')       
+                        input(type='hidden', id='masterDrug', name='masterDrug')       
+                        input(type='hidden', id='masterMaterial', name='masterMaterial') 
+                        input(type='hidden', id='manager', name='manager') 
+
+block scripts
+    script(src='/plugins/fileinput/bootstrap.file-input.js')
+    script(src='/javascripts/clients/neo.chat.js')
+    
+        
