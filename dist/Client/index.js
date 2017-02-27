@@ -30,9 +30,10 @@
                 var comment = req.comment + "";
                 comment = comment.trim();
 
+                // 2017-02-27 본사, 메디본사, 메디남부 접수시 바로 인계처리 
                 var query = util.format(
                     global.querys16._Request,
-                    req.hospnum, req.hospname, req.area, req.program, req.pcinfo,
+                    req.hospnum, req.hospname, req.area, req.program, /0000|0030|0031/.test(req.area) ? '2' : '0', req.pcinfo,
                     req.client_name, req.client_contact, comment, req.curversion,
                     req.bohum, req.hosp_contact, req.pacs, req.servername, req.serverid,
                     req.serverpw, req.dbname, req.certpw, req.openperson, req.sutak, req.exe,
