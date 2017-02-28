@@ -135,7 +135,7 @@ exports.isConnected = function () {
 Connect(function () {
 	ConnectToIntra(function () {
 		// console.log(connection);
-		console.log('Server 22 connected');
+		console.log('Server 22 connected // ', connection.config.server);		
 		// 22번 관리자 계정으로 로그인 후 다시 export
 		exports.connection = connection;
 		exports.connected = connection.connected;

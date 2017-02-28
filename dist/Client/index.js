@@ -33,7 +33,7 @@
                 // 2017-02-27 본사, 메디본사, 메디남부 접수시 바로 인계처리 
                 var query = util.format(
                     global.querys16._Request,
-                    req.hospnum, req.hospname, req.area, req.program, /0000|0030|0031/.test(req.area) ? '2' : '0', req.pcinfo,
+                    req.hospnum, req.hospname, req.area, req.program, /0000|0030|0031/.test(req.area) && req.manager != 0 ? '2' : '0', req.pcinfo,
                     req.client_name, req.client_contact, comment, req.curversion,
                     req.bohum, req.hosp_contact, req.pacs, req.servername, req.serverid,
                     req.serverpw, req.dbname, req.certpw, req.openperson, req.sutak, req.exe,
@@ -42,6 +42,7 @@
                 );
                 logger.info('Ready to Execute :::');
                 logger.info(query);
+                console.log(query);
                 if (server16.connection.connected) {
                     server16.execute(query, function (err, records) {
                         callback2(err, records);
@@ -409,7 +410,7 @@
                 var where = '';
 
                 where += " AND LEFT(convert(varchar(10), 접수일자, 120),7) = '" + params.month + "'";
-                
+
                 // query = util.format(query, where);
                 query = query.replace('{{검색조건}}', where);
                 console.log(query);
@@ -434,7 +435,7 @@
             } else {
                 data.err = null;
 
-                records.forEach(function(element) {
+                records.forEach(function (element) {
                     element['지사코드'] = global.area[element['지사코드']];
                     element['확인자지사'] = global.area[element['지사코드']];
                     element['인계자지사'] = global.area[element['지사코드']];
@@ -444,9 +445,9 @@
 
                 data.data = records;
 
-                
 
-            }            
+
+            }
             return callback(data);
         });
     };
