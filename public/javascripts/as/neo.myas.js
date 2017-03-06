@@ -705,6 +705,7 @@
         $(_this.$edit).summernote({
           toolbar  : _me.editor.toolbar,
           popover : _me.editor.popover,
+          disableDragAndDrop: true,
           lang : 'ko-KR',
           height: 500,
           buttons : _me.editor.buttons

@@ -969,6 +969,7 @@
           toolbar  : _me.editor.toolbar,
           popover : _me.editor.popover,
           lang : 'ko-KR',
+          disableDragAndDrop: true,
           height: 500,
           buttons : _me.editor.buttons
         });
