@@ -860,7 +860,7 @@
         });
         function _drawComment(comment){
           var comment = comment.trim();
-          comment = comment.replace(/src="uploads/,'src="/uploads');
+          comment = comment.replace(/src="uploads/gim,'src="/uploads');
           _me.selItem.data.문의내용 = comment;
           if(comment.indexOf('<span id="template">') >= 0){
             target.summernote('code', comment + TmpltTable);
@@ -1528,7 +1528,7 @@
                 // _me.elem.$edit_q.summernote('insertNode', img);
                 var img = $('<img />').addClass('img-preview').attr({
                             'src' : 'uploads/'+sendData.oParams.picName,
-                            'style' : 'width:25%;'
+                            'style' : 'width:100%;'
                           });
                 if(target_elem.is(_me.selItem.$elem)){
                   $('span#question').prepend(img);
