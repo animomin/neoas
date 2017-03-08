@@ -90,7 +90,7 @@ router.post('/upload', function (req, res, next) {
     var img = files.capture[0];
     fs.readFile(img.path, function (err, data) {
       // var path = "./public/uploads/" + img.originalFilename;
-      if (!fs.existsSync('public/uploads')) fs.mkdirSync('public/uploads');
+      if (!fs.existsSync('../public/uploads')) fs.mkdirSync('../public/uploads');
       var path = global.path.join(__dirname, '../public/uploads', img.originalFilename);
       fs.writeFile(path, data, function (err) {
         if (err) {
