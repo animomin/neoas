@@ -368,6 +368,8 @@
                     $item.find('a[data-name="인계자"]').text(item.인계자);
                     $item.find('small[data-name="인계일자"]').text(item.인계일자);
                     $item.find('small[data-name="인덱스"]').text(item.인덱스);
+                    $item.find('span[data-name="담당자"]').text(item.담당자 != 0 ? neo.users.GetUserName(item.담당자).USER_NAME : '미정');
+
                     $item.find('h5[data-name="기관명칭"]').text(item.기관명칭 + ' (' + item.기관코드 + ')');
                     item.문의내용 = item.문의내용.replace(/src="uploads/gim, 'src="/uploads');
                     $item.find('div[data-name="문의내용"]').html(item.문의내용);
