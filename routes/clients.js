@@ -59,25 +59,36 @@ router.post('/require', function (req, res, next) {
   form.parse(req, function (err, fields, files) {
     logger.info('AS Require insert ::: ');
     logger.info(err, fields, files);
-    var img = files.uploadimage[0];
-    fs.readFile(img.path, function (err, data) {
-      // var path = "./public/uploads/" + img.originalFilename;
-      var path = global.path.join(__dirname, '../public/uploads', img.originalFilename);
-      fs.writeFile(path, data, function (err) {
-        if (err) logger.error('(AS Require) IMAGE UPLOAD FAILED :: ', err);
-        if (!err) {
-          fields.comment = '<p><img class="img-preview" src="uploads/' + img.originalFilename +
-            '" data-filename="' + img.originalFilename +
-            '" style="width: 100%;"></p>' + fields.comment;
-        }
-        client.Accept(fields, function (err, data) {
-          if (err) logger.error('AS Require insert FAILED :: ', err);
+    if (files) {
+      var img = files.uploadimage[0];
+      fs.readFile(img.path, function (err, data) {
+        // var path = "./public/uploads/" + img.originalFilename;
+        var path = global.path.join(__dirname, '../public/uploads', img.originalFilename);
+        fs.writeFile(path, data, function (err) {
+          if (err) logger.error('(AS Require) IMAGE UPLOAD FAILED :: ', err);
           if (!err) {
-            res.render('client/room', { bodyClass: "", index: data[0].index, area: fields.area, data: fields });
+            fields.comment = '<p><img class="img-preview" src="uploads/' + img.originalFilename +
+              '" data-filename="' + img.originalFilename +
+              '" style="width: 100%;"></p>' + fields.comment;
           }
+          client.Accept(fields, function (err, data) {
+            if (err) logger.error('AS Require insert FAILED :: ', err);
+            if (!err) {
+              res.render('client/room', { bodyClass: "", index: data[0].index, area: fields.area, data: fields });
+            }
+          });
         });
       });
-    });
+    } else {
+      client.Accept(fields, function (err, data) {
+        if (err) logger.error('AS Require insert FAILED :: ', err);
+        if (!err) {
+          res.render('client/room', { bodyClass: "", index: data[0].index, area: fields.area, data: fields });
+        }
+      });
+    }
+    // var img = files.uploadimage[0];
+
   });
 });
 
